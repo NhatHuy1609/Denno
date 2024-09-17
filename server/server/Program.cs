@@ -1,5 +1,5 @@
-using Azure.Identity;
-using Azure.Security.KeyVault.Secrets;
+using Polly;
+using Polly.Retry;
 using server.Infrastructure;
 using server.Infrastructure.Configurations;
 using server.Infrastructure.ServiceConfigurations;

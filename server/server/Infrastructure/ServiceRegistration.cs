@@ -4,8 +4,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Polly;
+using Polly.Retry;
 using server.Data;
-using server.Helpers.TypeSafe;
 using server.Infrastructure.Configurations;
 using server.Infrastructure.ServiceConfigurations;
 using server.Interfaces;
@@ -18,16 +19,16 @@ namespace server.Infrastructure
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services, string? connectionStringConfigName) 
         {
-            services.AddDbContext<ApplicationDBContext>(options =>
-            {
-                options.UseSqlServer(connectionStringConfigName);
-            });
-
             services.AddHttpClient<GoogleService>();
             services.AddScoped<IGoogleService, GoogleService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IDataStore, EFGoogleDataStore>();
+
+            services.AddDbContext<ApplicationDBContext>(options =>
+            {
+                options.UseSqlServer(connectionStringConfigName);
+            });
 
             return services;
         }
@@ -73,10 +74,6 @@ namespace server.Infrastructure
                 {
                     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                })
-                .AddCookie(options =>
-                {
-                    options.Cookie.Name = TS.Cookies.AccessToken;
                 })
                 .AddJwtBearer(options =>
                 {

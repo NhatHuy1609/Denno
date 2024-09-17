@@ -219,7 +219,7 @@ namespace server.Controllers
             return Ok(response);
         }
 
-        [HttpPost("revoke")]
+        [HttpDelete("revoke")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> RevokeToken()
