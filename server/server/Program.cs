@@ -1,5 +1,4 @@
-using Polly;
-using Polly.Retry;
+using server.Exceptions;
 using server.Infrastructure;
 using server.Infrastructure.Configurations;
 using server.Infrastructure.ServiceConfigurations;
@@ -21,6 +20,10 @@ builder.Services.AddApplicationServices(builder.Configuration.GetConnectionStrin
 builder.Services.AddApplicationIdentity();
 builder.Services.AddApplicationJwtAuth(builder.Configuration.GetSection("Jwt").Get<JwtConfiguration>());
 builder.Services.AddApplicationApiVersioning();
+
+// Configure global exception handler
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -46,5 +49,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseExceptionHandler();
 
 app.Run();

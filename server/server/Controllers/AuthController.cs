@@ -6,6 +6,7 @@ using server.Dtos.Requests.Auth;
 using server.Dtos.Requests.Users;
 using server.Dtos.Response;
 using server.Dtos.Response.Users;
+using server.Exceptions;
 using server.Interfaces;
 using server.Models;
 
