@@ -1,3 +1,4 @@
+using Serilog;
 using server.Exceptions;
 using server.Infrastructure;
 using server.Infrastructure.Configurations;
@@ -20,6 +21,13 @@ builder.Services.AddApplicationServices(builder.Configuration.GetConnectionStrin
 builder.Services.AddApplicationIdentity();
 builder.Services.AddApplicationJwtAuth(builder.Configuration.GetSection("Jwt").Get<JwtConfiguration>());
 builder.Services.AddApplicationApiVersioning();
+
+// Configure Serilog
+builder.Host.UseSerilog((context, loggerConfiguration) =>
+{
+    loggerConfiguration.WriteTo.Console();
+    loggerConfiguration.ReadFrom.Configuration(context.Configuration);
+});
 
 // Configure global exception handler
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -51,5 +59,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.UseExceptionHandler();
+
+app.UseSerilogRequestLogging();
 
 app.Run();
