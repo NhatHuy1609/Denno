@@ -1,6 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+﻿using Asp.Versioning;
+using Google.Apis.Util.Store;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using server.Data;
+using server.Helpers.TypeSafe;
+using server.Infrastructure.Configurations;
+using server.Infrastructure.ServiceConfigurations;
+using server.Interfaces;
+using server.Models;
+using server.Services;
 
 namespace server.Infrastructure
 {
@@ -11,6 +21,99 @@ namespace server.Infrastructure
             services.AddDbContext<ApplicationDBContext>(options =>
             {
                 options.UseSqlServer(connectionStringConfigName);
+            });
+
+            services.AddHttpClient<GoogleService>();
+            services.AddScoped<IGoogleService, GoogleService>();
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IDataStore, EFGoogleDataStore>();
+
+            return services;
+        }
+
+        public static IdentityBuilder AddApplicationIdentity(this IServiceCollection services)
+        {
+            services.Configure<EmailConfirmationTokenProviderOptions>(opt => opt.TokenLifespan = TimeSpan.FromDays(3));
+
+            return services.AddIdentity<AppUser, IdentityRole>(options =>
+            {
+                options.SignIn.RequireConfirmedAccount = true;
+
+                // Password settings
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequiredLength = 12;
+                options.Password.RequireDigit = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequiredUniqueChars = 0;
+
+                // Lockout settings
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(60);
+
+                // User settings
+                options.User.RequireUniqueEmail = true;
+
+                // Sign in settings
+                options.SignIn.RequireConfirmedEmail = true;
+
+                // Token provider settings
+                options.Tokens.EmailConfirmationTokenProvider = "emailconfirmation";
+
+            })
+            .AddDefaultTokenProviders()
+            .AddTokenProvider<EmailConfirmationTokenProvider<AppUser>>("emailconfirmation")
+            .AddEntityFrameworkStores<ApplicationDBContext>();
+        }
+
+        public static IServiceCollection AddApplicationJwtAuth(this IServiceCollection services, JwtConfiguration configuration)
+        {
+            services
+                .AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddCookie(options =>
+                {
+                    options.Cookie.Name = TS.Cookies.AccessToken;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidateActor = true,
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        RequireExpirationTime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = configuration.Issuer,
+                        ValidAudience = configuration.Audience,
+                        IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(configuration.Key))
+                    };
+                });
+
+            return services;
+        }
+
+        public static IServiceCollection AddApplicationApiVersioning(this IServiceCollection services)
+        {
+            services.AddApiVersioning(options =>
+            {
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.DefaultApiVersion = new Asp.Versioning.ApiVersion(1, 0);
+                options.ReportApiVersions = true;
+                options.ApiVersionReader = ApiVersionReader.Combine(
+                    new UrlSegmentApiVersionReader(),
+                    new QueryStringApiVersionReader("api-version"),
+                    new HeaderApiVersionReader("X-Version"),
+                    new MediaTypeApiVersionReader("X-Version"));
+            })
+            .AddMvc()
+            .AddApiExplorer(options =>
+            {
+                options.GroupNameFormat = "'v'VVV";
+                options.SubstituteApiVersionInUrl = true;
             });
 
             return services;

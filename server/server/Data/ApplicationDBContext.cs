@@ -27,6 +27,7 @@ namespace server.Data
         public DbSet<CardAttachment> CardAttachments { get; set; }
         public DbSet<CardComment> CardComments { get; set; }
         public DbSet<CardActivity> CardActivites { get; set; }
+        public DbSet<GoogleAuthDataStore> GoogleAuthDataStores { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
