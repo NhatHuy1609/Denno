@@ -7,7 +7,7 @@ namespace server.Interfaces
     public interface IAuthService
     {
         string GenerateRefreshTokenString();
-        Task<string> GenerateTokenString(string username);
+        Task<string> GenerateTokenString(string userEmail);
         Task<LoginResponseDto> RefreshToken(RefreshTokenModel refreshTokenModel);
         Task<RegisterResponseDto> RegisterUser(RegisterRequestDto registerRequest);
         Task<RegisterResponseDto> RegisterUserWithGoogleAccount(RegisterRequestDto registerRequest);

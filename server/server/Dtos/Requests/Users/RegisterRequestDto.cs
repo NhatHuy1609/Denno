@@ -5,8 +5,7 @@ namespace server.Dtos.Requests.Users
     public class RegisterRequestDto
     {
         [Required]
-        public string UserName { get; set; }
-        [Required]
+        public string FullName { get; set; }
         public string Password { get; set; }
         [Required]
         [EmailAddress]

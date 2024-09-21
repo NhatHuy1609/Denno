@@ -36,13 +36,13 @@ namespace server.Services
             if (identityUser == null)
             {
                 response.RequiresRegistration = true;
-                response.Message = "Email verification successful, finish creating account with account name and password";
+                response.Message = "Email verification successful, finish creating account with password";
             }
             else
             {
                 response.RequiresRegistration = false;
                 response.Message = "Email was used to create account, proceed to login";
-                response.AccessToken = await GenerateTokenString(identityUser.UserName);
+                response.AccessToken = await GenerateTokenString(identityUser.Email ?? "");
                 response.RefreshToken = GenerateRefreshTokenString();
             }
 
@@ -55,7 +55,8 @@ namespace server.Services
 
             var newUser = new AppUser
             {
-                UserName = registerRequest.UserName,
+                FullName = registerRequest.FullName,
+                UserName = registerRequest.Email,
                 Email = registerRequest.Email,
             };
 
@@ -63,13 +64,16 @@ namespace server.Services
 
             if (createdResult.Errors.Any())
             {
+                var errorMessages = string.Join(", ", createdResult.Errors.Select(e => e.Description).ToList());
+
+                response.Message = errorMessages;
                 return response;
             }
 
             response.User = newUser;
-            response.Message = "Account created successfully";
             response.RequiresRegistration = true;
-            response.AccessToken = await GenerateTokenString(registerRequest.UserName);
+            response.Message = "Account created successfully";
+            response.AccessToken = await GenerateTokenString(registerRequest.Email);
             response.RefreshToken = GenerateRefreshTokenString();
 
             return response;
@@ -87,9 +91,9 @@ namespace server.Services
             return Convert.ToBase64String(randomNumber);
         }
 
-        public async Task<string> GenerateTokenString(string username)
+        public async Task<string> GenerateTokenString(string userEmail)
         {
-            var claims = await GetUserClaims(username);
+            var claims = await GetUserClaims(userEmail);
 
             var staticKey = _config.GetSection("Jwt:Key").Value;
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(staticKey));
@@ -152,13 +156,13 @@ namespace server.Services
             return new JwtSecurityTokenHandler().ValidateToken(token, validation, out _);
         }
 
-        private async Task<List<Claim>> GetUserClaims(string username)
+        private async Task<List<Claim>> GetUserClaims(string userEmail)
         {
-            var user = await _userManager.FindByNameAsync(username);
+            var user = await _userManager.FindByEmailAsync(userEmail);
 
             var claims = new List<Claim>()
             {
-                new Claim(JwtRegisteredClaimNames.Name, user.UserName),
+                new Claim(JwtRegisteredClaimNames.Name, user.FullName),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email)
             };
 

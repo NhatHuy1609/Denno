@@ -104,9 +104,10 @@ namespace server.Controllers
                 return Unauthorized(new ApiErrorResponse()
                 {
                     StatusCode = Enums.ApiStatusCode.Unauthorized,
-                    StatusMessage = "Account registration failed"
+                    StatusMessage = registerResult.Message
                 });
             }
+
             registerResult.Message = "Registration successful, please check your email to confirm your account";
 
             _ = Task.Run(async () =>
@@ -142,44 +143,38 @@ namespace server.Controllers
         {
             if (string.IsNullOrEmpty(reqDto.AuthorizationCode))
             {
-                return BadRequest("Failed to login with your accoung");
+                return BadRequest("Failed to login with your account");
             }
 
-            try
+            var googleResponse = await _googleService.GetTokenAsync(reqDto.AuthorizationCode);
+            if (googleResponse == null)
             {
-                var googleResponse = await _googleService.GetTokenAsync(reqDto.AuthorizationCode);
-                if (googleResponse == null)
-                {
-                    return BadRequest(new { Message = "Failed to retrieve Google token" });
-                }
+                return BadRequest(new { Message = "Failed to retrieve Google token" });
+            }
 
-                var userInfo = await _googleService.GetUserInfoAsync(googleResponse.AccessToken);
-                if (userInfo == null)
-                {
-                    return BadRequest(new { Message = "Failed to retrieve user information" });
-                }
+            var userInfo = await _googleService.GetUserInfoAsync(googleResponse.AccessToken);
+            if (userInfo == null)
+            {
+                return BadRequest(new { Message = "Failed to retrieve user information" });
+            }
 
-                var newUser = new RegisterRequestDto
-                {
-                    UserName = userInfo.GivenName,
-                    Password = string.Empty,
-                    Email = userInfo.Email
-                };
+            var newUser = new RegisterRequestDto
+            {
+                FullName = userInfo.Name,
+                Password = string.Empty,
+                Email = userInfo.Email
+            };
 
-                var registrationResult = await _authService.RegisterUserWithGoogleAccount(newUser);
+            var registrationResult = await _authService.RegisterUserWithGoogleAccount(newUser);
 
-                if (!registrationResult.RequiresRegistration)
-                {
-                    return Ok(registrationResult);
-                }
-
-                await _googleDataStore.StoreAsync(userInfo.GivenName, googleResponse);
+            if (!registrationResult.RequiresRegistration)
+            {
                 return Ok(registrationResult);
             }
-            catch (Exception ex) 
-            {
-                return StatusCode(500, ex.Message);
-            }
+
+            await _googleDataStore.StoreAsync(userInfo.GivenName, googleResponse);
+
+            return Ok(registrationResult);
         }
 
         [HttpPost("confirm-register-email")]
