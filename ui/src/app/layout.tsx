@@ -1,24 +1,30 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import './globals.css'
+import "./globals.css";
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import Favicon from "../../public/favicon.ico";
+import RootLayoutComp from "@/layouts/RootLayout";
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Denno',
-  description: 'Software for task management'
-}
+  title: process.env.NEXT_PUBLIC_APP_NAME,
+  description: "The software for task management",
+  icons: [{ rel: "icon", url: Favicon.src }],
+};
 
 export default function RootLayout({
-  children
+  children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
-    <html lang='en'>
+    <html lang="en">
+      <head>
+        <title>{process.env.NEXT_PUBLIC_APP_NAME}</title>
+      </head>
       <body className={inter.className}>
-        <main>{children}</main>
+        <RootLayoutComp>{children}</RootLayoutComp>
       </body>
     </html>
-  )
+  );
 }
