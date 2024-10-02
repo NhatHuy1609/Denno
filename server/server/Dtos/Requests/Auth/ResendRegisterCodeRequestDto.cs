@@ -2,11 +2,9 @@
 
 namespace server.Dtos.Requests.Auth
 {
-    public class EmailConfirmRequestDto
+    public class ResendRegisterCodeRequestDto
     {
-        [Required]
+        [EmailAddress]
         public string Email { get; set; }
-        [Required]
-        public string Token { get; set; }
     }
 }

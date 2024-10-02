@@ -1,12 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace server.Dtos.Requests.Users
+namespace server.Dtos.Requests.Auth
 {
-    public class LoginRequestDto
+    public class ValidateRegisterRequestDto
     {
         [Required]
         public string Email { get; set; }
         [Required]
-        public string Password { get; set; }
+        public string Code { get; set; }
     }
 }

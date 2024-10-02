@@ -2,7 +2,6 @@ using Serilog;
 using server.Exceptions;
 using server.Infrastructure;
 using server.Infrastructure.Configurations;
-using server.Infrastructure.ServiceConfigurations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +11,6 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 }); ;
 
-builder.Services.Configure<EmailConfirmationTokenProviderOptions>(opt => opt.TokenLifespan = TimeSpan.FromDays(3));
 builder.Services.Configure<FrontendUrlsConfiguration>(builder.Configuration.GetSection("FrontendUrls"));
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 builder.Services.Configure<GoogleAuthConfiguration>(builder.Configuration.GetSection("Authentication:Google"));

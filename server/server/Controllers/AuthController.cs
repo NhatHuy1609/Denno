@@ -2,6 +2,7 @@
 using Google.Apis.Util.Store;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using server.Dtos.Requests.Auth;
 using server.Dtos.Requests.Users;
 using server.Dtos.Response;
@@ -9,6 +10,7 @@ using server.Dtos.Response.Users;
 using server.Exceptions;
 using server.Interfaces;
 using server.Models;
+using server.Services;
 
 namespace server.Controllers
 {
@@ -53,7 +55,7 @@ namespace server.Controllers
                 return BadRequest(ModelState);
             }
 
-            var user = await _userManager.FindByNameAsync(loginDto.UserName);
+            var user = await _userManager.FindByEmailAsync(loginDto.Email);
 
             if (user == null || (await _userManager.CheckPasswordAsync(user, loginDto.Password)) == false )
             {
@@ -143,44 +145,52 @@ namespace server.Controllers
         {
             if (string.IsNullOrEmpty(reqDto.AuthorizationCode))
             {
-                return BadRequest("Failed to login with your account");
+                return BadRequest(new ApiErrorResponse()
+                {
+                    StatusCode = Enums.ApiStatusCode.BadRequest,
+                    StatusMessage = "Failed to login with your account"
+                });
             }
 
             var googleResponse = await _googleService.GetTokenAsync(reqDto.AuthorizationCode);
             if (googleResponse == null)
             {
-                return BadRequest(new { Message = "Failed to retrieve Google token" });
+                return BadRequest(new ApiErrorResponse()
+                {
+                    StatusCode = Enums.ApiStatusCode.BadRequest,
+                    StatusMessage = "Failed to connect to google"
+                });
             }
 
             var userInfo = await _googleService.GetUserInfoAsync(googleResponse.AccessToken);
             if (userInfo == null)
             {
-                return BadRequest(new { Message = "Failed to retrieve user information" });
+                return BadRequest(new ApiErrorResponse()
+                {
+                    StatusCode = Enums.ApiStatusCode.BadRequest,
+                    StatusMessage = "Failed to retrieve user information"
+                });
             }
 
-            var newUser = new RegisterRequestDto
-            {
-                FullName = userInfo.Name,
-                Password = string.Empty,
-                Email = userInfo.Email
-            };
+            // Execute login with google account
+            // If email has not been found in database then create new user with password
+            // Otherwise, proceed to login
 
-            var registrationResult = await _authService.RegisterUserWithGoogleAccount(newUser);
+            var registrationResult = await _authService.RegisterUserWithGoogleAccount(userInfo.Email);
 
             if (!registrationResult.RequiresRegistration)
             {
+                await _googleDataStore.StoreAsync(userInfo.Email, googleResponse);
                 return Ok(registrationResult);
             }
-
-            await _googleDataStore.StoreAsync(userInfo.GivenName, googleResponse);
 
             return Ok(registrationResult);
         }
 
-        [HttpPost("confirm-register-email")]
+        [HttpPost("validate-email")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> ConfirmRegisterEmail([FromBody] EmailConfirmRequestDto reqDto)
+        public async Task<IActionResult> ValidateEmailRegister([FromBody] ValidateRegisterRequestDto reqDto)
         {
             var user = await _userManager.FindByEmailAsync(reqDto.Email);
             if (user == null)
@@ -188,13 +198,66 @@ namespace server.Controllers
                 return BadRequest();
             }
 
-            var result = await _userManager.ConfirmEmailAsync(user, reqDto.Token);
+            var result = await _userManager.ConfirmEmailAsync(user, reqDto.Code);
+
+            var loginResponse = new LoginResponseDto()
+            {
+                Success = true,
+                AccessToken = await _authService.GenerateTokenString(reqDto.Email),
+                RefreshToken = _authService.GenerateRefreshTokenString()
+            };
+
             if (result.Succeeded)
             {
-                return Ok();
+                return Ok(loginResponse);
             }
 
-            return BadRequest();
+            return Unauthorized(new ApiErrorResponse()
+            {
+                StatusCode = Enums.ApiStatusCode.Unauthorized,
+                StatusMessage = "Code is invalid."
+            });
+        }
+
+        [HttpPost("resend-register-code")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> ResendRegisterCode([FromBody] ResendRegisterCodeRequestDto requestDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ApiErrorResponse()
+                {
+                    StatusCode = Enums.ApiStatusCode.BadRequest,
+                    StatusMessage = "Invalid information"
+                });
+            }
+
+            var user = await _userManager.FindByEmailAsync(requestDto.Email);
+
+            if (user == null)
+            {
+                return NotFound(new ApiErrorResponse()
+                {
+                    StatusCode = Enums.ApiStatusCode.NotFound,
+                    StatusMessage = $"Email {requestDto.Email} not found"
+                });
+            }
+
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await _emailService.SendConfirmationRegisterAccountEmailAsync(requestDto.Email, user);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError("Failed to send email after retries: {ex.Message}", ex);
+                }
+            });
+
+            return Ok();
         }
 
         [HttpPost("refresh")]

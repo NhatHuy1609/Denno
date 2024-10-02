@@ -88,22 +88,12 @@ namespace server.Services
             var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Helpers", "HtmlTemplates", "UserRegisterConfimationEmail.html");
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
-            var confirmationLinkBuilder = new UriBuilder(_frontendUrlsConfig.BaseUrl)
-            {
-                Path = _frontendUrlsConfig.EmailConfirmation,
-                Query = QueryString.Create(new Dictionary<string, string?>
-                {
-                    { "Email", email},
-                    { "Token", token }
-                }).ToString()
-            };
-
             var emailData = new EmailData()
             {
                 EmailToId = email,
                 EmailToName = email,
-                EmailSubject = "Xác thực email đăng ký tài khoản",
-                EmailBody = File.ReadAllText(templatePath).Replace("{VerificationLink}", confirmationLinkBuilder.ToString())
+                EmailSubject = "Denno: Registration Account Verification Code",
+                EmailBody = File.ReadAllText(templatePath).Replace("{VerificationCode}", token)
             };
 
             await SendEmailAsync(emailData, true);

@@ -56,7 +56,7 @@ namespace server.Services
 
         public string GetAuthorizationUrl()
         {
-            var queryParams = new Dictionary<string, string>
+            var queryParams = new Dictionary<string, string?>
                 {
                     { "access_type", "offline" },
                     { "client_id", _googleAuthConfig.ClientId },

@@ -8,7 +8,7 @@ using Polly;
 using Polly.Retry;
 using server.Data;
 using server.Infrastructure.Configurations;
-using server.Infrastructure.ServiceConfigurations;
+using server.Infrastructure.Providers;
 using server.Interfaces;
 using server.Models;
 using server.Services;
@@ -35,15 +35,13 @@ namespace server.Infrastructure
 
         public static IdentityBuilder AddApplicationIdentity(this IServiceCollection services)
         {
-            services.Configure<EmailConfirmationTokenProviderOptions>(opt => opt.TokenLifespan = TimeSpan.FromDays(3));
-
             return services.AddIdentity<AppUser, IdentityRole>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = true;
 
                 // Password settings
                 options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequiredLength = 12;
+                options.Password.RequiredLength = 8;
                 options.Password.RequireDigit = true;
                 options.Password.RequireUppercase = true;
                 options.Password.RequireLowercase = true;

@@ -27,11 +27,11 @@ namespace server.Services
             _roleManager = roleManager;
         }
 
-        public async Task<RegisterResponseDto> RegisterUserWithGoogleAccount(RegisterRequestDto registerRequest)
+        public async Task<RegisterResponseDto> RegisterUserWithGoogleAccount(string email)
         {
             var response = new RegisterResponseDto();
 
-            var identityUser = await _userManager.FindByEmailAsync(registerRequest.Email);
+            var identityUser = await _userManager.FindByEmailAsync(email);
 
             if (identityUser == null)
             {
@@ -64,13 +64,19 @@ namespace server.Services
 
             if (createdResult.Errors.Any())
             {
-                var errorMessages = string.Join(", ", createdResult.Errors.Select(e => e.Description).ToList());
+                var errorMessages = string.Join(",", createdResult.Errors.Select(e => $"{e.Code}::{e.Description}").ToList());
 
                 response.Message = errorMessages;
                 return response;
             }
 
+            var userInfo = new GetUserResponseDto()
+            {
+                Email = registerRequest.Email,
+            };
+
             response.User = newUser;
+            response.UserInfo = userInfo;
             response.RequiresRegistration = true;
             response.Message = "Account created successfully";
             response.AccessToken = await GenerateTokenString(registerRequest.Email);
