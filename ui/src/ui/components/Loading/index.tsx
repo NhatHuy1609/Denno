@@ -13,16 +13,12 @@ const createLoadingContainer = () => {
 export const setFixLoading: SetFixLoading = (enabled, { title, icon, className, border } = {}) => {
   const loadingWrapper = document.querySelector('#loading-wrapper')
 
-  console.log('BEFORE: ', loadingWrapper)
-
   if (!loadingWrapper) {
     const container = createLoadingContainer()
     const root = createRoot(container)
 
     root.render(<Loading {...{ enabled, title, icon, className, border }} />)
   }
-
-  console.log('AFTER: ', loadingWrapper)
 
   enabled
     ? loadingWrapper?.classList.remove('loading-hidden')

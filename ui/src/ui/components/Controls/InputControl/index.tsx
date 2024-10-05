@@ -1,5 +1,6 @@
 import './style.css'
 import { useState, useEffect, ChangeEvent, FocusEvent, useRef } from 'react'
+import { TiWarning } from 'react-icons/ti'
 import Addon from './Addon'
 import InputIcon from './InputIcon'
 import type { InputProps } from '../type'
@@ -36,11 +37,6 @@ export default function InputControl({
   const onInputBlur = (ev: FocusEvent<HTMLInputElement>) => {
     onBlur && onBlur(ev)
   }
-
-  // useEffect(() => {
-  //   console.log(value)
-  //   setVal(value)
-  // }, [value])
 
   useEffect(() => {
     const inpRef = ref.current
@@ -93,7 +89,12 @@ export default function InputControl({
         />
       </div>
       {helper && !error ? <p className='mt-2 text-sm text-gray-500'>{helper}</p> : null}
-      {error ? <p className='mt-2 text-sm text-red-500'>{error}</p> : null}
+      {error ? (
+        <span className='mt-2 flex items-center gap-1'>
+          <TiWarning className='-mt-px text-sm text-red-500' />
+          <p className='text-xs font-medium text-red-500'>{error}</p>
+        </span>
+      ) : null}
     </div>
   )
 }

@@ -1,14 +1,22 @@
 'use client'
 import React from 'react'
 import dynamic from 'next/dynamic'
+import ReduxProvider from '@/app/_providers/ReduxProvider'
+import { QueryClientProvider } from '@/app/_providers/QueryClientProvider'
 
-const ThemeProviderComp = dynamic(() => import('@/components/ThemeProviderComp'), { ssr: false })
+const ThemeProviderComp = dynamic(() => import('@/app/_components/ThemeProviderComp'), {
+  ssr: false
+})
 
 const RootLayoutComp = ({ children }: { children: React.ReactNode }) => {
   return (
-    <ThemeProviderComp>
-      <div>{children}</div>
-    </ThemeProviderComp>
+    <QueryClientProvider>
+      <ReduxProvider>
+        <ThemeProviderComp>
+          <div>{children}</div>
+        </ThemeProviderComp>
+      </ReduxProvider>
+    </QueryClientProvider>
   )
 }
 

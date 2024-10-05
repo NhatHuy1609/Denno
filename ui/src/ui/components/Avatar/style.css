@@ -1,0 +1,41 @@
+.avatar-root {
+  @apply rounded-full size-10;
+  @apply select-none overflow-hidden;
+  @apply inline-flex align-middle items-center justify-center;
+}
+
+.avatar-root.size-sm {
+  @apply size-6;
+}
+
+.avatar-root.size-lg {
+  @apply size-24;
+}
+
+.avatar-image {
+  @apply size-full;
+  @apply object-cover;
+}
+
+.avatar-fallback {
+  @apply size-full;
+  @apply bg-sky-400 text-gray-100 font-medium;
+  @apply flex items-center justify-center;
+  line-height: 1;
+}
+
+.avatar-root.size-sm .avatar-fallback {
+  @apply text-xs;
+}
+
+.avatar-root.size-base .avatar-fallback {
+  @apply text-sm;
+}
+
+.avatar-root.size-md .avatar-fallback {
+  @apply text-lg;
+}
+
+.avatar-root.size-lg .avatar-fallback {
+  @apply text-2xl;
+}
