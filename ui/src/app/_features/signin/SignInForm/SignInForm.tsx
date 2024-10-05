@@ -11,7 +11,7 @@ import { useAppSelector } from '@/store/hooks'
 import { useForm, Controller } from 'react-hook-form'
 import { useLoginMutation } from './signin.mutation'
 import { useResendCodeMutation } from '../../signup/SignUpVerificationForm/resendcode.mutation'
-import { authTypesDto, authContractsDto } from '@/service/api/auth'
+import { authTypesDto, authContractsDto, authApiLib } from '@/service/api/auth'
 import { LuMail, LuLock } from 'react-icons/lu'
 import { Form, Button, messageError, messageInfo } from '@/ui'
 import SignInGoogleButton from './SignInGoogleButton'
@@ -40,10 +40,16 @@ function SignInForm() {
       }
     },
     onError: (error) => {
-      const { status, message } = getErrorMessage(error)
+      const {
+        statusCode: status,
+        message,
+        errorType
+      } = authApiLib.getDetailedError(error)
       if (status) {
-        if (status === 403) {
-          messageInfo('You need to verify your email before logging into your account')
+        if (status === 401 && errorType === 'VerifyEmail') {
+          messageInfo(
+            'You need to verify your email before logging into your account'
+          )
           resendRegisterCode({ email })
           router.push('/sign-up/validate-email')
         } else {
@@ -112,7 +118,10 @@ function SignInForm() {
       </form>
       <div className='mt-3 flex items-center justify-center gap-2'>
         <span className='text-sm'>Don't have an account ?</span>
-        <Link href='/sign-up' className='text-sm font-semibold text-blue-600 hover:opacity-80'>
+        <Link
+          href='/sign-up'
+          className='text-sm font-semibold text-blue-600 hover:opacity-80'
+        >
           Go to sign up page
         </Link>
       </div>

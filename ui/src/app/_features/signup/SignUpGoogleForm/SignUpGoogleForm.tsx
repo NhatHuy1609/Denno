@@ -47,7 +47,7 @@ function SignUpGoogleForm() {
       router.push('/general')
     },
     onError: (error) => {
-      const { field, message } = authApiLib.formatAuthResponseError(error)
+      const { field, message } = authApiLib.getDetailedError(error)
       if (field === 'Password') {
         setError(field.toLowerCase() as 'password', { type: 'custom', message })
       } else {

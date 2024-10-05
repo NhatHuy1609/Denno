@@ -71,7 +71,7 @@ const Home = () => {
     onError: (error) => {
       const { message } = getErrorMessage(error)
 
-      messageError(`${message}. Please try again.`)
+      messageError(`${message || ''}. Please try again.`)
       router.replace('/sign-in')
     }
   })

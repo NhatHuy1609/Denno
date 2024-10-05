@@ -1,4 +1,13 @@
-import axios from 'axios'
+import { store } from '@/lib/redux/store'
+import { messageInfo } from '@/ui'
+import axios, { AxiosRequestConfig } from 'axios'
+
+import axiosRetry, { IAxiosRetryConfig } from 'axios-retry';
+import { authApiLib } from './auth';
+import { updateSession } from '@/store/features/session';
+interface ExtendedAxiosRequestConfig extends AxiosRequestConfig {
+  'axios-retry'?: IAxiosRetryConfig;
+}
 
 // console.log('=================================')
 // console.log('process.env', process.env.NEXT_PUBLIC_BE_GATEWAY)
@@ -7,6 +16,58 @@ import axios from 'axios'
 const instance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BE_GATEWAY
 })
+
+instance.interceptors.request.use(
+  (config) => {
+    const state = store.getState()
+    const { token } = state.session.session;
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`
+    }
+    return config
+  }, 
+  (error) => {
+    return Promise.reject(error)  
+  }
+)
+
+instance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.log(error)
+    const originalRequest = error.config;
+    const { statusCode, errorType } = authApiLib.getDetailedError(error)
+    if (statusCode === 401 && errorType === 'ExpiredToken' && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      // Taking old session to refresh
+      const state = store.getState()
+      const { token, refreshToken } = state.session.session
+      const data = {
+        jwtToken: token,
+        refreshToken
+      }
+
+      req.post('/auth/refresh', data)
+        .then(response => {
+          const { accessToken, refreshToken } = response.data
+          console.log(response)
+          store.dispatch(updateSession({
+            token: accessToken,
+            refreshToken
+          }))
+
+          return req(originalRequest)
+        })
+        .catch(error => {
+          messageInfo("Your session has expired. Please log in again to continue")
+          setTimeout(() => {
+            window.location.href = '/sign-in'
+          }, 500)
+        })
+    }
+  }
+)
 
 export const req = instance
 export const httpGet = req.get
