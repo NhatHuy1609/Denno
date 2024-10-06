@@ -1,23 +1,22 @@
 ﻿using Asp.Versioning;
 using Google.Apis.Util.Store;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using server.Dtos.Requests.Auth;
 using server.Dtos.Requests.Users;
 using server.Dtos.Response;
 using server.Dtos.Response.Users;
-using server.Exceptions;
+using server.Infrastructure.Providers;
 using server.Interfaces;
 using server.Models;
-using server.Services;
 
 namespace server.Controllers
 {
     [ApiController]
+    [ApiVersion("1.0")]
     [ControllerName("auth")]
     [Route("api/v{version:apiVersion}/[controller]")]
-    [ApiVersion("1.0")]
     public class AuthController : ControllerBase
     {
         private readonly UserManager<AppUser> _userManager;
@@ -68,10 +67,10 @@ namespace server.Controllers
 
             if ((await _userManager.IsEmailConfirmedAsync(user)) == false)
             {
-                return StatusCode(StatusCodes.Status403Forbidden, new ApiErrorResponse()
+                return Unauthorized(new ApiErrorResponse()
                 {
-                    StatusCode = Enums.ApiStatusCode.Forbidden,
-                    StatusMessage = "Verify your email to log in to your account"
+                    StatusCode = Enums.ApiStatusCode.Unauthorized,
+                    StatusMessage = "VerifyEmail::Verify your email to log in to your account"
                 });
             }
 
@@ -81,7 +80,7 @@ namespace server.Controllers
             loginResponse.RefreshToken = _authService.GenerateRefreshTokenString();
 
             user.RefreshToken = loginResponse.RefreshToken;
-            user.RefreshTokenExpiry = DateTime.Now.AddDays(7);
+            user.RefreshTokenExpiry = DateTime.Now.AddDays(JwtTokenProvider.RefreshTokenExpiration);
 
             await _userManager.UpdateAsync(user);
 
@@ -139,6 +138,7 @@ namespace server.Controllers
 
         [HttpPost("google-sign-in")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GoogleSignInCallback([FromBody] GoogleSignInRequestDto reqDto)
@@ -176,7 +176,7 @@ namespace server.Controllers
             // If email has not been found in database then create new user with password
             // Otherwise, proceed to login
 
-            var registrationResult = await _authService.RegisterUserWithGoogleAccount(userInfo.Email);
+            var registrationResult = await _authService.RegisterUserWithGoogleAccount(userInfo);
 
             if (!registrationResult.RequiresRegistration)
             {
@@ -184,7 +184,7 @@ namespace server.Controllers
                 return Ok(registrationResult);
             }
 
-            return Ok(registrationResult);
+            return Accepted(registrationResult);
         }
 
         [HttpPost("validate-email")]
@@ -200,6 +200,15 @@ namespace server.Controllers
 
             var result = await _userManager.ConfirmEmailAsync(user, reqDto.Code);
 
+            if (!result.Succeeded)
+            {
+                return Unauthorized(new ApiErrorResponse()
+                {
+                    StatusCode = Enums.ApiStatusCode.Unauthorized,
+                    StatusMessage = "Code is invalid."
+                });
+            }
+
             var loginResponse = new LoginResponseDto()
             {
                 Success = true,
@@ -207,16 +216,7 @@ namespace server.Controllers
                 RefreshToken = _authService.GenerateRefreshTokenString()
             };
 
-            if (result.Succeeded)
-            {
-                return Ok(loginResponse);
-            }
-
-            return Unauthorized(new ApiErrorResponse()
-            {
-                StatusCode = Enums.ApiStatusCode.Unauthorized,
-                StatusMessage = "Code is invalid."
-            });
+            return Ok(loginResponse);
         }
 
         [HttpPost("resend-register-code")]
@@ -260,6 +260,7 @@ namespace server.Controllers
             return Ok();
         }
 
+        [Authorize]
         [HttpPost("refresh")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -278,6 +279,7 @@ namespace server.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpDelete("revoke")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

@@ -1,4 +1,6 @@
-﻿using server.Dtos.Requests.Users;
+﻿using Google.Apis.Oauth2.v2.Data;
+using server.Dtos.Requests.Users;
+using server.Dtos.Response.Auth;
 using server.Dtos.Response.Users;
 using server.Models;
 
@@ -10,6 +12,6 @@ namespace server.Interfaces
         Task<string> GenerateTokenString(string userEmail);
         Task<LoginResponseDto> RefreshToken(RefreshTokenModel refreshTokenModel);
         Task<RegisterResponseDto> RegisterUser(RegisterRequestDto registerRequest);
-        Task<RegisterResponseDto> RegisterUserWithGoogleAccount(string email);
+        Task<GoogleSignInResponseDto> RegisterUserWithGoogleAccount(Userinfo userinfo);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace server.Dtos.Response.Auth
 {
-    public class GoogleSignInReponseDto
+    public class GetGoogleTokenResponseDto
     {
         [JsonProperty("access_token")]
         public string AccessToken { get; set; }

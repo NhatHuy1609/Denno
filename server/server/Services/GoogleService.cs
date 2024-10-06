@@ -33,7 +33,7 @@ namespace server.Services
             return JsonConvert.DeserializeObject<Userinfo>(userInfoJson);
         }
 
-        public async Task<GoogleSignInReponseDto> GetTokenAsync(string authorizationCode)
+        public async Task<GetGoogleTokenResponseDto> GetTokenAsync(string authorizationCode)
         {
             var tokenRequest = new Dictionary<string, string>()
             {
@@ -51,7 +51,7 @@ namespace server.Services
 
             var responseJson = await response.Content.ReadAsStringAsync();
 
-            return JsonConvert.DeserializeObject<GoogleSignInReponseDto>(responseJson);
+            return JsonConvert.DeserializeObject<GetGoogleTokenResponseDto>(responseJson);
         }
 
         public string GetAuthorizationUrl()

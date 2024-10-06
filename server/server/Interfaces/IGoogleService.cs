@@ -8,7 +8,7 @@ namespace server.Interfaces
 {
     public interface IGoogleService
     {
-        Task<GoogleSignInReponseDto> GetTokenAsync(string authorizationCode);
+        Task<GetGoogleTokenResponseDto> GetTokenAsync(string authorizationCode);
         Task<Userinfo> GetUserInfoAsync(string accessToken);
         string GetAuthorizationUrl();
     }

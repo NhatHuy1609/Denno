@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Google.Apis.Oauth2.v2.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using server.Dtos.Requests.Users;
+using server.Dtos.Response.Auth;
 using server.Dtos.Response.Users;
+using server.Infrastructure.Providers;
 using server.Interfaces;
 using server.Models;
 using System.IdentityModel.Tokens.Jwt;
@@ -27,23 +30,39 @@ namespace server.Services
             _roleManager = roleManager;
         }
 
-        public async Task<RegisterResponseDto> RegisterUserWithGoogleAccount(string email)
+        public async Task<GoogleSignInResponseDto> RegisterUserWithGoogleAccount(Userinfo userinfo)
         {
-            var response = new RegisterResponseDto();
+            var response = new GoogleSignInResponseDto();
 
-            var identityUser = await _userManager.FindByEmailAsync(email);
+            var identityUser = await _userManager.FindByEmailAsync(userinfo.Email);
+
+            var appUser = new GetUserResponseDto()
+            {
+                Email = userinfo.Email,
+                Avatar = userinfo.Picture,
+                FullName = userinfo.GivenName
+            };
 
             if (identityUser == null)
             {
+                response.UserInfo = appUser;
                 response.RequiresRegistration = true;
                 response.Message = "Email verification successful, finish creating account with password";
             }
             else
             {
+                appUser.Id = identityUser.Id;
+                response.UserInfo = appUser;
+
                 response.RequiresRegistration = false;
-                response.Message = "Email was used to create account, proceed to login";
-                response.AccessToken = await GenerateTokenString(identityUser.Email ?? "");
                 response.RefreshToken = GenerateRefreshTokenString();
+                response.AccessToken = await GenerateTokenString(userinfo.Email);
+                response.Message = "Email was used to create account, proceed to login";
+
+                identityUser.RefreshToken = response.RefreshToken;
+                identityUser.RefreshTokenExpiry = DateTime.Now.AddDays(JwtTokenProvider.RefreshTokenExpiration);
+
+                await _userManager.UpdateAsync(identityUser);
             }
 
             return response;
@@ -76,11 +95,13 @@ namespace server.Services
             };
 
             response.User = newUser;
-            response.UserInfo = userInfo;
             response.RequiresRegistration = true;
             response.Message = "Account created successfully";
-            response.AccessToken = await GenerateTokenString(registerRequest.Email);
+            response.AccessToken = await GenerateTokenString(newUser.Email);
             response.RefreshToken = GenerateRefreshTokenString();
+
+            newUser.RefreshTokenExpiry = DateTime.Now.AddDays(JwtTokenProvider.RefreshTokenExpiration);
+            await _userManager.UpdateAsync(newUser);
 
             return response;
         }
@@ -107,7 +128,7 @@ namespace server.Services
 
             var securityToken = new JwtSecurityToken(
                     claims: claims,
-                    expires: DateTime.Now.AddMinutes(60),
+                    expires: DateTime.Now.AddSeconds(30),
                     issuer: _config.GetSection("Jwt:Issuer").Value,
                     audience: _config.GetSection("Jwt:Audience").Value,
                     signingCredentials: signingCred);
@@ -123,12 +144,14 @@ namespace server.Services
 
             var response = new LoginResponseDto();
 
-            if (principal?.Identity?.Name is null)
+            var emailClaim = principal?.FindFirst(ClaimTypes.Email);
+
+            if (emailClaim is null)
             {
                 return response;
             }
 
-            var identityUser = await _userManager.FindByNameAsync(principal.Identity.Name);
+            var identityUser = await _userManager.FindByNameAsync(emailClaim.Value);
 
             if (identityUser is null || identityUser.RefreshToken != refreshTokenModel.RefreshToken || identityUser.RefreshTokenExpiry < DateTime.Now)
             {
@@ -136,11 +159,11 @@ namespace server.Services
             }
 
             response.Success = true;
-            response.AccessToken = await GenerateTokenString(principal.Identity.Name);
+            response.AccessToken = await GenerateTokenString(emailClaim.Value);
             response.RefreshToken = GenerateRefreshTokenString();
 
             identityUser.RefreshToken = response.RefreshToken;
-            identityUser.RefreshTokenExpiry = DateTime.Now.AddDays(7);
+            identityUser.RefreshTokenExpiry = DateTime.Now.AddDays(JwtTokenProvider.RefreshTokenExpiration);
             await _userManager.UpdateAsync(identityUser);
 
             return response;

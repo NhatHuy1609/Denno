@@ -1,12 +1,16 @@
 ﻿using Asp.Versioning;
 using Google.Apis.Util.Store;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using Polly;
 using Polly.Retry;
 using server.Data;
+using server.Dtos.Response;
+using server.Enums;
 using server.Infrastructure.Configurations;
 using server.Infrastructure.Providers;
 using server.Interfaces;
@@ -77,14 +81,37 @@ namespace server.Infrastructure
                 {
                     options.TokenValidationParameters = new TokenValidationParameters()
                     {
+                        ClockSkew = TimeSpan.Zero,
                         ValidateActor = true,
                         ValidateIssuer = true,
                         ValidateAudience = true,
+                        ValidateLifetime = true,
                         RequireExpirationTime = true,
                         ValidateIssuerSigningKey = true,
                         ValidIssuer = configuration.Issuer,
                         ValidAudience = configuration.Audience,
                         IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(configuration.Key))
+                    };
+
+                    options.Events = new JwtBearerEvents()
+                    {
+                        OnChallenge = context =>
+                        {
+                            context.HandleResponse();
+
+                            context.Response.Headers.Add("Token-Expired", "true");
+                            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                            context.Response.ContentType = "application/json";
+
+                            var response = new
+                            {
+                                statusCode = ApiStatusCode.Unauthorized,
+                                statusMessage = "ExpiredToken::Token has expired"
+                            };
+
+                            var json = JsonConvert.SerializeObject(response);
+                            return context.Response.WriteAsync(json);
+                        }
                     };
                 });
 
