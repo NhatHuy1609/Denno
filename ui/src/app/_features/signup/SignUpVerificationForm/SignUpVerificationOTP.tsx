@@ -21,12 +21,13 @@ interface VerificationOTPInputContextProps {
   setIndexHasDeleted: Dispatch<SetStateAction<number>>
 }
 
-const VerificationOTPInputContext = createContext<VerificationOTPInputContextProps>({
-  indexHasChanged: -1,
-  indexHasDeleted: 10e7,
-  setIndexHasChanged: () => {},
-  setIndexHasDeleted: () => {}
-})
+const VerificationOTPInputContext =
+  createContext<VerificationOTPInputContextProps>({
+    indexHasChanged: -1,
+    indexHasDeleted: 10e7,
+    setIndexHasChanged: () => {},
+    setIndexHasDeleted: () => {}
+  })
 
 function SignUpVerificationOTPInput({
   index,
@@ -41,11 +42,17 @@ function SignUpVerificationOTPInput({
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const value = useRef<string | undefined>(undefined) // Capture input's value
-  const { indexHasChanged, setIndexHasChanged, indexHasDeleted, setIndexHasDeleted } = useContext(
-    VerificationOTPInputContext
-  ) // Capture input's position has changed
+  const {
+    indexHasChanged,
+    setIndexHasChanged,
+    indexHasDeleted,
+    setIndexHasDeleted
+  } = useContext(VerificationOTPInputContext) // Capture input's position has changed
 
-  const handleKeyUpInput = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+  const handleKeyUpInput = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    index: number
+  ) => {
     const key = e.key
 
     const isLetter = /^[a-zA-Z]$/.test(key)
@@ -99,7 +106,9 @@ function SignUpVerificationOTPInput({
   }, [indexHasDeleted])
 
   // Handle reset indexHasChanged when click input
-  const handleClickInput = (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => {
+  const handleClickInput = (
+    e: React.MouseEvent<HTMLInputElement, MouseEvent>
+  ) => {
     setIndexHasChanged(10e7)
   }
 
@@ -157,19 +166,16 @@ function SignUpVerificationOTPInputList({
       {error && (
         <div className='mt-2 flex items-center'>
           <TiWarning className='-mt-px text-sm text-red-500' />
-          <span className='text-xs font-medium text-red-500'>Must enter all 4 numbers</span>
+          <span className='text-xs font-medium text-red-500'>
+            Must enter all 4 numbers
+          </span>
         </div>
       )}
     </div>
   )
 }
 
-function SignUpVerificationOTP({
-  fieldList,
-  error,
-  setValue,
-  control
-}: {
+function SignUpVerificationOTP(props: {
   fieldList: FormKeys[]
   error?: boolean
   setValue: UseFormSetValue<FormValues>
@@ -180,14 +186,14 @@ function SignUpVerificationOTP({
 
   return (
     <VerificationOTPInputContext.Provider
-      value={{ indexHasChanged, setIndexHasChanged, indexHasDeleted, setIndexHasDeleted }}
+      value={{
+        indexHasChanged,
+        setIndexHasChanged,
+        indexHasDeleted,
+        setIndexHasDeleted
+      }}
     >
-      <SignUpVerificationOTPInputList
-        setValue={setValue}
-        fieldList={fieldList}
-        error={error}
-        control={control}
-      />
+      <SignUpVerificationOTPInputList {...props} />
     </VerificationOTPInputContext.Provider>
   )
 }
