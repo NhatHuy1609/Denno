@@ -3,6 +3,7 @@ import GoogleIcon from 'public/google.png'
 import { Button, messageError } from '@/ui'
 import Image from 'next/image'
 import { AuthService } from '@/service/api/auth'
+import { getErrorMessage } from '@/service/api/_getErrorMessage'
 
 export default function SignInGoogleButton() {
   const [url, setUrl] = useState('')
@@ -16,11 +17,12 @@ export default function SignInGoogleButton() {
   const handleGetGoogleLoginUrl = () => {
     AuthService.getGoogleLoginUrl()
       .then((response) => {
-        const redirectUrl: string = response.data
+        const redirectUrl: string = response?.data
         setUrl(redirectUrl)
       })
       .catch((error) => {
-        messageError((error as Error).message)
+        const { message } = getErrorMessage(error)
+        messageError(message)
       })
   }
 
@@ -29,7 +31,9 @@ export default function SignInGoogleButton() {
       block
       onClick={handleGetGoogleLoginUrl}
       title='Continue with google'
-      leadingIcon={<Image src={GoogleIcon} alt='google-image' className='mr-4 size-6' />}
+      leadingIcon={
+        <Image src={GoogleIcon} alt='google-image' className='mr-4 size-6' />
+      }
     />
   )
 }

@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-export const GetUserResponseDtoSchema = z.object({
-  id: z.string().nullable(),
+export const UserSchema = z.object({
+  id: z.string(),
   email: z.string(),
   avatar: z.string(),
   fullName: z.string()

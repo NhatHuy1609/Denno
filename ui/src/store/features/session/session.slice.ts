@@ -13,6 +13,7 @@ const initialState: SessionState = {
     refreshToken: ''
   },
   currentUser: {
+    id: '',
     email: '',
     avatar: '',
     fullName: ''

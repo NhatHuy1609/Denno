@@ -4,12 +4,12 @@ import { useEffect } from 'react'
 import { useAppDispatch } from '@/store/hooks'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useLoginGoogleMutation } from '@/app/_features/signin/SignInForm'
-import { messageError, messageInfo, setFixLoading } from '@/ui'
 import {
   updateCurrentUser,
   updateEntireSession
 } from '@/store/features/session'
 import { getErrorMessage } from '@/service/api/_getErrorMessage'
+import { messageError, messageInfo, setFixLoading } from '@/ui'
 
 const Home = () => {
   const router = useRouter()
@@ -48,7 +48,7 @@ const Home = () => {
         const {
           accessToken,
           refreshToken,
-          userInfo: { email, fullName, avatar }
+          userInfo: { id, email, fullName, avatar }
         } = data
 
         dispatch(
@@ -58,6 +58,7 @@ const Home = () => {
               refreshToken: refreshToken as string
             },
             currentUser: {
+              id: id as string,
               email,
               fullName,
               avatar
@@ -83,6 +84,8 @@ const Home = () => {
 
     if (authorizationCode) {
       handleGetGoogleAccessToken(authorizationCode)
+    } else {
+      router.replace('sign-in')
     }
   }, [authorizationCode])
 

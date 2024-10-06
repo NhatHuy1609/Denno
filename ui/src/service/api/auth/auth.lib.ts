@@ -30,7 +30,7 @@ const parseErrorDetails = (errorString: string): Pick<DetailedError, 'errorType'
 export const getDetailedError = (
   error: Error | AxiosError
 ) : DetailedError => {
-  if (isAxiosError(error) && error.response?.data) {
+  if (isAxiosError(error) && error?.response?.data) {
     const { statusMessage, statusCode } = error.response.data
     const errorList = statusMessage.split(',')
     const { errorType = '', message } = parseErrorDetails(errorList[0]);
@@ -50,6 +50,7 @@ export const getDetailedError = (
       statusCode
     };
   } else {
+    // console.log(error)
     return {
       message: error.message
     }

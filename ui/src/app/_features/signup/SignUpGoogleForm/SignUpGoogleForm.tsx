@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { z } from 'zod'
 import { useRouter } from 'next/navigation'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -11,7 +11,6 @@ import { useForm, Controller } from 'react-hook-form'
 import { useRegisterUserMutation } from '../SignUpForm/signup.mutation'
 import { LuLock } from 'react-icons/lu'
 import { Avatar, Button, Form, messageError } from '@/ui'
-import { GetUserResponseDtoSchema } from '@/service/api/user/user.contracts'
 
 const SignUpGoogleSchema = z.object({
   password: z
@@ -55,6 +54,12 @@ function SignUpGoogleForm() {
       }
     }
   })
+
+  useEffect(() => {
+    if (!email || !avatar || !fullName) {
+      router.replace('/sign-up')
+    }
+  }, [email, avatar, fullName])
 
   const onSubmit = (data: FormValues) => {
     const user: authTypesDto.RegisterUserDto = {

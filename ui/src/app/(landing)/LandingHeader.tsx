@@ -9,17 +9,8 @@ function LandingHeader() {
     { title: 'Templates', href: '#' }
   ]
 
-  const handleGetMe = async () => {
-    const response = await httpGet('/user/get-me')
-    console.log(response)
-  }
-
   return (
     <header className='flex w-full justify-between bg-white px-10 py-3'>
-      <div
-        onClick={handleGetMe}
-        className='h-16 w-[100px] cursor-pointer bg-red-500 hover:opacity-90'
-      ></div>
       <div className='flex items-center'>
         <Link href='/'>
           <div className='mr-20'>

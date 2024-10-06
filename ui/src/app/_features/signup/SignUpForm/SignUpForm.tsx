@@ -45,7 +45,6 @@ export default function SignUpForm() {
         })
       } else {
         messageError(message)
-        console.log(message)
       }
     }
   })

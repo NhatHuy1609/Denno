@@ -1,13 +1,10 @@
 import { store } from '@/lib/redux/store'
-import { messageInfo } from '@/ui'
-import axios, { AxiosRequestConfig } from 'axios'
+import { messageError, messageInfo } from '@/ui'
+import axios from 'axios'
 
-import axiosRetry, { IAxiosRetryConfig } from 'axios-retry';
 import { authApiLib } from './auth';
 import { updateSession } from '@/store/features/session';
-interface ExtendedAxiosRequestConfig extends AxiosRequestConfig {
-  'axios-retry'?: IAxiosRetryConfig;
-}
+import { getErrorMessage } from './_getErrorMessage';
 
 // console.log('=================================')
 // console.log('process.env', process.env.NEXT_PUBLIC_BE_GATEWAY)
@@ -34,7 +31,6 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.log(error)
     const originalRequest = error.config;
     const { statusCode, errorType } = authApiLib.getDetailedError(error)
     if (statusCode === 401 && errorType === 'ExpiredToken' && !originalRequest._retry) {
@@ -66,6 +62,8 @@ instance.interceptors.response.use(
           }, 500)
         })
     }
+
+    return Promise.reject(error)
   }
 )
 
