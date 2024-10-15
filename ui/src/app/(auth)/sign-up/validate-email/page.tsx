@@ -1,6 +1,6 @@
 'use client'
 
-import SignUpVerificationForm from '@/app/_features/signup/SignUpVerificationForm/SignUpVerificationForm'
+import SignUpVerificationForm from '@/app/_features/Signup/SignUpVerificationForm/SignUpVerificationForm'
 
 function Page() {
   return <SignUpVerificationForm />

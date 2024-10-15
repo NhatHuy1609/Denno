@@ -12,7 +12,7 @@ import { authContractsDto, authTypesDto } from '@/service/api/auth'
 import { authApiLib } from '@/service/api/auth'
 import { LuMail, LuUser2, LuLock } from 'react-icons/lu'
 import { Button, Form, messageError, setFixLoading } from '@/ui'
-import SignInGoogleButton from '../../signin/SignInForm/SignInGoogleButton'
+import SignInGoogleButton from '../../Signin/SignInForm/SignInGoogleButton'
 
 type RegisterUserFormData = authTypesDto.RegisterUserDto
 
@@ -55,9 +55,7 @@ export default function SignUpForm() {
 
   return (
     <div className='absolute z-[100] w-[36%] rounded-lg bg-white px-12 py-8 shadow-[0px_0px_20px_rgba(0,0,0,0.05)]'>
-      <p className='mb-4 text-center text-3xl font-semibold'>
-        Seconds to sign up!
-      </p>
+      <p className='mb-4 text-center text-3xl font-semibold'>Seconds to sign up!</p>
       <div className='flex-col'>
         <SignInGoogleButton />
       </div>
@@ -123,10 +121,7 @@ export default function SignUpForm() {
       </form>
       <div className='mt-3 flex items-center justify-center gap-2'>
         <span className='text-sm'>Already have an account ?</span>
-        <Link
-          href='/sign-in'
-          className='text-sm font-semibold text-blue-600 hover:opacity-80'
-        >
+        <Link href='/sign-in' className='text-sm font-semibold text-blue-600 hover:opacity-80'>
           Log in
         </Link>
       </div>

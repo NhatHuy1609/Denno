@@ -15,7 +15,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   const user = useAppSelector((state) => state.session.currentUser)
 
   // Handle protected route
-  useProtectionRoute({ user })
+  // useProtectionRoute({ user })
 
   return (
     <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>

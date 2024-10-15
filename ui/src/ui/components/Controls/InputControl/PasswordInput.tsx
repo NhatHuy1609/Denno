@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react'
 import { TiWarning } from 'react-icons/ti'
 import InputIcon from './InputIcon'
 import Addon from './Addon'
-import type { InputProps } from '@/ui/components/Controls/type'
+import type { InputProps } from '@/ui/components/Controls/types'
 
 export default function PasswordInputControl({
   title,

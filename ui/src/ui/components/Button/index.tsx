@@ -5,7 +5,13 @@ import './style.css'
 type ButtonBaseAttrs = HTMLAttributes<HTMLButtonElement>
 type ButtonBaseAttrsFilter = Pick<
   ButtonBaseAttrs,
-  'onMouseUp' | 'onMouseDown' | 'onClick' | 'onSubmit' | 'onKeyPress' | 'onKeyUp' | 'onKeyDown'
+  | 'onMouseUp'
+  | 'onMouseDown'
+  | 'onClick'
+  | 'onSubmit'
+  | 'onKeyPress'
+  | 'onKeyUp'
+  | 'onKeyDown'
 >
 
 interface IButtonProps {
@@ -22,7 +28,10 @@ interface IButtonProps {
   type?: 'button' | 'reset' | 'submit'
 }
 
-type ButtonPropsWithoutDuplicate = Omit<ButtonBaseAttrsFilter, keyof IButtonProps>
+type ButtonPropsWithoutDuplicate = Omit<
+  ButtonBaseAttrsFilter,
+  keyof IButtonProps
+>
 
 type ButtonProps = IButtonProps & ButtonPropsWithoutDuplicate
 
@@ -53,7 +62,12 @@ const Button = ({
   ].filter(Boolean)
 
   return (
-    <button type={type} className={classes.join(' ')} disabled={disabled} {...otherProps}>
+    <button
+      type={type}
+      className={classes.join(' ')}
+      disabled={disabled}
+      {...otherProps}
+    >
       {leadingIcon && !loading ? leadingIcon : null}
       {loading ? <Loading /> : null}
       {title}

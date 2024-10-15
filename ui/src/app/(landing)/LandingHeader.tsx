@@ -1,6 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
-import { httpGet } from '@/service/api/_req'
+import axios from 'axios'
+import { httpPost } from '@/service/api/_req'
 
 function LandingHeader() {
   const links = [
@@ -11,6 +12,10 @@ function LandingHeader() {
 
   return (
     <header className='flex w-full justify-between bg-white px-10 py-3'>
+      <div
+        className='size-10 cursor-pointer bg-red-500'
+        // onClick={handleTest}
+      ></div>
       <div className='flex items-center'>
         <Link href='/'>
           <div className='mr-20'>

@@ -1,4 +1,4 @@
-import { ChangeEvent, FocusEvent } from 'react'
+import { ChangeEvent, ChangeEventHandler, FocusEvent } from 'react'
 
 interface InputBaseProps {
   title: string
@@ -22,4 +22,11 @@ interface InputBaseProps {
   addon: string
 }
 
+type TextareaBaseProps = Omit<InputBaseProps, 'onChange'> & {
+  onChange: (ev: ChangeEvent<HTMLTextAreaElement>) => void
+  rows: number
+  cols: number
+}
+
 export type InputProps = Partial<InputBaseProps>
+export type TextareaProps = Partial<TextareaBaseProps>

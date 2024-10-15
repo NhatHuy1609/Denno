@@ -3,7 +3,7 @@ import { useState, useEffect, ChangeEvent, FocusEvent, useRef } from 'react'
 import { TiWarning } from 'react-icons/ti'
 import Addon from './Addon'
 import InputIcon from './InputIcon'
-import type { InputProps } from '../type'
+import type { InputProps } from '../types'
 
 export default function InputControl({
   title,

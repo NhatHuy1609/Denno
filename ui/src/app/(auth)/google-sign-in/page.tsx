@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { useAppDispatch } from '@/store/hooks'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { useLoginGoogleMutation } from '@/app/_features/signin/SignInForm'
+import { useLoginGoogleMutation } from '@/app/_features/Signin/SignInForm'
 import {
   updateCurrentUser,
   updateEntireSession

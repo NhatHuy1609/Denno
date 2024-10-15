@@ -1,5 +1,5 @@
 .btn {
-  @apply border border-gray-200 rounded px-3 py-2;
+  @apply border border-gray-200 rounded px-3 py-1;
   @apply hover:bg-gray-50 active:bg-gray-100;
   @apply inline-flex items-center;
 }
@@ -23,10 +23,6 @@
   @apply pr-6;
 }
 
-.btn.notitle svg {
-  margin: 0px;
-}
-
 /* Button size */
 .btn.sm {
   @apply px-2 py-1 text-xs;
@@ -44,11 +40,15 @@
   @apply w-5 h-5 mr-2;
 }
 
+.btn.notitle svg {
+  margin: 0px;
+}
+
 /* Button colors */
 
 .btn.btn-primary {
   @apply border-blue-500 bg-blue-500 text-white;
-  @apply hover:bg-blue-500 active:bg-blue-700;
+  @apply hover:bg-blue-600 active:bg-blue-700;
 }
 
 .btn.btn-danger {
