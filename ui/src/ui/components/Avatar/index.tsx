@@ -1,0 +1,36 @@
+import {
+  Root,
+  Image as AvatarImage,
+  Fallback as AvatarFallback
+} from '@radix-ui/react-avatar'
+import './style.css'
+
+type Null<T> = T | null
+
+interface IAvatarProps {
+  size?: 'sm' | 'base' | 'lg'
+  src: Null<string>
+  name: Null<string>
+}
+
+function Avatar({ src, name, size = 'base' }: IAvatarProps) {
+  return (
+    <Root className={`avatar-root size-${size} shrink-0`}>
+      <AvatarImage
+        className='avatar-image'
+        src={src || ''}
+        alt={name || ''}
+        title={name || ''}
+      />
+      <AvatarFallback
+        title={name || ''}
+        className='avatar-fallback'
+        delayMs={600}
+      >
+        {(name || '').slice(0, 2).toUpperCase()}
+      </AvatarFallback>
+    </Root>
+  )
+}
+
+export default Avatar

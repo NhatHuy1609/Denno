@@ -1,6 +1,6 @@
 ﻿namespace server.Enums
 {
-    public class ActionType
+    public enum ActionType
     {
 
     }
