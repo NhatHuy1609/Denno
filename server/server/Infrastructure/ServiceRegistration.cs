@@ -15,7 +15,9 @@ using server.Infrastructure.Configurations;
 using server.Infrastructure.Providers;
 using server.Interfaces;
 using server.Models;
+using server.Repositories;
 using server.Services;
+using server.UnitOfWorks;
 
 namespace server.Infrastructure
 {
@@ -28,6 +30,10 @@ namespace server.Infrastructure
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IDataStore, EFGoogleDataStore>();
+            #region Repositories
+            services.AddTransient<IWorkspaceRepository, WorkspaceRepository>();
+            #endregion
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
 
             services.AddDbContext<ApplicationDBContext>(options =>
             {

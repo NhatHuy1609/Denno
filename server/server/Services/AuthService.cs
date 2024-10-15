@@ -191,6 +191,7 @@ namespace server.Services
 
             var claims = new List<Claim>()
             {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id),
                 new Claim(JwtRegisteredClaimNames.Name, user.FullName),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email)
             };

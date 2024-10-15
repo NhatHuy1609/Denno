@@ -6,6 +6,7 @@ namespace server.Models
     {
         public Guid Id { get; set; }
         public required string Name { get; set; }
+        public required string Description { get; set; }
         public WorkspaceVisibility Visibility { get; set; } = 0;
 
         public string OwnerId { get; set; }
