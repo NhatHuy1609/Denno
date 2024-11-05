@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using server.Entities;
 using server.Models;
 
 namespace server.Data
@@ -39,6 +40,11 @@ namespace server.Data
                 .HasForeignKey(e => e.OwnerId)
                 .OnDelete(DeleteBehavior.Cascade)
                 .IsRequired();
+
+            modelBuilder.Entity<AppUser>()
+                .HasOne(u => u.UserVisibilitySettings)
+                .WithOne()
+                .HasForeignKey<UserVisibilitySettings>(v => v.Id);
 
             modelBuilder.Entity<Workspace>()
                 .HasKey(e => e.Id)
