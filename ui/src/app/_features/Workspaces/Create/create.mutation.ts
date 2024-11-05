@@ -1,7 +1,6 @@
 import { WorkspaceService, workspaceTypesDto } from '@/service/api/workspace'
 import { DefaultError, MutationOptions, useMutation } from '@tanstack/react-query'
 
-
 export default function useCreateWorkspaceMutation(
   options?: Pick<
     MutationOptions<

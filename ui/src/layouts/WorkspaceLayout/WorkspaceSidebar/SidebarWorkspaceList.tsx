@@ -1,6 +1,9 @@
 import React, { ReactNode } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useQuery } from '@tanstack/react-query'
+import { queryClient } from '@/lib/react-query/query-client'
+import { WorkspaceQueries } from '@/entities/workspace/workspace.queries'
 import { LiaAngleDownSolid } from 'react-icons/lia'
 import { HiViewBoards } from 'react-icons/hi'
 import { FaRegHeart } from 'react-icons/fa6'
@@ -8,6 +11,8 @@ import { LuUsers } from 'react-icons/lu'
 import { MdOutlineGridView } from 'react-icons/md'
 import { IoIosSettings } from 'react-icons/io'
 import { Collapsible } from '@/ui'
+import WorkspaceLogo from '@/app/_components/WorkspaceLogo'
+import { workspaceTypes } from '@/entities/workspace'
 
 interface IWorkspaceSubItem {
   title: string
@@ -15,11 +20,15 @@ interface IWorkspaceSubItem {
   href: string
 }
 
-function SidebarWorkspaceSubContent() {
+function SidebarWorkspaceSubContent({ workspaceId }: { workspaceId: string }) {
   const iconClass = 'text-sm text-slate-600'
 
   const items: IWorkspaceSubItem[] = [
-    { title: 'Boards', icon: <HiViewBoards className={iconClass} />, href: '' },
+    {
+      title: 'Boards',
+      icon: <HiViewBoards className={iconClass} />,
+      href: `/w/${workspaceId}/home`
+    },
     {
       title: 'Highlights',
       icon: <FaRegHeart className={iconClass} />,
@@ -51,40 +60,42 @@ function SidebarWorkspaceSubContent() {
           className='flex cursor-pointer items-center gap-2 rounded-md py-2 pl-10 pr-2 hover:bg-gray-200'
         >
           {item.icon}
-          <span className='text-[13px] font-medium text-slate-600'>
-            {item.title}
-          </span>
+          <span className='text-[13px] font-medium text-slate-600'>{item.title}</span>
         </Link>
       ))}
     </div>
   )
 }
 
-function SidebarWorkspaceItem() {
+function SidebarWorkspaceItem({ workspace }: { workspace: workspaceTypes.Workspace }) {
+  const { id, name, logoUrl } = workspace
+
   return (
     <Collapsible.Collapsible>
       <Collapsible.Trigger className='w-full'>
         <div className='flex cursor-pointer items-center justify-between rounded-md p-2 pr-4 hover:bg-gray-200'>
           <div className='flex items-center gap-2'>
-            <span className='block size-6 rounded-md bg-red-500'></span>
-            <span className='text-sm font-semibold text-slate-700'>
-              nhathuy
-            </span>
+            <WorkspaceLogo name={name} imageUrl={logoUrl} size='sm' />
+            <span className='text-sm font-semibold text-slate-700'>{name}</span>
           </div>
           <LiaAngleDownSolid className='-translate-y-px text-sm' />
         </div>
       </Collapsible.Trigger>
       <Collapsible.Content>
-        <SidebarWorkspaceSubContent />
+        <SidebarWorkspaceSubContent workspaceId={id} />
       </Collapsible.Content>
     </Collapsible.Collapsible>
   )
 }
 
 function SidebarWorkspaceList() {
+  const { data: workspaces } = useQuery(WorkspaceQueries.currentUserWorkspacesQuery())
+
   return (
     <div className='mt-3 flex w-full flex-col'>
-      <SidebarWorkspaceItem />
+      {workspaces?.map((workspaceItem, index) => (
+        <SidebarWorkspaceItem workspace={workspaceItem} key={index} />
+      ))}
     </div>
   )
 }

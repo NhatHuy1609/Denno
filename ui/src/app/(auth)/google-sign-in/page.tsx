@@ -4,10 +4,7 @@ import { useEffect } from 'react'
 import { useAppDispatch } from '@/store/hooks'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useLoginGoogleMutation } from '@/app/_features/Signin/SignInForm'
-import {
-  updateCurrentUser,
-  updateEntireSession
-} from '@/store/features/session'
+import { updateCurrentUser, updateEntireSession } from '@/store/features/session'
 import { getErrorMessage } from '@/service/api/_getErrorMessage'
 import { messageError, messageInfo, setFixLoading } from '@/ui'
 
@@ -28,12 +25,12 @@ const Home = () => {
     },
     onSuccess: async (response) => {
       const { status, data } = response
+      const {
+        message,
+        userInfo: { email, fullName, avatar, userName }
+      } = data
 
       if (status === 202) {
-        const {
-          message,
-          userInfo: { email, fullName, avatar }
-        } = data
         dispatch(
           updateCurrentUser({
             email,
@@ -45,28 +42,28 @@ const Home = () => {
         router.push('/sign-up/complete-signup')
         messageInfo(message)
       } else if (status === 200) {
-        const {
-          accessToken,
-          refreshToken,
-          userInfo: { id, email, fullName, avatar }
-        } = data
+        // const {
+        //   accessToken,
+        //   refreshToken,
+        //   userInfo: { id, email, fullName, avatar }
+        // } = data
 
-        dispatch(
-          updateEntireSession({
-            session: {
-              token: accessToken as string,
-              refreshToken: refreshToken as string
-            },
-            currentUser: {
-              id: id as string,
-              email,
-              fullName,
-              avatar
-            }
-          })
-        )
+        // dispatch(
+        //   updateEntireSession({
+        //     session: {
+        //       token: accessToken as string,
+        //       refreshToken: refreshToken as string
+        //     },
+        //     currentUser: {
+        //       id: id as string,
+        //       email,
+        //       fullName,
+        //       avatar
+        //     }
+        //   })
+        // )
 
-        router.push('/general')
+        router.push(`/u/${userName}/boards`)
       }
     },
     onError: (error) => {

@@ -1,4 +1,6 @@
+import { PersistedStateKey } from '@/data/persisted-keys';
 import { AuthService, authTypesDto } from '@/service/api/auth';
+import { setLocalStorageItem } from '@/utils/local-storage';
 import { DefaultError, UseMutationOptions, useMutation } from '@tanstack/react-query'
 
 export function useLoginGoogleMutation(
@@ -26,7 +28,19 @@ export function useLoginGoogleMutation(
       return AuthService.loginGoogleMutation({ loginGoogleDto })
     },
     onMutate,
-    onSuccess,
+    onSuccess: async (response, variables, context) => {
+      const { 
+        userInfo: { id },
+        accessToken,
+        refreshToken 
+      } = response.data
+
+      setLocalStorageItem(PersistedStateKey.MeId, id)
+      setLocalStorageItem(PersistedStateKey.Token, accessToken)
+      setLocalStorageItem(PersistedStateKey.RefreshToken, refreshToken)
+
+      await onSuccess?.(response, variables, context)
+    },
     onError,
     onSettled
   })

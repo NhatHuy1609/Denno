@@ -1,7 +1,9 @@
+import { PersistedStateKey } from '@/data/persisted-keys'
+import { setLocalStorageItem } from '@/utils/local-storage'
 import { AuthService, authTypesDto } from '@/service/api/auth';
 import { DefaultError, useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { useAppDispatch } from '@/store/hooks'
-import { updateCurrentUser, updateSession } from '@/store/features/session'
+import { updateCurrentUser, updateEntireSession } from '@/store/features/session'
 
 export function useLoginMutation(
   options?: Pick<
@@ -14,6 +16,8 @@ export function useLoginMutation(
     'mutationKey' | 'onMutate' | 'onSuccess' | 'onError' | 'onSettled'
   >
 ) {
+  const dispatch = useAppDispatch()
+
   const {
     mutationKey = [],
     onMutate,
@@ -21,8 +25,6 @@ export function useLoginMutation(
     onError,
     onSettled
   } = options || {}
-
-  const dispatch = useAppDispatch()
 
   return useMutation({
     mutationKey: ['sign-in', ...mutationKey],
@@ -38,12 +40,19 @@ export function useLoginMutation(
     },
     onSuccess: async (response, variables, context) => {
       const { data } = response
-      const { accessToken, refreshToken } = data
+      const { accessToken, refreshToken, user } = data
 
-      dispatch(updateSession({
-        token: accessToken,
-        refreshToken
-      }))
+      setLocalStorageItem(PersistedStateKey.MeId, user.id)
+      setLocalStorageItem(PersistedStateKey.Token, accessToken)
+      setLocalStorageItem(PersistedStateKey.RefreshToken, refreshToken)
+
+      // dispatch(updateEntireSession({
+      //   session: {
+      //     token: accessToken,
+      //     refreshToken
+      //   },
+      //   currentUser: user
+      // }))
 
       await onSuccess?.(response, variables, context)
     },

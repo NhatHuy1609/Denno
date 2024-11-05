@@ -16,7 +16,14 @@ const initialState: SessionState = {
     id: '',
     email: '',
     avatar: '',
-    fullName: ''
+    fullName: '',
+    userName: '',
+    jobTitle: '',
+    department: '',
+    basedIn: '',
+    organization: '',
+    coverImage: '',
+    userVisibilitySettings: null
   }
 }
 

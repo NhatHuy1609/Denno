@@ -1,5 +1,7 @@
 import { z } from 'zod'
 import { GetUserResponseDtoSchema } from '../user/user.contracts'
+import { userContracts } from '@/entities/user'
+import { userContractsDto } from '../user'
 
 // RequestsDto ============================================================================
 
@@ -53,6 +55,7 @@ export const LoginResponseDtoSchema = z.object({
   success: z.boolean(),
   accessToken: z.string(),
   refreshToken: z.string(),
+  user: userContractsDto.GetUserResponseDtoSchema
 })
 
 export const LoginGoogleResponseDtoSchema = z.object({
