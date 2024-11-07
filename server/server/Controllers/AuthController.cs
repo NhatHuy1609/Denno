@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using AutoMapper;
 using Google.Apis.Util.Store;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -20,6 +21,7 @@ namespace server.Controllers
     public class AuthController : ControllerBase
     {
         private readonly UserManager<AppUser> _userManager;
+        private readonly IMapper _mapper;
         private readonly IAuthService _authService;
         private readonly IEmailService _emailService;
         private readonly IDataStore _googleDataStore;
@@ -28,6 +30,7 @@ namespace server.Controllers
 
         public AuthController(
             UserManager<AppUser> userManager,
+            IMapper mapper,
             IAuthService authService,
             IEmailService emailService,
             IDataStore googleDataStore,
@@ -35,6 +38,7 @@ namespace server.Controllers
             ILogger<AuthController> logger)
         {
             _userManager = userManager;
+            _mapper = mapper;
             _authService = authService;
             _emailService = emailService;
             _googleService = googleService;
@@ -75,9 +79,11 @@ namespace server.Controllers
             }
 
             var loginResponse = new LoginResponseDto();
+
             loginResponse.Success = true;
-            loginResponse.AccessToken = await _authService.GenerateTokenString(user.UserName);
+            loginResponse.User = _mapper.Map<GetUserResponseDto>(user);
             loginResponse.RefreshToken = _authService.GenerateRefreshTokenString();
+            loginResponse.AccessToken = await _authService.GenerateTokenString(user.Email);
 
             user.RefreshToken = loginResponse.RefreshToken;
             user.RefreshTokenExpiry = DateTime.Now.AddDays(JwtTokenProvider.RefreshTokenExpiration);

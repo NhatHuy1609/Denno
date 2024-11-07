@@ -31,7 +31,8 @@ export const getDetailedError = (
   error: Error | AxiosError
 ) : DetailedError => {
   if (isAxiosError(error) && error?.response?.data) {
-    const { statusMessage, statusCode } = error.response.data
+    const statusCode = error.response.status
+    const { statusMessage } = error.response.data
     const errorList = statusMessage.split(',')
     const { errorType = '', message } = parseErrorDetails(errorList[0]);
 
