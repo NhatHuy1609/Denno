@@ -7,7 +7,8 @@ interface ErrorDetail {
 
 export function getErrorMessage(error: Error | AxiosError): ErrorDetail {
   if (isAxiosError(error) && error.response?.data) {
-    const { statusMessage, statusCode } = error.response.data
+    const statusCode = error.response.status
+    const { statusMessage } = error.response.data
     return {
       status: statusCode as number ,
       message: statusMessage as string

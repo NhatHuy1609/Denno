@@ -1,7 +1,6 @@
 import { DefaultError, UseMutationOptions, useMutation } from '@tanstack/react-query'
 import { AuthService, authTypesDto } from '@/service/api/auth'
 import { sessionStoreLib } from '@/store/features/session'
-import { useAppDispatch } from '@/store/hooks'
 import { updateSession } from '@/store/features/session'
 import { useDispatch } from 'react-redux'
 

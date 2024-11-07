@@ -155,6 +155,37 @@ namespace server.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("server.Entities.UserVisibilitySettings", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AvatarVisibility")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BasedInVisibility")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DepartmentVisibility")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EmailVisibility")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FullNameVisibility")
+                        .HasColumnType("int");
+
+                    b.Property<int>("JobTitleVisibility")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrganizationVisibility")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserVisibilitySettings");
+                });
+
             modelBuilder.Entity("server.Models.AppUser", b =>
                 {
                     b.Property<string>("Id")
@@ -166,14 +197,8 @@ namespace server.Migrations
                     b.Property<string>("Avatar")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("AvatarVisibility")
-                        .HasColumnType("int");
-
                     b.Property<string>("BasedIn")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("BasedInVisibility")
-                        .HasColumnType("int");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -185,9 +210,6 @@ namespace server.Migrations
                     b.Property<string>("Department")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("DepartmentVisibility")
-                        .HasColumnType("int");
-
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -195,20 +217,11 @@ namespace server.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<int>("EmailVisibility")
-                        .HasColumnType("int");
-
                     b.Property<string>("FullName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("FullNameVisibility")
-                        .HasColumnType("int");
-
                     b.Property<string>("JobTitle")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("JobTitleVisibility")
-                        .HasColumnType("int");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -226,9 +239,6 @@ namespace server.Migrations
 
                     b.Property<string>("Organization")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("OrganizationVisibility")
-                        .HasColumnType("int");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
@@ -273,6 +283,10 @@ namespace server.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Background")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -659,6 +673,14 @@ namespace server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LogoUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -741,6 +763,15 @@ namespace server.Migrations
                     b.HasOne("server.Models.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("server.Entities.UserVisibilitySettings", b =>
+                {
+                    b.HasOne("server.Models.AppUser", null)
+                        .WithOne("UserVisibilitySettings")
+                        .HasForeignKey("server.Entities.UserVisibilitySettings", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -987,6 +1018,9 @@ namespace server.Migrations
                     b.Navigation("CardMembers");
 
                     b.Navigation("OwnedWorkspaces");
+
+                    b.Navigation("UserVisibilitySettings")
+                        .IsRequired();
 
                     b.Navigation("WorkspaceMembers");
                 });

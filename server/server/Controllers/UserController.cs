@@ -8,10 +8,11 @@ namespace server.Controllers
     [ApiController]
     [ApiVersion("1.0")]
     [ControllerName("user")]
-    [Route("api/v{version:apiVersion}/[controller]")]
+    [Route("api/v{version:apiVersion}")]
     public class UserController: ControllerBase
     {
-        [HttpGet("get-me")]
+        [HttpGet]
+        [Route("users/me")]
         public async Task<IActionResult> GetMe()
         {
             var user = HttpContext.User;

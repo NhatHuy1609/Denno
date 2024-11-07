@@ -1,8 +1,8 @@
 'use client'
 
 import React from 'react'
-import MyBoardsList from '@/app/_features/Board/List/MyBoardsList'
-import WorkspaceInfoCard from '@/app/_features/Workspaces/WorkspaceInfoCard'
+import WorkspaceBoardList from '@/app/_features/Board/List/WorkspaceBoardList'
+import WorkspaceInfoCard from '@/app/_features/Workspaces/Info/WorkspaceInfoCard'
 
 function page() {
   return (
@@ -11,7 +11,7 @@ function page() {
         <WorkspaceInfoCard />
       </div>
       <div className='h-[800px] p-4 pr-0'>
-        <MyBoardsList />
+        <WorkspaceBoardList />
       </div>
     </div>
   )

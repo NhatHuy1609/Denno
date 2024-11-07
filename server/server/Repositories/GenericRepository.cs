@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using server.Data;
 using server.Interfaces;
-using System.Linq.Expressions;
 
 namespace server.Repositories
 {
@@ -22,11 +21,6 @@ namespace server.Repositories
         public void AddRange(IEnumerable<T> entities)
         {
             _context.Set<T>().AddRange(entities);
-        }
-
-        public IEnumerable<T> FindAsync(Expression<Func<T, bool>> expression)
-        {
-            return  _context.Set<T>().Where(expression);
         }
 
         public async Task<IEnumerable<T>> GetAllAsync()
