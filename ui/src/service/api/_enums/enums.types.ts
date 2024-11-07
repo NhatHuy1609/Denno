@@ -1,3 +1,4 @@
 import { z } from 'zod'
+import { BoardVisibilityEnumSchema } from './enums.contracts'
 
-export const BoardVisibilityEnumSchema = z.enum(['Private', 'Workspace', 'Public'])
+export type BoardVisibilityEnum = z.infer<typeof BoardVisibilityEnumSchema>

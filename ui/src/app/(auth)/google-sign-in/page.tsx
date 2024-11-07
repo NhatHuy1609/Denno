@@ -42,27 +42,6 @@ const Home = () => {
         router.push('/sign-up/complete-signup')
         messageInfo(message)
       } else if (status === 200) {
-        // const {
-        //   accessToken,
-        //   refreshToken,
-        //   userInfo: { id, email, fullName, avatar }
-        // } = data
-
-        // dispatch(
-        //   updateEntireSession({
-        //     session: {
-        //       token: accessToken as string,
-        //       refreshToken: refreshToken as string
-        //     },
-        //     currentUser: {
-        //       id: id as string,
-        //       email,
-        //       fullName,
-        //       avatar
-        //     }
-        //   })
-        // )
-
         router.push(`/u/${userName}/boards`)
       }
     },

@@ -1,5 +1,6 @@
 export enum PersistedStateKey  {
   MeId = 'meId',
   Token = 'token',
-  RefreshToken = 'refreshToken'
+  RefreshToken = 'refreshToken',
+  RecentAccessWorkspace = 'recentAccessWorkspace'
 }

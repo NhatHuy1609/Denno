@@ -3,7 +3,7 @@ import { setLocalStorageItem } from '@/utils/local-storage'
 import { AuthService, authTypesDto } from '@/service/api/auth';
 import { DefaultError, useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { useAppDispatch } from '@/store/hooks'
-import { updateCurrentUser, updateEntireSession } from '@/store/features/session'
+import { updateCurrentUser } from '@/store/features/session'
 
 export function useLoginMutation(
   options?: Pick<
@@ -42,17 +42,13 @@ export function useLoginMutation(
       const { data } = response
       const { accessToken, refreshToken, user } = data
 
-      setLocalStorageItem(PersistedStateKey.MeId, user.id)
+      setLocalStorageItem(PersistedStateKey.MeId, user?.id)
       setLocalStorageItem(PersistedStateKey.Token, accessToken)
       setLocalStorageItem(PersistedStateKey.RefreshToken, refreshToken)
 
-      // dispatch(updateEntireSession({
-      //   session: {
-      //     token: accessToken,
-      //     refreshToken
-      //   },
-      //   currentUser: user
-      // }))
+      dispatch(updateCurrentUser({
+        email: user?.email
+      }))
 
       await onSuccess?.(response, variables, context)
     },

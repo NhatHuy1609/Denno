@@ -6,13 +6,7 @@ import { LuPencil } from 'react-icons/lu'
 import { MdLockOutline } from 'react-icons/md'
 import WorkspaceLogo from '@/app/_components/WorkspaceLogo'
 
-function WorkspaceInfoLogo({
-  logoUrl = '',
-  name = ''
-}: {
-  logoUrl?: string
-  name?: string
-}) {
+function WorkspaceInfoLogo({ logoUrl = '', name = '' }: { logoUrl?: string; name?: string }) {
   return (
     <div className='group relative cursor-pointer'>
       <WorkspaceLogo size='lg' imageUrl={logoUrl} name={name} />
@@ -25,13 +19,7 @@ function WorkspaceInfoLogo({
   )
 }
 
-function WorkspaceInfoDetail({
-  name = '',
-  visibility
-}: {
-  name?: string
-  visibility?: string
-}) {
+function WorkspaceInfoDetail({ name = '', visibility }: { name?: string; visibility?: string }) {
   return (
     <div className='flex flex-col justify-center gap-1'>
       <span className='flex items-center gap-2'>

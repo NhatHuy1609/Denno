@@ -1,8 +1,8 @@
 import React, { ReactNode } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
+import { setLocalStorageItem } from '@/utils/local-storage'
+import { PersistedStateKey } from '@/data/persisted-keys'
 import { useQuery } from '@tanstack/react-query'
-import { queryClient } from '@/lib/react-query/query-client'
 import { WorkspaceQueries } from '@/entities/workspace/workspace.queries'
 import { LiaAngleDownSolid } from 'react-icons/lia'
 import { HiViewBoards } from 'react-icons/hi'
@@ -18,6 +18,7 @@ interface IWorkspaceSubItem {
   title: string
   icon: ReactNode
   href: string
+  onClick?: () => void
 }
 
 function SidebarWorkspaceSubContent({ workspaceId }: { workspaceId: string }) {
@@ -27,7 +28,10 @@ function SidebarWorkspaceSubContent({ workspaceId }: { workspaceId: string }) {
     {
       title: 'Boards',
       icon: <HiViewBoards className={iconClass} />,
-      href: `/w/${workspaceId}/home`
+      href: `/w/${workspaceId}/home`,
+      onClick: () => {
+        setLocalStorageItem(PersistedStateKey.RecentAccessWorkspace, workspaceId)
+      }
     },
     {
       title: 'Highlights',
@@ -53,16 +57,19 @@ function SidebarWorkspaceSubContent({ workspaceId }: { workspaceId: string }) {
 
   return (
     <div className='mt-1 flex flex-col gap-[2px]'>
-      {items.map((item, index) => (
-        <Link
-          key={index}
-          href={item.href}
-          className='flex cursor-pointer items-center gap-2 rounded-md py-2 pl-10 pr-2 hover:bg-gray-200'
-        >
-          {item.icon}
-          <span className='text-[13px] font-medium text-slate-600'>{item.title}</span>
-        </Link>
-      ))}
+      {items.map((item, index) => {
+        return (
+          <Link
+            key={index}
+            href={item.href}
+            onClick={item.onClick}
+            className='flex cursor-pointer items-center gap-2 rounded-md py-2 pl-10 pr-2 hover:bg-gray-200'
+          >
+            {item.icon}
+            <span className='text-[13px] font-medium text-slate-600'>{item.title}</span>
+          </Link>
+        )
+      })}
     </div>
   )
 }

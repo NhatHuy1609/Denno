@@ -32,6 +32,7 @@ export function useRegisterUserMutation(
     },
     onMutate: async (variables) => {
       const { email } = variables
+      // Update current user's email used for validating registration code
       dispatch(updateCurrentUser({
         email
       }))

@@ -1,10 +1,17 @@
+import dynamic from 'next/dynamic'
 import React, { ReactNode, useState } from 'react'
 import { HiXMark } from 'react-icons/hi2'
 import { HiViewBoards } from 'react-icons/hi'
 import { BsPersonWorkspace } from 'react-icons/bs'
 import { LiaAngleLeftSolid } from 'react-icons/lia'
-import BoardCreateForm from '@/app/_features/Board/CreateForm'
 import WorkspaceCreateForm from '@/app/_features/Workspaces/Create/WorkspaceCreateForm'
+import DefaultLazyFallbackComp from '@/app/_components/DefaultLazyFallbackComp'
+
+// Lazy loading components
+const BoardCreateForm = dynamic(() => import('@/app/_features/Board/CreateForm'), {
+  ssr: false,
+  loading: () => <DefaultLazyFallbackComp className='w-[300px]' />
+})
 
 interface IItem {
   title: string

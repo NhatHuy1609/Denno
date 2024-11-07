@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import type { BoardVisibilityEnum } from '@/service/api/_enums'
+import type { enumTypes } from '@/service/api/_enums'
 import { cn } from '@/lib/styles/utils'
 import { useBoardCreateForm } from './context'
 import { boardVisibilityDescriptions } from '@/data/enum-detail'
@@ -9,7 +9,7 @@ import { FaAngleDown, FaUserFriends, FaLock } from 'react-icons/fa'
 
 type VisibilityItem = {
   icon: ReactNode
-  value: BoardVisibilityEnum
+  value: enumTypes.BoardVisibilityEnum
   description: string
 }
 
@@ -31,22 +31,10 @@ const VisibilitySelectionCard = ({ item }: { item: VisibilityItem }) => {
         isSelected && 'bg-blue-100 hover:bg-blue-200'
       )}
     >
-      <div
-        className={cn('size-6 text-gray-700', isSelected && 'text-blue-600')}
-      >
-        {icon}
-      </div>
+      <div className={cn('size-6 text-gray-700', isSelected && 'text-blue-600')}>{icon}</div>
       <div className='flex flex-col gap-1'>
-        <span
-          className={cn('tex-gray-700 text-sm', isSelected && 'text-blue-600')}
-        >
-          {value}
-        </span>
-        <p
-          className={cn('text-xs text-gray-500', isSelected && 'text-blue-600')}
-        >
-          {description}
-        </p>
+        <span className={cn('tex-gray-700 text-sm', isSelected && 'text-blue-600')}>{value}</span>
+        <p className={cn('text-xs text-gray-500', isSelected && 'text-blue-600')}>{description}</p>
       </div>
     </div>
   )

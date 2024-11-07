@@ -55,7 +55,7 @@ export const LoginResponseDtoSchema = z.object({
   success: z.boolean(),
   accessToken: z.string(),
   refreshToken: z.string(),
-  user: userContractsDto.GetUserResponseDtoSchema
+  user: userContractsDto.GetUserResponseDtoSchema.nullable()
 })
 
 export const LoginGoogleResponseDtoSchema = z.object({

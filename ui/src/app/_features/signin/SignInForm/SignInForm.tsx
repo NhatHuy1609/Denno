@@ -32,9 +32,9 @@ function SignInForm() {
   const { mutate: login, isPending } = useLoginMutation({
     onSuccess: (response) => {
       const status = response.status
-      const {
-        user: { userName }
-      } = response.data
+      const data = response?.data
+      const userName = data?.user?.userName
+
       if (status === 200) {
         router.push(`/u/${userName}/boards`)
       }

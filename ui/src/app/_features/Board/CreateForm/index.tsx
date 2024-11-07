@@ -1,4 +1,6 @@
 import React from 'react'
+import { getLocalStorageItem } from '@/utils/local-storage'
+import { PersistedStateKey } from '@/data/persisted-keys'
 import { queryClient } from '@/lib/react-query/query-client'
 import { BoardQueries } from '@/entities/board'
 import { PHOTOS_BACKGROUND } from '@/data/board-photo-backgrounds'
@@ -6,10 +8,10 @@ import { useForm, Controller } from 'react-hook-form'
 import { useCreateBoardMutation } from './boardCreate.mutation'
 import useCurrentUserWorkspacesQuery from '@/app/_hooks/query/useCurrentUserWorkspacesQuery'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { BoardService, boardTypesDto } from '@/service/api/board'
+import { boardTypesDto } from '@/service/api/board'
 import { boardContractsDto } from '@/service/api/board'
 import { CreateFormProvider as BoardCreateFormProvider } from './context'
-import { Button, Form, FormGroup, ScrollArea } from '@/ui'
+import { Button, Form, FormGroup, ScrollArea, toastSuccess } from '@/ui'
 import WorkspaceDropdown from './WorkspaceDropdown'
 import VisibilityDropdown from './VisibilityDropdown'
 import BoardBackgroundSelection from './BoardBackgroundSelection'
@@ -21,6 +23,7 @@ function BoardCreateForm() {
   const { data: userWorkspaces = [] } = useCurrentUserWorkspacesQuery()
 
   const {
+    reset,
     watch,
     control,
     setValue,
@@ -31,7 +34,8 @@ function BoardCreateForm() {
     defaultValues: {
       name: '',
       visibility: 'Workspace',
-      workspaceId: userWorkspaces[0].id || '',
+      workspaceId:
+        getLocalStorageItem(PersistedStateKey.RecentAccessWorkspace) || userWorkspaces[0].id || '',
       background: PHOTOS_BACKGROUND[0].url
     },
     resolver: zodResolver(boardContractsDto.CreateBoardDtoSchema)
@@ -42,6 +46,13 @@ function BoardCreateForm() {
       queryClient.invalidateQueries({
         queryKey: BoardQueries.boardsByWorkspaceIdQuery(getValues('workspaceId')).queryKey
       })
+      toastSuccess('Board created successfully')
+    },
+    onError: (error) => {
+      console.log(error)
+    },
+    onSettled: () => {
+      reset()
     }
   })
 
@@ -81,6 +92,7 @@ function BoardCreateForm() {
                   title='Board title'
                   placeholder="John's board"
                   onChange={field.onChange}
+                  value={field.value}
                 />
               )}
             />
