@@ -16,9 +16,9 @@ export const CreateBoardDtoSchema = z.object({
   workspaceId: z.string(),
   background: z.string(),
   visibility: z.string()
-})
+}).describe("CreateBoardDtoSchema")
 
 // Response
-export const BoardResponseDtoSchema = BoardDto
+export const BoardResponseDtoSchema = BoardDto.describe("BoardResponseDtoSchema")
 
-export const BoardsResponseDtoSchema = z.array(BoardDto)
+export const BoardsResponseDtoSchema = z.array(BoardDto).describe("BoardsResponseDtoSchema")

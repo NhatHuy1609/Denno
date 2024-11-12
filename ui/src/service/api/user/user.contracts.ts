@@ -21,4 +21,4 @@ export const GetUserResponseDtoSchema = z.object({
     emailVisibility: z.string(),
     avatarVisibility: z.string(),
   }).nullable()
-});
+}).describe("GetUserResponseDtoSchema")

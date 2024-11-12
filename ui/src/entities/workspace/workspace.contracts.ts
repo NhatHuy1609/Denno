@@ -5,7 +5,7 @@ export const WorkspaceSchema = z.object({
   name: z.string (),
   description: z.string(),
   visibility: z.string(),
-  logoUrl: z.string(),
+  logoUrl: z.string().nullable(),
   ownerId: z.string(),
 })
 

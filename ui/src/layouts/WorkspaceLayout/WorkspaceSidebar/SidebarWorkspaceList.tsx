@@ -13,6 +13,7 @@ import { IoIosSettings } from 'react-icons/io'
 import { Collapsible } from '@/ui'
 import WorkspaceLogo from '@/app/_components/WorkspaceLogo'
 import { workspaceTypes } from '@/entities/workspace'
+import { useWorkspaceQuery } from '@/app/_hooks/query'
 
 interface IWorkspaceSubItem {
   title: string
@@ -74,8 +75,10 @@ function SidebarWorkspaceSubContent({ workspaceId }: { workspaceId: string }) {
   )
 }
 
-function SidebarWorkspaceItem({ workspace }: { workspace: workspaceTypes.Workspace }) {
-  const { id, name, logoUrl } = workspace
+function SidebarWorkspaceItem({ workspaceId }: { workspaceId: string }) {
+  const { data: workspace } = useWorkspaceQuery(workspaceId)
+
+  const { id = '', name = '', logoUrl = '' } = workspace || {}
 
   return (
     <Collapsible.Collapsible>
@@ -101,7 +104,7 @@ function SidebarWorkspaceList() {
   return (
     <div className='mt-3 flex w-full flex-col'>
       {workspaces?.map((workspaceItem, index) => (
-        <SidebarWorkspaceItem workspace={workspaceItem} key={index} />
+        <SidebarWorkspaceItem workspaceId={workspaceItem.id} key={workspaceItem.id} />
       ))}
     </div>
   )
