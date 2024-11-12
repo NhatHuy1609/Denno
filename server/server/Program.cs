@@ -14,6 +14,7 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.Converters.Add(new StringEnumConverter());
 }); ;
 
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 builder.Services.Configure<FrontendUrlsConfiguration>(builder.Configuration.GetSection("FrontendUrls"));
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 builder.Services.Configure<GoogleAuthConfiguration>(builder.Configuration.GetSection("Authentication:Google"));
@@ -30,11 +31,6 @@ builder.Host.UseSerilog((context, loggerConfiguration) =>
     loggerConfiguration.WriteTo.Console();
     loggerConfiguration.ReadFrom.Configuration(context.Configuration);
 });
-
-// Configure AWS
-builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
-builder.Services.AddAWSService<IAmazonS3>();
-
 
 // Configure global exception handler
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -62,6 +58,8 @@ app.UseCors(x => x
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+app.UseStaticFiles();
 
 app.MapControllers();
 

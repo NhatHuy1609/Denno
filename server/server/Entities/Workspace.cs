@@ -1,4 +1,5 @@
-﻿using server.Enums;
+﻿using server.Entities;
+using server.Enums;
 
 namespace server.Models
 {
@@ -6,15 +7,15 @@ namespace server.Models
     {
         public Guid Id { get; set; }
         public required string Name { get; set; }
-        public string LogoUrl { get; set; } = string.Empty;
         public required string Description { get; set; }
         public WorkspaceVisibility Visibility { get; set; } = 0;
 
         public string OwnerId { get; set; }
         public AppUser Owner { get; set; }
 
-        public virtual ICollection<WorkspaceMember> WorkspaceMembers { get; set; } = new List<WorkspaceMember>();
+        public FileUpload Logo { get; set; }
 
         public ICollection<Board> Boards { get; set; } = new List<Board>();
+        public virtual ICollection<WorkspaceMember> WorkspaceMembers { get; set; } = new List<WorkspaceMember>();
     }
 }

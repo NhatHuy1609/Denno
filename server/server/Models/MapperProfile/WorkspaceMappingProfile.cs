@@ -7,7 +7,8 @@ namespace server.Models.MapperProfile
     {
         public WorkspaceMappingProfile()
         {
-            CreateMap<Workspace, WorkspaceResponseDto>();
+            CreateMap<Workspace, WorkspaceResponseDto>()
+                .ForMember(dest => dest.LogoUrl, opt => opt.MapFrom(src => src.Logo.Url));
         }
     }
 }

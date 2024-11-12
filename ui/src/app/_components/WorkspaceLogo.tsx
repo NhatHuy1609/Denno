@@ -50,7 +50,7 @@ type AvatarSizes = 'sm' | 'base' | 'lg'
 
 type IWorkspaceAvatarProps = {
   name: string
-  imageUrl: string
+  imageUrl?: string | null
   size?: AvatarSizes
   className?: string
 }
@@ -85,7 +85,15 @@ function WorkspaceLogo({
           <span className='block h-auto font-medium text-white'>{defaultLogoLetter}</span>
         </div>
       )}
-      {imageUrl && <Image src={imageUrl} alt='workspace-image' className='object-fit size-full' />}
+      {imageUrl && (
+        <Image
+          src={imageUrl}
+          alt='workspace-image'
+          className='object-fit size-full'
+          width={100}
+          height={100}
+        />
+      )}
     </div>
   )
 }
