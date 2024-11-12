@@ -30,6 +30,7 @@ namespace server.Infrastructure
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IDataStore, EFGoogleDataStore>();
+            services.AddScoped<IFileUploadService, FileUploadService>();
             #region Repositories
             services.AddTransient<IWorkspaceRepository, WorkspaceRepository>();
             #endregion

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using server.Data;
 using server.Interfaces;
+using System.Linq.Expressions;
 
 namespace server.Repositories
 {
@@ -28,9 +29,21 @@ namespace server.Repositories
             return await _context.Set<T>().ToListAsync();
         }
 
-        public async Task<T> GetByIdAsync(TId id)
+        public async Task<T?> GetByIdAsync(TId id, params Expression<Func<T, object>>[] includes)
         {
-            return await _context.Set<T>().FindAsync(id);
+            IQueryable<T> query = _context.Set<T>();
+
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+
+            return await query.FirstOrDefaultAsync(e => EF.Property<TId>(e, "Id").Equals(id));
+        }
+
+        public void Update(T entity)
+        {
+            _context.Set<T>().Update(entity);
         }
 
         public void Remove(T entity)

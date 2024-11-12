@@ -1,5 +1,6 @@
 ﻿using Asp.Versioning;
 using AutoMapper;
+using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -22,11 +23,17 @@ namespace server.Controllers
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<AppUser> _userManager;
+        private readonly IFileUploadService _uploadService;
 
-        public WorkspacesController(IUnitOfWork unitOfWork, UserManager<AppUser> userManager, IMapper mapper)
+        public WorkspacesController(
+            IMapper mapper,
+            IUnitOfWork unitOfWork,
+            UserManager<AppUser> userManager,
+            IFileUploadService uploadService)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
+            _uploadService = uploadService;
             _mapper = mapper;
         }
 
@@ -70,7 +77,7 @@ namespace server.Controllers
         [ProducesResponseType(typeof(Workspace), StatusCodes.Status200OK)]
         public async Task<IActionResult> Get(Guid id)
         {
-            var workspace = await _unitOfWork.Workspaces.GetByIdAsync(id);
+            var workspace = await _unitOfWork.Workspaces.GetByIdAsync(id, w => w.Logo);
 
             if (workspace == null)
             {
@@ -90,7 +97,7 @@ namespace server.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public IActionResult Create([FromBody] CreateWorkspaceRequestDto request)
+        public IActionResult Create([FromForm] CreateWorkspaceRequestDto request)
         {
             if (!ModelState.IsValid)
             {
@@ -120,6 +127,99 @@ namespace server.Controllers
             _unitOfWork.Complete();
 
             return CreatedAtAction(nameof(Create), workspace);
+        }
+
+        [HttpPut("[controller]/{workspaceId}")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> UpdateWorkspaceBasicInformationAsync(Guid workspaceId, [FromBody] UpdateWorkspaceRequestDto request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var updatedWorkspace = await _unitOfWork.Workspaces.GetByIdAsync(workspaceId, w => w.Logo);
+
+            if (updatedWorkspace == null)
+            {
+                return NotFound(new ApiErrorResponse()
+                {
+                    StatusMessage = "Workspace not found"
+                });
+            }
+
+            updatedWorkspace.Name = request.Name;
+            updatedWorkspace.Description = request.Description;
+
+            _unitOfWork.Complete();
+
+            return NoContent();
+        }
+
+        [HttpPut("[controller]/{workspaceId}/logo")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> UpdateWorkspaceLogoAsync(Guid workspaceId, [FromForm] UpdateWorkspaceLogoRequestDto request)
+        {
+            var updatedWorkspace = await _unitOfWork.Workspaces.GetByIdAsync(workspaceId, w => w.Logo);
+
+            if (updatedWorkspace == null)
+            {
+                return NotFound(new ApiErrorResponse()
+                {
+                    StatusMessage = "Workspace not found"
+                });
+            }
+
+            if (request.LogoFile != null)
+            {
+                var oldLogo = updatedWorkspace.Logo;
+
+                // Remove Logo in database and remove old logo image stored in cloudinary
+                if (oldLogo != null)
+                {
+                    _unitOfWork.FileUploads.Remove(updatedWorkspace.Logo);
+                    var cloudDeletionResult = await _uploadService.DeletePhotoAsync(oldLogo.PublicId);
+
+                    if (cloudDeletionResult.Result != "ok")
+                    {
+                        throw new Exception($"File deletion failed: {cloudDeletionResult.Error.Message}");
+                    }
+                }
+
+                // Add new Logo to database and upload new logo image to Cloudinary
+                var uploadResult = await _uploadService.UploadPhotoAsync(request.LogoFile);
+
+                if (!uploadResult.Success)
+                {
+                    throw new Exception($"File upload failed: {uploadResult.ErrorMessage}");
+                }
+
+                _unitOfWork.FileUploads.Add(uploadResult.FileUpload);
+                uploadResult.FileUpload.WorkspaceId = updatedWorkspace.Id;
+            }
+            else
+            {
+                var oldLogo = updatedWorkspace.Logo;
+                if (oldLogo != null)
+                {
+                    _unitOfWork.FileUploads.Remove(oldLogo);
+
+                    var cloudDeletionResult = await _uploadService.DeletePhotoAsync(oldLogo.PublicId);
+                    if (cloudDeletionResult.Result != "ok")
+                    {
+                        throw new Exception($"File deletion failed: {cloudDeletionResult.Error.Message}");
+                    }
+                }
+            }
+
+            _unitOfWork.Workspaces.Update(updatedWorkspace);
+            _unitOfWork.Complete();
+
+            return NoContent();
         }
     }
 }
