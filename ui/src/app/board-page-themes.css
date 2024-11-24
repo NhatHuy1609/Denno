@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Override light theme when showing board page and does not affect to other themes*/
+@layer base {
+  [data-page='board']:root {
+    --ds-border-light-transparent: rgba(255, 255, 255, 0.1);
+  }
+
+  [data-page='board'][data-theme='light'] {
+    --ds-text: #ffffff;
+    --ds-button-pressed: rgba(255, 255, 255, 0.2);
+    --ds-button-pressed-text: var(--ds-text);
+    --ds-button-pressed-icon: var(--ds-button-pressed-text);
+    --ds-button-pressed-hovered: var(--ds-button-pressed);
+    --ds-button-hovered: rgba(255, 255, 255, 0.2);
+    --ds-header-background: rgba(0, 0, 0, 0.6);
+  }
+}
