@@ -1,8 +1,8 @@
 'use client'
 import React from 'react'
 import dynamic from 'next/dynamic'
-import AuthProvider from '@/app/_providers/AuthProvider/AuthProvider'
 import ReduxProvider from '@/app/_providers/ReduxProvider'
+import AuthProvider from '@/app/_providers/AuthProvider/AuthProvider'
 import { QueryClientProvider } from '@/app/_providers/QueryClientProvider'
 import { Toaster } from '@/ui'
 

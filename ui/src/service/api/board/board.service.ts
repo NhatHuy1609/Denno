@@ -17,4 +17,9 @@ export class BoardService {
     return httpGet(`/workspaces/${workspaceId}/boards`)
             .then(AxiosContracts.responseContract(boardContractsDto.BoardsResponseDtoSchema))
   }
+
+  static boardQuery(boardId: string) {
+    return httpGet(`/boards/${boardId}`)
+            .then(AxiosContracts.responseContract(boardContractsDto.BoardResponseDtoSchema))
+  }
 }
