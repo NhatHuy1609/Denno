@@ -9,10 +9,13 @@ interface Props {
 }
 
 function BoardItem({ item }: Props) {
-  const { background: backgroundSource, name } = item
+  const { background: backgroundSource, name, id } = item
 
   return (
-    <Link href='' className='group relative block min-h-24 w-full overflow-hidden rounded-md'>
+    <Link
+      href={`/b/${id}`}
+      className='group relative block min-h-24 w-full overflow-hidden rounded-md'
+    >
       <div className='absolute inset-0 group-hover:brightness-90'>
         <Image
           width={120}

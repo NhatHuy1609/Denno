@@ -1,7 +1,7 @@
 import React from 'react'
 import { HiMagnifyingGlass } from 'react-icons/hi2'
 
-function WorkspaceHeaderInputSearch() {
+function HeaderInputSearch() {
   return (
     <div className='group relative h-full min-w-[200px] overflow-hidden rounded-md border border-black'>
       <span className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2'>
@@ -15,4 +15,4 @@ function WorkspaceHeaderInputSearch() {
   )
 }
 
-export default WorkspaceHeaderInputSearch
+export default HeaderInputSearch

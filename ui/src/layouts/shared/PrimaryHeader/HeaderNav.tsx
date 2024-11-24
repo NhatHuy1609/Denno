@@ -20,19 +20,25 @@ function HeaderNavItem({ item }: { item: IHeaderNavItemProps }) {
   const TriggerComp = title ? (
     <div
       className={cn(
-        `vertical-align inline-flex cursor-pointer items-center gap-2 rounded-sm px-3 py-[6px] hover:bg-gray-200`,
-        isActive && 'bg-blue-200 text-blue-600 hover:bg-blue-200'
+        `vertical-align inline-flex cursor-pointer items-center gap-2 rounded-sm px-3 py-[6px] hover:bg-[var(--ds-button-hovered)]`,
+        isActive &&
+          'bg-[var(--ds-button-pressed)] text-blue-600 hover:bg-[var(--ds-button-pressed-hovered)]'
       )}
     >
       <span
         className={cn(
-          'select-none text-sm font-medium text-slate-600',
-          isActive && 'text-blue-600'
+          'select-none text-sm font-medium text-[var(--ds-text)]',
+          isActive && 'text-[var(--ds-button-pressed-text)]'
         )}
       >
         {item.title}
       </span>
-      <LiaAngleDownSolid className='-translate-y-[2px] text-sm font-bold' />
+      <LiaAngleDownSolid
+        className={cn(
+          '-translate-y-[2px] text-sm font-bold text-[var(--ds-text)]',
+          isActive && 'text-[var(--ds-button-pressed-text)]'
+        )}
+      />
     </div>
   ) : (
     component
@@ -48,7 +54,7 @@ function HeaderNavItem({ item }: { item: IHeaderNavItemProps }) {
   )
 }
 
-function WorkspaceHeaderNav({ navList }: { navList: IHeaderNavItemProps[] }) {
+function HeaderNav({ navList }: { navList: IHeaderNavItemProps[] }) {
   return (
     <div className='flex list-none items-center gap-1'>
       {navList.map((navItem, index) => (
@@ -58,4 +64,4 @@ function WorkspaceHeaderNav({ navList }: { navList: IHeaderNavItemProps[] }) {
   )
 }
 
-export default WorkspaceHeaderNav
+export default HeaderNav
