@@ -2,8 +2,6 @@
 
 import React from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
-import GoogleIcon from 'public/google.png'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useForm, Controller } from 'react-hook-form'

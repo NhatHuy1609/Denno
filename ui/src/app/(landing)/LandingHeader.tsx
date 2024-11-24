@@ -1,7 +1,5 @@
 import React from 'react'
 import Link from 'next/link'
-import axios from 'axios'
-import { httpPost } from '@/service/api/_req'
 
 function LandingHeader() {
   const links = [
@@ -12,10 +10,6 @@ function LandingHeader() {
 
   return (
     <header className='flex w-full justify-between bg-white px-10 py-3'>
-      <div
-        className='size-10 cursor-pointer bg-red-500'
-        // onClick={handleTest}
-      ></div>
       <div className='flex items-center'>
         <Link href='/'>
           <div className='mr-20'>
@@ -24,11 +18,7 @@ function LandingHeader() {
         </Link>
         <ul className='flex list-none items-center gap-10'>
           {links.map((link) => (
-            <Link
-              key={link.title}
-              href={link.href}
-              className='font-medium hover:text-blue-500'
-            >
+            <Link key={link.title} href={link.href} className='font-medium hover:text-blue-500'>
               {link.title}
             </Link>
           ))}

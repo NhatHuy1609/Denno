@@ -1,10 +1,10 @@
+import axios from 'axios'
 import { store } from '@/lib/redux/store'
 import { messageError, messageInfo } from '@/ui'
-import axios from 'axios'
-
-import { authApiLib } from './auth';
-import { updateSession } from '@/store/features/session';
-import { getErrorMessage } from './_getErrorMessage';
+import { getLocalStorageItem } from '@/utils/local-storage'
+import { authApiLib } from './auth'
+import { updateSession } from '@/store/features/session'
+import { PersistedStateKey } from '@/data/persisted-keys'
 
 // console.log('=================================')
 // console.log('process.env', process.env.NEXT_PUBLIC_BE_GATEWAY)
@@ -16,8 +16,7 @@ const instance = axios.create({
 
 instance.interceptors.request.use(
   (config) => {
-    const state = store.getState()
-    const { token } = state.session.session;
+    const token = getLocalStorageItem(PersistedStateKey.Token)
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`
     }
@@ -37,8 +36,8 @@ instance.interceptors.response.use(
       originalRequest._retry = true;
 
       // Taking old session to refresh
-      const state = store.getState()
-      const { token, refreshToken } = state.session.session
+      const token = getLocalStorageItem(PersistedStateKey.Token)
+      const refreshToken = getLocalStorageItem(PersistedStateKey.RefreshToken)
       const data = {
         jwtToken: token,
         refreshToken

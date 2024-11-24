@@ -1,4 +1,5 @@
-﻿using server.Enums;
+﻿using server.Entities;
+using server.Enums;
 
 namespace server.Models
 {
@@ -12,8 +13,9 @@ namespace server.Models
         public string OwnerId { get; set; }
         public AppUser Owner { get; set; }
 
-        public virtual ICollection<WorkspaceMember> WorkspaceMembers { get; set; } = new List<WorkspaceMember>();
+        public FileUpload Logo { get; set; }
 
         public ICollection<Board> Boards { get; set; } = new List<Board>();
+        public virtual ICollection<WorkspaceMember> WorkspaceMembers { get; set; } = new List<WorkspaceMember>();
     }
 }

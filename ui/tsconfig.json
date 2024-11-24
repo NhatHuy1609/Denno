@@ -21,14 +21,16 @@
     "paths": {
       "@/*": ["./src/*"],
       "public/*": ["./public/*"]
-    }
+    },
+    "target": "ES2017"
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/middleware.ts"
+    "src/middleware.ts",
+    "src/utils/getStaticBoardBackgroundImage.Pathts"
   ],
   "exclude": ["node_modules"]
 }
