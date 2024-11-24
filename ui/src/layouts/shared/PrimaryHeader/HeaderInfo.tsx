@@ -11,7 +11,7 @@ function HeaderInfoItem({ item }: { item: IHeaderInfo }) {
   return (
     <Popover.Popover>
       <Popover.Trigger>
-        <div className='flex size-8 items-center justify-center rounded-full hover:bg-gray-300'>
+        <div className='flex size-8 items-center justify-center rounded-full hover:bg-[var(--ds-button-hovered)]'>
           {TriggerComp}
         </div>
       </Popover.Trigger>
@@ -20,7 +20,7 @@ function HeaderInfoItem({ item }: { item: IHeaderInfo }) {
   )
 }
 
-function WorkspaceHeaderInfo({ infoList }: { infoList: IHeaderInfo[] }) {
+function HeaderInfo({ infoList }: { infoList: IHeaderInfo[] }) {
   return (
     <div className='flex items-center gap-1'>
       {infoList.map((item, index) => (
@@ -30,4 +30,4 @@ function WorkspaceHeaderInfo({ infoList }: { infoList: IHeaderInfo[] }) {
   )
 }
 
-export default WorkspaceHeaderInfo
+export default HeaderInfo
