@@ -1,9 +1,10 @@
 'use client'
 
 import React from 'react'
+import BoardView from '@/app/_features/BoardViews/BoardView'
 
 function BoardHomePage() {
-  return <div className='px-4 py-2'>page</div>
+  return <BoardView />
 }
 
 export default BoardHomePage
