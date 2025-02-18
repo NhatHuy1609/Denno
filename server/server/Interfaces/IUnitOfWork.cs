@@ -6,6 +6,7 @@
         IBoardRepository Boards { get; }
         IWorkspaceRepository Workspaces { get; }
         IFileUploadRepository FileUploads { get; }
+        ICardListRepository CardLists { get; }
         int Complete();
     }
 }
