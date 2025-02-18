@@ -11,6 +11,7 @@ namespace server.UnitOfWorks
         public IBoardRepository Boards { get; private set; }
         public IWorkspaceRepository Workspaces { get; private set; }
         public IFileUploadRepository FileUploads { get; private set; }
+        public ICardListRepository CardLists { get; private set; }
 
         public UnitOfWork(ApplicationDBContext context)
         {
@@ -18,6 +19,7 @@ namespace server.UnitOfWorks
             Users = new UserRepository(context);
             Boards = new BoardRepository(context);
             Workspaces = new WorkspaceRepository(context);
+            CardLists = new CardListRepository(context);
             FileUploads = new FileUploadRepository(context);
         }
 
