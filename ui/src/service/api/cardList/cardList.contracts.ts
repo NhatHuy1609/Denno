@@ -13,9 +13,12 @@ export const CreateCardListDtoSchema = z.object({
   boardId: z.string()
 }).describe('CreateCardListDtoSchema')
 
+export const UpdateCardListDtoSchema = z.object({
+  name: z.string(),
+  rank: z.string() 
+}).describe('UpdateCardListDtoSchema')
+
 // Responses
 export const CardListResponseDtoSchema = CardListDto.describe('CardListResponseDtoSchema')
-
 export const CardListsResponseDtoSchema = z.array(CardListDto).describe('CardListsResponseDtoSchema')
-
 export const CardListsByBoardResponseDtoSchema = CardListsResponseDtoSchema.describe('CardListsByBoardResponseDtoSchema')

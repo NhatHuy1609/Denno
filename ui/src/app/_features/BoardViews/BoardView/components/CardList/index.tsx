@@ -14,6 +14,8 @@ function CardList({ id, boardId, name }: ICardList) {
     id
   })
 
+  // console.log(transform)
+
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -37,7 +39,7 @@ function CardList({ id, boardId, name }: ICardList) {
       {...attributes}
       {...listeners}
       ref={setNodeRef}
-      className='h-[80px] shrink-0 basis-[272px] rounded-xl bg-[var(--ds-card-list-background)] p-2'
+      className='h-[80px] w-[272px] shrink-0 rounded-xl bg-[var(--ds-card-list-background)] p-2'
     >
       <CardListHeader name={name} />
     </div>
