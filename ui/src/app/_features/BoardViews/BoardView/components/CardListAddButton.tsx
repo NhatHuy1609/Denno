@@ -117,15 +117,18 @@ function CardListAddButton() {
   }
 
   return (
-    <div className='relative h-auto w-auto'>
-      <button
-        onClick={handleShowForm}
-        className='flex w-[var(--ds-card-list-width)] items-center gap-2 rounded-xl bg-[#ffffff3d] p-3 hover:bg-[--ds-button-hovered]'
-      >
-        <FiPlus className='text-xl text-white' />
-        <span className='text-sm font-semibold text-white'>Add another list</span>
-      </button>
-      {showForm && <CardListAddForm hideForm={handleHideForm} />}
+    <div className='relative h-auto w-[var(--ds-card-list-width)]'>
+      {showForm ? (
+        <CardListAddForm hideForm={handleHideForm} />
+      ) : (
+        <button
+          onClick={handleShowForm}
+          className='flex w-full items-center gap-2 rounded-xl bg-[#ffffff3d] p-3 hover:bg-[--ds-button-hovered]'
+        >
+          <FiPlus className='text-xl text-white' />
+          <span className='text-sm font-semibold text-white'>Add another list</span>
+        </button>
+      )}
     </div>
   )
 }
