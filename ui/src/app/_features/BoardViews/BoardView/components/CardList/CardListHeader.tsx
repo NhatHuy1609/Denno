@@ -2,7 +2,7 @@ import React from 'react'
 import { HiOutlineDotsHorizontal } from 'react-icons/hi'
 
 interface IProps {
-  name: string
+  name?: string
 }
 
 function CardListHeader({ name }: IProps) {
