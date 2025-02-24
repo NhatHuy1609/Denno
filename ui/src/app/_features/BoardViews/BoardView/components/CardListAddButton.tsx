@@ -117,7 +117,7 @@ function CardListAddButton() {
   }
 
   return (
-    <div className='relative h-auto w-[var(--ds-card-list-width)]'>
+    <div className='relative h-auto w-[var(--ds-card-list-width)] shrink-0'>
       {showForm ? (
         <CardListAddForm hideForm={handleHideForm} />
       ) : (
