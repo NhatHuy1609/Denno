@@ -1,7 +1,7 @@
 import { httpPost, httpGet, httpPut } from "../_req";
 import { AxiosContracts } from "@/lib/axios/AxiosContracts";
-import { CreateCardListDtoSchema, UpdateCardListDtoSchema } from "./cardList.contracts";
-import { CardListResponseDto, CardListsByBoardResponseDto, CreateCardListDto, UpdateCardListDto } from "./cardList.types";
+import { CreateCardListDtoSchema, UpdateCardListDtoSchema, UpdateCardListRankDtoSchema } from "./cardList.contracts";
+import { CardListResponseDto, CardListsByBoardResponseDto, CreateCardListDto, UpdateCardListDto, UpdateCardListRankDto } from "./cardList.types";
 
 export class CardListService {
   static cardListsByBoardQuery(data: { boardId: string }, config: { signal?: AbortSignal }) {
@@ -26,5 +26,14 @@ export class CardListService {
     )
 
     return httpPut<CardListResponseDto>(`/cardLists/${data.id}`, updateCardListDto)
+  }
+
+  static updateCardListRankMutation(data: { id: string, updateCardListRankDto: UpdateCardListRankDto }) {
+    const updateCardListRankDto = AxiosContracts.requestContract(
+      UpdateCardListRankDtoSchema,
+      data.updateCardListRankDto
+    )
+
+    return httpPut<CardListResponseDto>(`/cardLists/${data.id}/rank`, updateCardListRankDto)
   }
 }
