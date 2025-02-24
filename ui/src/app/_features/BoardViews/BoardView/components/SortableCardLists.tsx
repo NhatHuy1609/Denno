@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import { createPortal } from 'react-dom'
-import { useParams } from 'next/navigation'
-import { useCardListsByBoards } from '@/app/_hooks/query/useCardListsByBoard'
+import useUpdateCardListRankMutation from '../mutations/updateCardListRank.mutation'
 import {
   closestCenter,
   DndContext,
@@ -9,7 +8,6 @@ import {
   useSensors,
   PointerSensor,
   DragStartEvent,
-  UniqueIdentifier,
   DragOverlay,
   DragEndEvent,
   DropAnimation,
@@ -20,6 +18,11 @@ import type { CardLists } from '@/entities/cardList/cardList.types'
 import CardList from './CardList'
 import SortableCardList from './SortableCardList'
 import CardListAddButton from './CardListAddButton'
+import { cardListTypesDto } from '@/service/api/cardList'
+import { useQueryClient } from '@tanstack/react-query'
+import { CardListQueries } from '@/entities/cardList'
+import { useParams } from 'next/navigation'
+import { toastError } from '@/ui'
 
 interface Props {
   cardLists: CardLists
@@ -36,6 +39,9 @@ const dropAnimation: DropAnimation = {
 }
 
 function SortableCardLists({ cardLists }: Props) {
+  const queryClient = useQueryClient()
+  const { boardId } = useParams()
+
   const [lists, setLists] = useState<CardLists>(cardLists)
   // Active Dragging CardList
   const [activeId, setActiveId] = useState<null | string>(null)
@@ -43,6 +49,28 @@ function SortableCardLists({ cardLists }: Props) {
   const sensors = useSensors(useSensor(PointerSensor))
 
   const listIds = useMemo(() => lists.map((cardList) => cardList.id), [lists])
+
+  const { mutate: updateCardListRank } = useUpdateCardListRankMutation({
+    onMutate() {
+      const previousCardLists = queryClient.getQueryData(
+        CardListQueries.cardListsByBoardQuery(boardId as string).queryKey
+      )
+      return { previousCardLists }
+    },
+    onSuccess(data, variables, context) {
+      queryClient.invalidateQueries({
+        queryKey: CardListQueries.cardListsByBoardQuery(boardId as string).queryKey
+      })
+    },
+    onError(error, variables, context) {
+      queryClient.setQueryData(
+        CardListQueries.cardListsByBoardQuery(boardId as string).queryKey,
+        context.previousCardLists
+      )
+      setLists(context.previousCardLists)
+      toastError("Failed to update card list's rank")
+    }
+  })
 
   useEffect(() => {
     setLists(cardLists)
@@ -57,18 +85,44 @@ function SortableCardLists({ cardLists }: Props) {
     const { active, over } = event
 
     if (active && over && active.id !== over.id) {
+      const overId = over.id as string
+      const activeId = active.id as string
+      const overIndex = lists.findIndex((list) => list.id === overId)
+      const activeIndex = lists.findIndex((list) => list.id === activeId)
+
       setLists((items) => {
         const oldItems = [...items]
-        const activeIndex = oldItems.findIndex((list) => list.id === active?.id)
-        const overIndex = oldItems.findIndex((list) => list.id === over?.id)
-
         return arrayMove(oldItems, activeIndex, overIndex)
       })
 
-      setActiveId(null)
+      // Calling to API to update in background
+      let updateCardListRankDto: cardListTypesDto.UpdateCardListRankDto = {
+        previousRank: null,
+        nextRank: null
+      }
+
+      if (activeIndex > overIndex) {
+        updateCardListRankDto = {
+          nextRank: lists[overIndex].rank,
+          previousRank: lists[overIndex - 1]?.rank ?? null
+        }
+      } else {
+        updateCardListRankDto = {
+          nextRank: lists[overIndex + 1]?.rank ?? null,
+          previousRank: lists[overIndex]?.rank
+        }
+      }
+
+      updateCardListRank({
+        id: activeId,
+        updateCardListRankDto
+      })
     }
+
+    setActiveId(null)
   }
 
+  // Active dragging cardlist
   const draggingCardList = lists.find((cardList) => cardList.id === activeId)
 
   return (
