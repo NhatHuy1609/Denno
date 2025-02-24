@@ -19,6 +19,7 @@ import { SortableContext, horizontalListSortingStrategy, arrayMove } from '@dnd-
 import type { CardLists } from '@/entities/cardList/cardList.types'
 import CardList from './CardList'
 import SortableCardList from './SortableCardList'
+import CardListAddButton from './CardListAddButton'
 
 interface Props {
   cardLists: CardLists
@@ -77,13 +78,16 @@ function SortableCardLists({ cardLists }: Props) {
       sensors={sensors}
       collisionDetection={closestCenter}
     >
-      <div className='flex max-w-fit'>
+      <div className='absolute inset-0 overflow-x-auto'>
         <SortableContext items={listIds} strategy={horizontalListSortingStrategy}>
-          <div className='flex w-full gap-2'>
+          <ul className='flex max-w-fit list-none gap-2 p-2'>
             {lists?.map((cardList) => (
-              <SortableCardList key={cardList.id} id={cardList.id} name={cardList.name} />
+              <li key={cardList.id}>
+                <SortableCardList id={cardList.id} name={cardList.name} />
+              </li>
             ))}
-          </div>
+            <CardListAddButton />
+          </ul>
         </SortableContext>
       </div>
       {createPortal(

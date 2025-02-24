@@ -20,7 +20,7 @@ function BoardLayoutComp({ children }: { children: React.ReactNode }) {
       }}
     >
       <PrimaryHeader />
-      <section className='relative z-[1] flex h-[calc(100%-var(--header-height))]'>
+      <section className='max-w-screen relative z-[1] flex h-[calc(100%-var(--header-height))]'>
         <PrimarySidebar />
         <div className='h-full flex-1'>{children}</div>
       </section>
