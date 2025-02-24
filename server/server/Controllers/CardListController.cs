@@ -86,7 +86,7 @@ namespace server.Controllers
             {
                 return NotFound(new ApiErrorResponse()
                 {
-                    StatusMessage = "Board không tồn tại"
+                    StatusMessage = "Board not found"
                 });
             }
 
@@ -110,6 +110,30 @@ namespace server.Controllers
 
             updatedCardList.Name = requestDto.Name;
             updatedCardList.Rank = requestDto.Rank;
+
+            _unitOfWork.CardLists.Update(updatedCardList);
+            _unitOfWork.Complete();
+
+            return Ok(_mapper.Map<CardListResponseDto>(updatedCardList));
+        }
+
+        [HttpPut("[controller]/{id}/rank")]
+        public async Task<IActionResult> UpdateCardListRankAsync(Guid id, [FromBody] UpdateCardListRankRequestDto requestDto)
+        {
+            var updatedCardList = await _unitOfWork.CardLists.GetByIdAsync(id);
+
+            if (updatedCardList == null)
+            {
+                return NotFound(new ApiErrorResponse()
+                {
+                    StatusMessage = "CardList not found"
+                });
+            }
+
+            var lexoRankGen = new LexoRankGenerator();
+            var newRank = lexoRankGen.GenerateNewRank(requestDto.PreviousRank, requestDto.NextRank);
+
+            updatedCardList.Rank = newRank;
 
             _unitOfWork.CardLists.Update(updatedCardList);
             _unitOfWork.Complete();
