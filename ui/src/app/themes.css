@@ -15,7 +15,8 @@
     --ds-button-pressed-hovered: #c2dbff;
     --ds-button-hovered: #9c9c9c3d;
     --ds-header-background: #ffffff;
-  }
+    --ds-card-list-background: #f1f2f4;
 
-  [data-theme='dark'] {}
+    --ds-accent-text: #172b4d;
+  }
 }

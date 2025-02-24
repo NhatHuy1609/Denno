@@ -16,7 +16,7 @@ const RootLayoutComp = ({ children }: { children: React.ReactNode }) => {
       <ReduxProvider>
         <AuthProvider>
           <ThemeProviderComp>
-            <div>{children}</div>
+            <div className='size-full'>{children}</div>
             <Toaster />
           </ThemeProviderComp>
         </AuthProvider>
