@@ -2,10 +2,10 @@ import React from 'react'
 import CardListHeader from './CardListHeader'
 import { CSS, Transform } from '@dnd-kit/utilities'
 import type { DraggableSyntheticListeners } from '@dnd-kit/core'
+import { cardListTypes } from '@/entities/cardList'
 
 interface Props {
-  id: string
-  name?: string
+  cardListData?: cardListTypes.CardList
   dragging?: boolean
   transform?: Transform | null
   transition?: string | null
@@ -18,8 +18,7 @@ export const CardList = React.memo(
   React.forwardRef<HTMLDivElement, Props>(
     (
       {
-        id,
-        name,
+        cardListData,
         dragging,
         transform,
         transition,
@@ -36,7 +35,6 @@ export const CardList = React.memo(
         border: '1px solid #ddd',
         padding: '10px',
         backgroundColor: 'white',
-        cursor: 'grab',
         userSelect: 'none',
         height: '80px',
         flexShrink: 0,
@@ -54,7 +52,7 @@ export const CardList = React.memo(
           className='h-[80px] w-[272px] shrink-0 rounded-xl bg-[var(--ds-card-list-background)] p-2'
           {...props}
         >
-          <CardListHeader name={name} listeners={listeners} />
+          <CardListHeader cardListData={cardListData} listeners={listeners} />
         </div>
       )
     }

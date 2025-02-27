@@ -1,13 +1,15 @@
-import React, { useState } from 'react'
+import React from 'react'
 import CardList from './CardList'
 import { useSortable } from '@dnd-kit/sortable'
+import { cardListTypes } from '@/entities/cardList'
 
 interface Props {
-  id: string
-  name: string
+  cardListData: cardListTypes.CardList
 }
 
-function SortableCardList({ id, name }: Props) {
+function SortableCardList({ cardListData }: Props) {
+  const { id } = cardListData
+
   const {
     isDragging,
     attributes,
@@ -22,8 +24,7 @@ function SortableCardList({ id, name }: Props) {
 
   return (
     <CardList
-      id={id}
-      name={name}
+      cardListData={cardListData}
       ref={setNodeRef}
       listeners={listeners}
       transform={transform}
