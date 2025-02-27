@@ -7,12 +7,14 @@ import {
   useSensor,
   useSensors,
   PointerSensor,
+  MouseSensor,
   DragStartEvent,
   DragOverlay,
   DragEndEvent,
   DropAnimation,
   defaultDropAnimationSideEffects
 } from '@dnd-kit/core'
+// import { PointerSensor, MouseSensor } from '@/lib/dnd-kit/custom-sensors'
 import { SortableContext, horizontalListSortingStrategy, arrayMove } from '@dnd-kit/sortable'
 import type { CardLists } from '@/entities/cardList/cardList.types'
 import CardList from './CardList'
@@ -39,16 +41,24 @@ const dropAnimation: DropAnimation = {
 }
 
 function SortableCardLists({ cardLists }: Props) {
-  const queryClient = useQueryClient()
   const { boardId } = useParams()
+  const queryClient = useQueryClient()
 
+  // For updating cardlists on client screen
   const [lists, setLists] = useState<CardLists>(cardLists)
+  const listIds = useMemo(() => lists.map((cardList) => cardList.id), [lists])
+
   // Active Dragging CardList
   const [activeId, setActiveId] = useState<null | string>(null)
 
-  const sensors = useSensors(useSensor(PointerSensor))
-
-  const listIds = useMemo(() => lists.map((cardList) => cardList.id), [lists])
+  // Adding sensors
+  const pointerSensor = useSensor(PointerSensor, {
+    activationConstraint: {
+      delay: 80,
+      tolerance: 50
+    }
+  })
+  const sensors = useSensors(pointerSensor)
 
   const { mutate: updateCardListRank } = useUpdateCardListRankMutation({
     onMutate() {
