@@ -10,11 +10,26 @@ interface Props {
   transform?: Transform | null
   transition?: string | null
   listeners?: DraggableSyntheticListeners
+  setActivatorNodeRef?: (element: HTMLElement | null) => void
+  setDisabledDnd?: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export const CardList = React.memo(
   React.forwardRef<HTMLDivElement, Props>(
-    ({ id, name, dragging, transform, transition, listeners, ...props }, ref) => {
+    (
+      {
+        id,
+        name,
+        dragging,
+        transform,
+        transition,
+        listeners,
+        setDisabledDnd,
+        setActivatorNodeRef,
+        ...props
+      },
+      ref
+    ) => {
       const style: React.CSSProperties = {
         transform: transform ? CSS.Transform.toString(transform) : undefined,
         transition: transition ?? undefined,
@@ -34,13 +49,12 @@ export const CardList = React.memo(
 
       return (
         <div
-          style={style}
-          {...listeners}
           ref={ref}
+          style={style}
           className='h-[80px] w-[272px] shrink-0 rounded-xl bg-[var(--ds-card-list-background)] p-2'
           {...props}
         >
-          <CardListHeader name={name} />
+          <CardListHeader name={name} listeners={listeners} />
         </div>
       )
     }

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import CardList from './CardList'
 import { useSortable } from '@dnd-kit/sortable'
 
@@ -8,7 +8,15 @@ interface Props {
 }
 
 function SortableCardList({ id, name }: Props) {
-  const { isDragging, attributes, listeners, setNodeRef, transform, transition } = useSortable({
+  const {
+    isDragging,
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    setActivatorNodeRef
+  } = useSortable({
     id
   })
 
@@ -21,6 +29,7 @@ function SortableCardList({ id, name }: Props) {
       transform={transform}
       transition={transition}
       dragging={isDragging}
+      setActivatorNodeRef={setActivatorNodeRef}
       {...attributes}
     />
   )
