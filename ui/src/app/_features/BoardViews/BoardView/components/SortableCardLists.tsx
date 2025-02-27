@@ -147,7 +147,7 @@ function SortableCardLists({ cardLists }: Props) {
           <ul className='flex max-w-fit list-none gap-2 p-2'>
             {lists?.map((cardList) => (
               <li key={cardList.id}>
-                <SortableCardList id={cardList.id} name={cardList.name} />
+                <SortableCardList cardListData={cardList} />
               </li>
             ))}
             <CardListAddButton />
@@ -156,7 +156,7 @@ function SortableCardLists({ cardLists }: Props) {
       </div>
       {createPortal(
         <DragOverlay dropAnimation={dropAnimation}>
-          {activeId !== null ? <CardList id={activeId} name={draggingCardList?.name} /> : null}
+          {activeId !== null ? <CardList cardListData={draggingCardList} /> : null}
         </DragOverlay>,
         document.body
       )}
