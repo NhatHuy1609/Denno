@@ -96,7 +96,7 @@ namespace server.Controllers
         }
 
         [HttpPut("[controller]/{id}")]
-        public async Task<IActionResult> UpdateCardListAsync(Guid id, [FromForm] UpdateCardListRequestDto requestDto)
+        public async Task<IActionResult> UpdateCardListAsync(Guid id, [FromBody] UpdateCardListRequestDto requestDto)
         {
             var updatedCardList = await _unitOfWork.CardLists.GetByIdAsync(id);
 
