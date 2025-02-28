@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from 'react'
+import React, { ChangeEvent, useState, useEffect } from 'react'
 import type { TextareaProps } from '../types'
 import { TiWarning } from 'react-icons/ti'
 
@@ -33,7 +33,7 @@ export default function TextareaControl({
       {title ? <label>{title}</label> : null}
       <div className='form-control-wrapper relative inline-flex w-full'>
         <textarea
-          value={val}
+          value={value}
           name={name}
           rows={rows}
           cols={cols}

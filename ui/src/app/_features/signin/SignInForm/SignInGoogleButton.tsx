@@ -29,11 +29,10 @@ export default function SignInGoogleButton() {
   return (
     <Button
       block
+      size='lg'
       onClick={handleGetGoogleLoginUrl}
       title='Continue with google'
-      leadingIcon={
-        <Image src={GoogleIcon} alt='google-image' className='mr-4 size-6' />
-      }
+      leadingIcon={<Image src={GoogleIcon} alt='google-image' className='mr-4 size-6' />}
     />
   )
 }

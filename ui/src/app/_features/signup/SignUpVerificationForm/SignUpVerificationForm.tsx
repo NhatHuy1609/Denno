@@ -43,28 +43,31 @@ function SignUpVerificationForm() {
     resolver: zodResolver(VerificationOTPSchema)
   })
 
-  const { mutate: validateRegister, isPending } =
-    useValidateRegisterUserMutation({
-      onSuccess: async (response) => {
-        if (response.status === 200) {
-          messageSuccess('Account registration verification successful.')
-          router.replace('/general')
-        }
-      },
-      onError: (error) => {
-        const { message } = getErrorMessage(error)
-        messageError(message)
+  const { mutate: validateRegister, isPending } = useValidateRegisterUserMutation({
+    onSuccess: async (response) => {
+      if (response.status === 200) {
+        messageSuccess('Account registration verification successful.')
+        router.replace('/general')
       }
-    })
+    },
+    onError: (error) => {
+      const { message } = getErrorMessage(error)
+      messageError(message)
+    }
+  })
 
   const isFormError = Object.keys(errors).length > 0
-  const fieldNames: FormKeys[] = Object.keys(
-    VerificationOTPSchema.shape
-  ) as FormKeys[]
+  const fieldNames: FormKeys[] = Object.keys(VerificationOTPSchema.shape) as FormKeys[]
 
   // Handle submit otp code after validation
   const onSubmit = (data: FormValues) => {
     let otpCode = Object.values(data).join('')
+
+    console.log({
+      email,
+      code: otpCode
+    })
+
     validateRegister({
       email,
       code: otpCode
@@ -74,22 +77,13 @@ function SignUpVerificationForm() {
   return (
     <div className='absolute z-[100] w-[36%] min-w-[400px] rounded-lg bg-white px-12 py-8 shadow-[0px_0px_20px_rgba(0,0,0,0.05)]'>
       <div className='w-full'>
-        <p className='mb-4 text-center text-3xl font-semibold'>
-          Seconds to verify!
-        </p>
+        <p className='mb-4 text-center text-3xl font-semibold'>Seconds to verify!</p>
         <div className='flex justify-center'>
-          <Image
-            priority={true}
-            src={MailLogo}
-            alt='email logo'
-            className='size-1/2'
-          />
+          <Image priority={true} src={MailLogo} alt='email logo' className='size-1/2' />
         </div>
         <span className='text-2xl'>We just emailed you.</span>
         <div className='mt-6 flex flex-col gap-2'>
-          <p className='block text-sm text-stone-400'>
-            Please enter the code we emailed you.
-          </p>
+          <p className='block text-sm text-stone-400'>Please enter the code we emailed you.</p>
           <span className='text-sm'>{email}</span>
         </div>
         <span
@@ -102,10 +96,7 @@ function SignUpVerificationForm() {
         </span>
       </div>
 
-      <form
-        className='mt-6 flex flex-col gap-4'
-        onSubmit={handleSubmit(onSubmit)}
-      >
+      <form className='mt-6 flex flex-col gap-4' onSubmit={handleSubmit(onSubmit)}>
         <SignUpVerificationOTP
           setValue={setValue}
           fieldList={fieldNames}
