@@ -24,19 +24,26 @@ namespace server.Repositories
             _context.Set<T>().AddRange(entities);
         }
 
-        public IEnumerable<T> FindAsync(Expression<Func<T, bool>> expression)
-        {
-            return  _context.Set<T>().Where(expression);
-        }
-
         public async Task<IEnumerable<T>> GetAllAsync()
         {
             return await _context.Set<T>().ToListAsync();
         }
 
-        public async Task<T> GetByIdAsync(TId id)
+        public async Task<T?> GetByIdAsync(TId id, params Expression<Func<T, object>>[] includes)
         {
-            return await _context.Set<T>().FindAsync(id);
+            IQueryable<T> query = _context.Set<T>();
+
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+
+            return await query.FirstOrDefaultAsync(e => EF.Property<TId>(e, "Id").Equals(id));
+        }
+
+        public void Update(T entity)
+        {
+            _context.Set<T>().Update(entity);
         }
 
         public void Remove(T entity)

@@ -8,6 +8,7 @@ namespace server.Models
         public string Name { get; set; } = string.Empty;
         public bool StarredStatus { get; set; } = false;
         public BoardVisibility Visibility { get; set; }
+        public string Background { get; set; } = string.Empty;
 
         public Guid WorkspaceId { get; set; }
         public Workspace Workspace { get; set; }

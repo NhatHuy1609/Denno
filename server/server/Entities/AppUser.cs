@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using server.Data.Enums;
+using server.Entities;
 
 namespace server.Models
 {
@@ -14,13 +15,8 @@ namespace server.Models
         public string? CoverImage { get; set; } = string.Empty;
         public string? RefreshToken { get; set; }
         public DateTime RefreshTokenExpiry { get; set; }
-        public UserInformationVisibility FullNameVisibility { get; set; } = 0;
-        public UserInformationVisibility JobTitleVisibility { get; set; } = 0;
-        public UserInformationVisibility DepartmentVisibility { get; set; } = 0;
-        public UserInformationVisibility OrganizationVisibility { get; set; } = 0;
-        public UserInformationVisibility BasedInVisibility { get; set; } = 0;
-        public UserInformationVisibility EmailVisibility { get; set; } = 0;
-        public UserInformationVisibility AvatarVisibility { get; set; } = 0;
+
+        public UserVisibilitySettings UserVisibilitySettings { get; set; } = new UserVisibilitySettings();
 
         public virtual ICollection<Workspace> OwnedWorkspaces { get; set; } = new List<Workspace>();
 

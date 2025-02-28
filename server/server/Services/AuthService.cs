@@ -11,20 +11,24 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using AutoMapper;
 
 namespace server.Services
 {
     public class AuthService : IAuthService
     {
+        private readonly IMapper _mapper;
         private readonly IConfiguration _config;
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 
         public AuthService(
+            IMapper mapper,
             IConfiguration config,
             UserManager<AppUser> userManager,
             RoleManager<IdentityRole> roleManager)
         {
+            _mapper = mapper;
             _config = config;
             _userManager = userManager;
             _roleManager = roleManager;
@@ -51,12 +55,11 @@ namespace server.Services
             }
             else
             {
-                appUser.Id = identityUser.Id;
-                response.UserInfo = appUser;
-
+                // appUser.Id = identityUser.Id;
                 response.RequiresRegistration = false;
                 response.RefreshToken = GenerateRefreshTokenString();
                 response.AccessToken = await GenerateTokenString(userinfo.Email);
+                response.UserInfo = _mapper.Map<GetUserResponseDto>(identityUser);
                 response.Message = "Email was used to create account, proceed to login";
 
                 identityUser.RefreshToken = response.RefreshToken;
@@ -75,7 +78,7 @@ namespace server.Services
             var newUser = new AppUser
             {
                 FullName = registerRequest.FullName,
-                UserName = registerRequest.Email,
+                UserName = GenerateUserNameByEmail(registerRequest.Email),
                 Email = registerRequest.Email,
             };
 
@@ -128,7 +131,7 @@ namespace server.Services
 
             var securityToken = new JwtSecurityToken(
                     claims: claims,
-                    expires: DateTime.Now.AddSeconds(30),
+                    expires: DateTime.Now.AddDays(JwtTokenProvider.AccessTokenExpiration),
                     issuer: _config.GetSection("Jwt:Issuer").Value,
                     audience: _config.GetSection("Jwt:Audience").Value,
                     signingCredentials: signingCred);
@@ -197,6 +200,13 @@ namespace server.Services
             };
 
             return claims;
+        }
+
+        private string GenerateUserNameByEmail(string userEmail)
+        {
+            var userName = userEmail.Substring(0, userEmail.IndexOf("@"));
+
+            return userName;
         }
     }
 }

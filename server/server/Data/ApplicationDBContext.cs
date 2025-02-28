@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using server.Entities;
 using server.Models;
 
 namespace server.Data
@@ -28,6 +29,7 @@ namespace server.Data
         public DbSet<CardComment> CardComments { get; set; }
         public DbSet<CardActivity> CardActivites { get; set; }
         public DbSet<GoogleAuthDataStore> GoogleAuthDataStores { get; set; }
+        public DbSet<FileUpload> FileUploads { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -40,9 +42,19 @@ namespace server.Data
                 .OnDelete(DeleteBehavior.Cascade)
                 .IsRequired();
 
+            modelBuilder.Entity<AppUser>()
+                .HasOne(u => u.UserVisibilitySettings)
+                .WithOne()
+                .HasForeignKey<UserVisibilitySettings>(v => v.Id);
+
             modelBuilder.Entity<Workspace>()
                 .HasKey(e => e.Id)
                 .IsClustered(false);
+
+            modelBuilder.Entity<Workspace>()
+                .HasOne(w => w.Logo)
+                .WithOne(l => l.Workspace)
+                .HasForeignKey<FileUpload>(l => l.WorkspaceId);
 
             modelBuilder.Entity<WorkspaceMember>()
                 .HasKey(e => new { e.WorkspaceId, e.AppUserId });

@@ -3,7 +3,7 @@ import { ThemeProvider } from 'next-themes'
 
 function ThemeProviderComp({ children }: { children: React.ReactNode }) {
   return (
-    <ThemeProvider attribute='class' defaultTheme='light'>
+    <ThemeProvider attribute='data-theme' defaultTheme='light'>
       {children}
     </ThemeProvider>
   )
