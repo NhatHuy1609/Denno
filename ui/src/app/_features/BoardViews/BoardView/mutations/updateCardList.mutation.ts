@@ -12,7 +12,7 @@ export default function useUpdateCardListMutation(
       Awaited<cardListTypesDto.CardListResponseDto>,
       DefaultError,
       UpdateCardListParams,
-      unknown
+      any
     >,
     'mutationKey' | 'onMutate' | 'onSettled' | 'onSuccess' | 'onError'
   >
