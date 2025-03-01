@@ -26,4 +26,4 @@ export const UpdateCardListRankDtoSchema = z.object({
 // Responses
 export const CardListResponseDtoSchema = CardListDto.describe('CardListResponseDtoSchema')
 export const CardListsResponseDtoSchema = z.array(CardListDto).describe('CardListsResponseDtoSchema')
-export const CardListsByBoardResponseDtoSchema = CardListsResponseDtoSchema.describe('CardListsByBoardResponseDtoSchema')
+export const CardListsByBoardResponseDtoSchema = z.array(CardListDto).describe('CardListsByBoardResponseDtoSchema')
