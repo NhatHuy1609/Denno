@@ -7,7 +7,7 @@ import { RxCross1 } from 'react-icons/rx'
 import { useParams } from 'next/navigation'
 import { useForm, Controller } from 'react-hook-form'
 import { useQueryClient } from '@tanstack/react-query'
-import { useOnClickOutSide } from '@/app/_hooks/useOnClickOutside'
+import { useOnClickOutSide } from '@/app/_hooks/useOnClickOutSide'
 import useCreateCardListMutation from '../mutations/createCardList.mutation'
 import { CardListQueries, cardListTypes } from '@/entities/cardList'
 

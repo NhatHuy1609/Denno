@@ -52,8 +52,16 @@ namespace server.Controllers
 
         [HttpPost("[controller]")]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<IActionResult> Create([FromForm] CreateCardRequestDto requestDto)
+        public async Task<IActionResult> Create(CreateCardRequestDto requestDto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ApiErrorResponse()
+                {
+                    StatusMessage = "RequestDto is invalid"
+                });
+            }
+
             var newCard = new Card()
             {
                 Name = requestDto.Name,

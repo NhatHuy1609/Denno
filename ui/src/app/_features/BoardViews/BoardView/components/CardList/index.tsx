@@ -4,6 +4,8 @@ import { CSS, Transform } from '@dnd-kit/utilities'
 import type { DraggableSyntheticListeners } from '@dnd-kit/core'
 import { cardListTypes } from '@/entities/cardList'
 import CardListFooter from './CardListFooter'
+import { CardListProvider } from './context'
+import CardListBody from './CardListBody'
 
 interface Props {
   cardListData?: cardListTypes.CardList
@@ -47,10 +49,13 @@ export const CardList = React.memo(
       }
 
       return (
-        <div ref={ref} style={style} className='flex w-[272px] flex-col gap-2' {...props}>
-          <CardListHeader cardListData={cardListData} listeners={listeners} />
-          <CardListFooter />
-        </div>
+        <CardListProvider value={{ cardListData }}>
+          <div ref={ref} style={style} className='flex w-[272px] flex-col gap-2' {...props}>
+            <CardListHeader cardListData={cardListData} listeners={listeners} />
+            <CardListBody />
+            <CardListFooter />
+          </div>
+        </CardListProvider>
       )
     }
   )
