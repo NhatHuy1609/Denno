@@ -47,7 +47,7 @@ namespace server.Controllers
             }
 
             var cards = await _unitOfWork.Cards.GetCardsByCardListIdAsync(cardListId);
-            return Ok(_mapper.Map<List<CardListResponseDto>>(cards));
+            return Ok(_mapper.Map<List<CardResponseDto>>(cards));
         }
 
         [HttpPost("[controller]")]
