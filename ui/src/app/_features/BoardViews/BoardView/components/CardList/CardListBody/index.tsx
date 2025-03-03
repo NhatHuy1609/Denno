@@ -9,7 +9,7 @@ function CardListBody() {
 
   console.log('CARDS DATA: ', cards)
 
-  return <div>{cards?.map((card) => <CardItem key={card.id} />)}</div>
+  return <div>{cards?.map((card) => <CardItem key={card.id} cardData={card} />)}</div>
 }
 
 export default CardListBody
