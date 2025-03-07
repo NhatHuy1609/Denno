@@ -1,4 +1,5 @@
-﻿using server.Enums;
+﻿using server.Dtos.Response.Card;
+using server.Enums;
 
 namespace server.Dtos.Response.Board;
 
