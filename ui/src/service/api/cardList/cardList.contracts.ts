@@ -1,10 +1,12 @@
 import { z } from 'zod'
+import { CardsResponseDtoSchema } from '../card/card.contracts'
 
 const CardListDto = z.object({
   id: z.string(),
   name: z.string(),
   rank: z.string(),
-  boardId: z.string()
+  boardId: z.string(),
+  cards: CardsResponseDtoSchema
 })
 
 // Requests
