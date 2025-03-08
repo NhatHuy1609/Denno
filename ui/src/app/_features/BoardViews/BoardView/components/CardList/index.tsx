@@ -5,7 +5,6 @@ import type { DraggableSyntheticListeners } from '@dnd-kit/core'
 import { cardListTypes } from '@/entities/cardList'
 import CardListFooter from './CardListFooter'
 import { CardListProvider } from './context'
-import CardListBody from './CardListBody'
 
 interface Props {
   children: React.ReactNode
@@ -55,7 +54,6 @@ export const CardList = React.memo(
           <div className='size-auto'>
             <div ref={ref} style={style} className='flex w-[272px] flex-col gap-2' {...props}>
               <CardListHeader cardListData={cardListData} listeners={listeners} />
-              {/* <CardListBody /> */}
               {children}
               <CardListFooter />
             </div>
