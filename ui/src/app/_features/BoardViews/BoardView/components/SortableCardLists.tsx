@@ -38,7 +38,7 @@ import { CardListQueries, cardListTypes } from '@/entities/cardList'
 import { useParams } from 'next/navigation'
 import { toastError } from '@/ui'
 import { cardTypes } from '@/entities/card'
-import SortableCardItem from './CardList/SortableCards/SortableCardItem'
+import SortableCardItem from './CardList/SortableCardItem'
 import CardItem from './CardList/CardItem'
 
 interface Props {
@@ -241,10 +241,6 @@ function SortableCardLists({ cardLists }: Props) {
     })
   }, [lists])
 
-  // useEffect(() => {
-  //   setLists(cardLists)
-  // }, [cardLists])
-
   // const handleDragStart = (event: DragStartEvent) => {
   //   const { active } = event
   //   setActiveId(active.id as string)
@@ -414,6 +410,7 @@ function SortableCardLists({ cardLists }: Props) {
           strategy: MeasuringStrategy.Always
         }
       }}
+      onDragCancel={onDragCancel}
       onDragStart={onDragStart}
       onDragOver={onDragOver}
       onDragEnd={onDragEnd}

@@ -14,7 +14,6 @@ interface Props {
   transition?: string | null
   listeners?: DraggableSyntheticListeners
   setActivatorNodeRef?: (element: HTMLElement | null) => void
-  setDisabledDnd?: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export const CardList = React.memo(
@@ -27,7 +26,6 @@ export const CardList = React.memo(
         transform,
         transition,
         listeners,
-        setDisabledDnd,
         setActivatorNodeRef,
         ...props
       },
