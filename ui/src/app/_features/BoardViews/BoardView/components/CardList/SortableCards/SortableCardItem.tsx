@@ -10,19 +10,10 @@ interface Props {
 function SortableCardItem({ cardData }: Props) {
   const { id, name } = cardData
 
-  const {
-    setNodeRef,
-    setActivatorNodeRef,
-    listeners,
-    isDragging,
-    isSorting,
-    over,
-    overIndex,
-    transform,
-    transition
-  } = useSortable({
-    id
-  })
+  const { setNodeRef, listeners, isDragging, isSorting, over, overIndex, transform, transition } =
+    useSortable({
+      id
+    })
 
   const style: React.CSSProperties = {
     transform: transform ? CSS.Translate.toString(transform) : undefined,

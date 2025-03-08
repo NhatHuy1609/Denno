@@ -39,6 +39,7 @@ import { useParams } from 'next/navigation'
 import { toastError } from '@/ui'
 import { cardTypes } from '@/entities/card'
 import SortableCardItem from './CardList/SortableCards/SortableCardItem'
+import CardItem from './CardList/CardItem'
 
 interface Props {
   cardLists: CardLists
@@ -391,6 +392,20 @@ function SortableCardLists({ cardLists }: Props) {
     setActiveId(null)
   }
 
+  const renderContainerDragOverlay = (containerId: UniqueIdentifier) => {
+    return (
+      <CardList cardListData={cardListsMap[containerId]}>
+        {lists[containerId].map((cardId) => (
+          <CardItem key={cardId} cardData={cardsMap[cardId]} />
+        ))}
+      </CardList>
+    )
+  }
+
+  const renderCardItemDragOverlay = (cardId: UniqueIdentifier) => {
+    return <CardItem cardData={cardsMap[cardId]} />
+  }
+
   return (
     <DndContext
       collisionDetection={collisionDetectionStrategy}
@@ -410,9 +425,9 @@ function SortableCardLists({ cardLists }: Props) {
             {containers?.map((containerId) => (
               <SortableCardList key={containerId} cardListData={cardListsMap[containerId]}>
                 <SortableContext items={lists[containerId]} strategy={verticalListSortingStrategy}>
-                  {lists[containerId].map((cardId) => {
-                    return <SortableCardItem cardData={cardsMap[cardId]} />
-                  })}
+                  {lists[containerId].map((cardId) => (
+                    <SortableCardItem key={cardId} cardData={cardsMap[cardId]} />
+                  ))}
                 </SortableContext>
               </SortableCardList>
             ))}
@@ -420,12 +435,16 @@ function SortableCardLists({ cardLists }: Props) {
           </div>
         </SortableContext>
       </div>
-      {/* {createPortal(
+      {createPortal(
         <DragOverlay dropAnimation={dropAnimation}>
-          {activeId !== null ? <CardList cardListData={draggingCardList} /> : null}
+          {activeId
+            ? containers.includes(activeId)
+              ? renderContainerDragOverlay(activeId)
+              : renderCardItemDragOverlay(activeId)
+            : null}
         </DragOverlay>,
         document.body
-      )} */}
+      )}
     </DndContext>
   )
 }
