@@ -18,20 +18,27 @@ import {
   pointerWithin,
   rectIntersection,
   getFirstCollision,
-  DragOverEvent
+  DragOverEvent,
+  MeasuringStrategy
 } from '@dnd-kit/core'
 // import { PointerSensor, MouseSensor } from '@/lib/dnd-kit/custom-sensors'
-import { SortableContext, horizontalListSortingStrategy, arrayMove } from '@dnd-kit/sortable'
+import {
+  SortableContext,
+  horizontalListSortingStrategy,
+  arrayMove,
+  verticalListSortingStrategy
+} from '@dnd-kit/sortable'
 import type { CardLists } from '@/entities/cardList/cardList.types'
 import CardList from './CardList'
 import SortableCardList from './SortableCardList'
 import CardListAddButton from './CardListAddButton'
 import { cardListTypesDto } from '@/service/api/cardList'
 import { useQueryClient } from '@tanstack/react-query'
-import { CardListQueries } from '@/entities/cardList'
+import { CardListQueries, cardListTypes } from '@/entities/cardList'
 import { useParams } from 'next/navigation'
 import { toastError } from '@/ui'
 import { cardTypes } from '@/entities/card'
+import SortableCardItem from './CardList/SortableCards/SortableCardItem'
 
 interface Props {
   cardLists: CardLists
@@ -50,7 +57,7 @@ const dropAnimation: DropAnimation = {
 // Transform cardlists array to a data structure like Map to handle drag and drop
 type TransformedItems = Record<UniqueIdentifier, UniqueIdentifier[]>
 
-const transformCardListsToItems = (data: cardListTypesDto.CardListsByBoardResponseDto) => {
+const transformCardListsToItems = (data: cardListTypes.CardLists) => {
   return data.reduce<TransformedItems>((acc, cardList) => {
     const cardListKey = cardList.id as UniqueIdentifier
     acc[cardListKey] = [...cardList.cards].map((c) => c.id as UniqueIdentifier)
@@ -58,9 +65,36 @@ const transformCardListsToItems = (data: cardListTypesDto.CardListsByBoardRespon
   }, {})
 }
 
+const transformCardListsToMap = (data: cardListTypes.CardLists) => {
+  const cardListsMap: Record<string, cardListTypes.CardList> = {}
+  const cardsMap: Record<string, cardTypes.Card> = {}
+
+  data.forEach((cardList) => {
+    const cardListId = cardList.id
+    const cards = cardList.cards
+
+    cardListsMap[cardListId] = { ...cardList }
+
+    cards.forEach((card) => {
+      const cardId = card.id
+      cardsMap[cardId] = { ...card }
+    })
+  })
+
+  return { cardListsMap, cardsMap }
+}
+
 function SortableCardLists({ cardLists }: Props) {
-  // Active Dragging CardList
-  // const [activeId, setActiveId] = useState<null | string>(null)
+  /**
+   * Transforms an array of card lists into two lookup maps:
+   * - `cardListsMap`: Maps card list IDs to their corresponding card list objects.
+   * - `cardsMap`: Maps card IDs to their corresponding card objects.
+   *
+   * This structure improves data access performance.
+   */
+  const { cardListsMap, cardsMap } = useMemo(() => {
+    return transformCardListsToMap(cardLists)
+  }, [cardLists])
 
   const { boardId } = useParams()
   const queryClient = useQueryClient()
@@ -69,7 +103,7 @@ function SortableCardLists({ cardLists }: Props) {
     return transformCardListsToItems(cardLists)
   })
   // CardList containers
-  const containers = useMemo(() => Object.keys(lists), [lists]) as UniqueIdentifier[]
+  const [containers, setContainers] = useState(() => Object.keys(lists) as UniqueIdentifier[])
   // For drag and drop of dnd-kit logic
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null)
   const lastOverId = useRef<UniqueIdentifier | null>(null)
@@ -316,26 +350,77 @@ function SortableCardLists({ cardLists }: Props) {
     }
   }
 
+  const onDragEnd = ({ active, over }: DragEndEvent) => {
+    if (active.id in lists && over?.id) {
+      setContainers((containers) => {
+        const activeIndex = containers.indexOf(active.id)
+        const overIndex = containers.indexOf(over.id)
+
+        return arrayMove(containers, activeIndex, overIndex)
+      })
+    }
+
+    const activeContainer = findContainer(active.id)
+
+    if (!activeContainer) {
+      setActiveId(null)
+      return
+    }
+
+    const overId = over?.id
+
+    if (overId == null) {
+      setActiveId(null)
+      return
+    }
+
+    const overContainer = findContainer(overId)
+
+    if (overContainer) {
+      const activeIndex = lists[activeContainer].indexOf(active.id)
+      const overIndex = lists[overContainer].indexOf(overId)
+
+      if (activeIndex !== overIndex) {
+        setLists((lists) => ({
+          ...lists,
+          [overContainer]: arrayMove(lists[overContainer], activeIndex, overIndex)
+        }))
+      }
+    }
+
+    setActiveId(null)
+  }
+
   return (
     <DndContext
+      collisionDetection={collisionDetectionStrategy}
+      measuring={{
+        droppable: {
+          strategy: MeasuringStrategy.Always
+        }
+      }}
       onDragStart={onDragStart}
-      // onDragEnd={handleDragEnd}
+      onDragOver={onDragOver}
+      onDragEnd={onDragEnd}
       sensors={sensors}
-      collisionDetection={closestCenter}
     >
-      {/* <div className='absolute inset-0 overflow-x-auto'>
-        <SortableContext items={listIds} strategy={horizontalListSortingStrategy}>
-          <ul className='flex max-w-fit list-none gap-2 p-2'>
-            {lists?.map((cardList) => (
-              <li key={cardList.id}>
-                <SortableCardList cardListData={cardList} />
-              </li>
+      <div className='absolute inset-0 overflow-x-auto'>
+        <SortableContext items={containers} strategy={horizontalListSortingStrategy}>
+          <div className='flex max-w-fit list-none gap-2 p-2'>
+            {containers?.map((containerId) => (
+              <SortableCardList key={containerId} cardListData={cardListsMap[containerId]}>
+                <SortableContext items={lists[containerId]} strategy={verticalListSortingStrategy}>
+                  {lists[containerId].map((cardId) => {
+                    return <SortableCardItem cardData={cardsMap[cardId]} />
+                  })}
+                </SortableContext>
+              </SortableCardList>
             ))}
             <CardListAddButton />
-          </ul>
+          </div>
         </SortableContext>
       </div>
-      {createPortal(
+      {/* {createPortal(
         <DragOverlay dropAnimation={dropAnimation}>
           {activeId !== null ? <CardList cardListData={draggingCardList} /> : null}
         </DragOverlay>,

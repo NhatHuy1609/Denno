@@ -8,6 +8,7 @@ import { CardListProvider } from './context'
 import CardListBody from './CardListBody'
 
 interface Props {
+  children: React.ReactNode
   cardListData?: cardListTypes.CardList
   dragging?: boolean
   transform?: Transform | null
@@ -21,6 +22,7 @@ export const CardList = React.memo(
   React.forwardRef<HTMLDivElement, Props>(
     (
       {
+        children,
         cardListData,
         dragging,
         transform,
@@ -33,7 +35,7 @@ export const CardList = React.memo(
       ref
     ) => {
       const style: React.CSSProperties = {
-        transform: transform ? CSS.Transform.toString(transform) : undefined,
+        transform: transform ? CSS.Translate.toString(transform) : undefined,
         transition: transition ?? undefined,
         border: '1px solid #ddd',
         padding: '10px',
@@ -50,10 +52,13 @@ export const CardList = React.memo(
 
       return (
         <CardListProvider value={{ cardListData }}>
-          <div ref={ref} style={style} className='flex w-[272px] flex-col gap-2' {...props}>
-            <CardListHeader cardListData={cardListData} listeners={listeners} />
-            <CardListBody />
-            <CardListFooter />
+          <div className='size-auto'>
+            <div ref={ref} style={style} className='flex w-[272px] flex-col gap-2' {...props}>
+              <CardListHeader cardListData={cardListData} listeners={listeners} />
+              {/* <CardListBody /> */}
+              {children}
+              <CardListFooter />
+            </div>
           </div>
         </CardListProvider>
       )
