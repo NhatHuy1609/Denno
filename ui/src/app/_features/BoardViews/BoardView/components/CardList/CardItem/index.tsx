@@ -18,19 +18,18 @@ const CardItem = React.forwardRef<HTMLDivElement, Props>(
     const style: React.CSSProperties = {
       transform: transform ? CSS.Translate.toString(transform) : undefined,
       transition: transition ?? undefined,
-      padding: '4px',
-      border: '1px solid blue'
+      opacity: dragging ? '0.5' : '1'
     }
 
     return (
       <div
         ref={ref}
         style={style}
-        className='h-[60px] w-full border border-blue-500'
+        className='w-full rounded-lg border-2 border-transparent bg-white px-3 py-[6px] shadow-[0_1px_1px_rgba(0,0,0,0.15)] hover:border-2 hover:border-blue-500'
         {...props}
         {...listeners}
       >
-        {name}
+        <span className='text-sm'>{name}</span>
       </div>
     )
   }

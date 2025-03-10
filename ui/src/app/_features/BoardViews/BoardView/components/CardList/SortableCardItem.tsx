@@ -21,6 +21,7 @@ function SortableCardItem({ cardData }: Props) {
       cardData={cardData}
       transform={transform}
       transition={transition}
+      dragging={isDragging}
       ref={setNodeRef}
       {...listeners}
     />
