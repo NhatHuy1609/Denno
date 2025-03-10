@@ -37,9 +37,10 @@ import { useQueryClient } from '@tanstack/react-query'
 import { CardListQueries, cardListTypes } from '@/entities/cardList'
 import { useParams } from 'next/navigation'
 import { toastError } from '@/ui'
-import { cardTypes } from '@/entities/card'
+import { CardQueries, cardTypes } from '@/entities/card'
 import SortableCardItem from './CardList/SortableCardItem'
 import CardItem from './CardList/CardItem'
+import useUpdateCardRankMutation from '@/app/_hooks/mutation/card/useUpdateCardRankMutation'
 
 const dropAnimation: DropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
@@ -133,23 +134,27 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
 
   const { mutate: updateCardListRank } = useUpdateCardListRankMutation({
     onMutate() {
-      const previousCardLists = queryClient.getQueryData(
+      const previousData = queryClient.getQueryData(
         CardListQueries.cardListsByBoardQuery(boardId as string).queryKey
       )
-      return { previousCardLists }
-    },
-    onSuccess(data, variables, context) {
-      queryClient.invalidateQueries({
-        queryKey: CardListQueries.cardListsByBoardQuery(boardId as string).queryKey
-      })
+      const previousLists = transformCardListsToItems(previousData as cardListTypes.CardLists)
+      const previousContainers = Object.keys(previousLists)
+
+      return { previousLists, previousContainers }
     },
     onError(error, variables, context) {
-      queryClient.setQueryData(
-        CardListQueries.cardListsByBoardQuery(boardId as string).queryKey,
-        context.previousCardLists
-      )
-      setLists(context.previousCardLists)
+      const { previousLists, previousContainers } = context
+      setLists(previousLists)
+      setContainers(previousContainers)
       toastError("Failed to update card list's rank")
+    }
+  })
+
+  const { mutate: updateCardRank } = useUpdateCardRankMutation({
+    onMutate() {
+      // const previousCards = queryClient.getQueryData(
+      //   CardQueries.cardsByCardListQuery
+      // )
     }
   })
 
@@ -261,7 +266,6 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
   }, [lists])
 
   const onDragStart = ({ active }: DragStartEvent) => {
-    console.log(active)
     setActiveId(active.id)
     setClonedLists(lists)
   }
@@ -316,8 +320,6 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
       })
     }
   }
-
-  console.log('CONTAINERS: ', containers)
 
   const onDragEnd = ({ active, over }: DragEndEvent) => {
     if (active.id in lists && over?.id) {
@@ -394,6 +396,14 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
   const renderCardItemDragOverlay = (cardId: UniqueIdentifier) => {
     return <CardItem cardData={cardsMap[cardId]} />
   }
+
+  // useEffect(() => {
+  //   console.log('CONTAINERS HAS CHANGED')
+  // }, [containers])
+
+  // useEffect(() => {
+  //   console.log('LISTS HAS CHANGED TOO')
+  // }, [lists])
 
   return (
     <DndContext
