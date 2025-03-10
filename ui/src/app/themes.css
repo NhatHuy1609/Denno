@@ -18,5 +18,12 @@
     --ds-card-list-background: #f1f2f4;
 
     --ds-accent-text: #172b4d;
+    /* System colors */
+    --ds-background-neutral-hovered: #091E4224;
+  }
+
+  [data-theme='dark'] {
+    /* System colors */
+    --ds-background-neutral-hovered: #A6C5E229;
   }
 }

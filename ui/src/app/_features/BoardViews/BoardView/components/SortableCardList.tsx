@@ -5,9 +5,10 @@ import { cardListTypes } from '@/entities/cardList'
 
 interface Props {
   cardListData: cardListTypes.CardList
+  children: React.ReactNode
 }
 
-function SortableCardList({ cardListData }: Props) {
+function SortableCardList({ cardListData, children }: Props) {
   const { id } = cardListData
 
   const {
@@ -32,7 +33,9 @@ function SortableCardList({ cardListData }: Props) {
       dragging={isDragging}
       setActivatorNodeRef={setActivatorNodeRef}
       {...attributes}
-    />
+    >
+      {children}
+    </CardList>
   )
 }
 

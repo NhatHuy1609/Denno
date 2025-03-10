@@ -5,7 +5,7 @@ import { Inter } from 'next/font/google'
 import Favicon from '../../public/favicon.ico'
 import RootLayoutComp from '@/layouts/RootLayout'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin'], display: 'swap' })
 
 export const metadata: Metadata = {
   title: process.env.NEXT_PUBLIC_APP_NAME,
