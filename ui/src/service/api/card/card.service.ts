@@ -25,6 +25,6 @@ export class CardService {
       data.updateCardRankDto
     )
 
-    return httpPut<UpdateCardRankResponseDto>(`/cards/${data.id}`, updateCardRankDto)
+    return httpPut<UpdateCardRankResponseDto>(`/cards/${data.id}/rank`, updateCardRankDto)
   }
 }

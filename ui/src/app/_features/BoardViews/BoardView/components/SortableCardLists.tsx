@@ -41,6 +41,7 @@ import { CardQueries, cardTypes } from '@/entities/card'
 import SortableCardItem from './CardList/SortableCardItem'
 import CardItem from './CardList/CardItem'
 import useUpdateCardRankMutation from '@/app/_hooks/mutation/card/useUpdateCardRankMutation'
+import { cardTypesDto } from '@/service/api/card'
 
 const dropAnimation: DropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
@@ -142,6 +143,11 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
 
       return { previousLists, previousContainers }
     },
+    onSuccess(data, variables, context) {
+      queryClient.invalidateQueries({
+        queryKey: CardListQueries.cardListsByBoardQuery(boardId as string).queryKey
+      })
+    },
     onError(error, variables, context) {
       const { previousLists, previousContainers } = context
       setLists(previousLists)
@@ -152,9 +158,22 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
 
   const { mutate: updateCardRank } = useUpdateCardRankMutation({
     onMutate() {
-      // const previousCards = queryClient.getQueryData(
-      //   CardQueries.cardsByCardListQuery
-      // )
+      const previousData = queryClient.getQueryData(
+        CardListQueries.cardListsByBoardQuery(boardId as string).queryKey
+      )
+      const previousLists = transformCardListsToItems(previousData as cardListTypes.CardLists)
+
+      return { previousLists }
+    },
+    onSuccess(data, variables, context) {
+      queryClient.invalidateQueries({
+        queryKey: CardListQueries.cardListsByBoardQuery(boardId as string).queryKey
+      })
+    },
+    onError(error, variables, context) {
+      const { previousLists } = context
+      setLists(previousLists)
+      toastError("Failed to update card's rank")
     }
   })
 
@@ -377,6 +396,25 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
           ...lists,
           [overContainer]: arrayMove(lists[overContainer], activeIndex, overIndex)
         }))
+
+        // Call API to update card's rank
+        let updateCardRankDto = {} as cardTypesDto.UpdateCardRankDto
+        const isDraggingUpward = activeIndex > overIndex
+        const overContainerItems = lists[overContainer]
+        updateCardRankDto = isDraggingUpward
+          ? {
+              nextRank: cardsMap[overContainerItems[overIndex]]?.rank,
+              previousRank: cardsMap[overContainerItems[overIndex - 1]]?.rank ?? null
+            }
+          : {
+              nextRank: cardsMap[overContainerItems[overIndex + 1]]?.rank ?? null,
+              previousRank: cardsMap[overContainerItems[overIndex]]?.rank
+            }
+
+        updateCardRank({
+          id: active.id as string,
+          updateCardRankDto
+        })
       }
     }
 
@@ -396,14 +434,6 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
   const renderCardItemDragOverlay = (cardId: UniqueIdentifier) => {
     return <CardItem cardData={cardsMap[cardId]} />
   }
-
-  // useEffect(() => {
-  //   console.log('CONTAINERS HAS CHANGED')
-  // }, [containers])
-
-  // useEffect(() => {
-  //   console.log('LISTS HAS CHANGED TOO')
-  // }, [lists])
 
   return (
     <DndContext
