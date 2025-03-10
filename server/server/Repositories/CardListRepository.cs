@@ -16,6 +16,7 @@ namespace server.Repositories
         {
             var cardLists = await _context.CardLists
                 .Where(c => c.BoardId == boardId)
+                .Include(c => c.Cards)
                 .OrderBy(c => c.Rank)
                 .ToListAsync();
 

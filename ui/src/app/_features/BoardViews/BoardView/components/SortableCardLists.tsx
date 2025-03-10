@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react'
+import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import useUpdateCardListRankMutation from '../mutations/updateCardListRank.mutation'
 import {
@@ -12,23 +12,36 @@ import {
   DragOverlay,
   DragEndEvent,
   DropAnimation,
-  defaultDropAnimationSideEffects
+  defaultDropAnimationSideEffects,
+  UniqueIdentifier,
+  CollisionDetection,
+  pointerWithin,
+  rectIntersection,
+  getFirstCollision,
+  DragOverEvent,
+  MeasuringStrategy
 } from '@dnd-kit/core'
 // import { PointerSensor, MouseSensor } from '@/lib/dnd-kit/custom-sensors'
-import { SortableContext, horizontalListSortingStrategy, arrayMove } from '@dnd-kit/sortable'
+import {
+  SortableContext,
+  horizontalListSortingStrategy,
+  arrayMove,
+  verticalListSortingStrategy
+} from '@dnd-kit/sortable'
 import type { CardLists } from '@/entities/cardList/cardList.types'
 import CardList from './CardList'
 import SortableCardList from './SortableCardList'
 import CardListAddButton from './CardListAddButton'
 import { cardListTypesDto } from '@/service/api/cardList'
 import { useQueryClient } from '@tanstack/react-query'
-import { CardListQueries } from '@/entities/cardList'
+import { CardListQueries, cardListTypes } from '@/entities/cardList'
 import { useParams } from 'next/navigation'
 import { toastError } from '@/ui'
-
-interface Props {
-  cardLists: CardLists
-}
+import { CardQueries, cardTypes } from '@/entities/card'
+import SortableCardItem from './CardList/SortableCardItem'
+import CardItem from './CardList/CardItem'
+import useUpdateCardRankMutation from '@/app/_hooks/mutation/card/useUpdateCardRankMutation'
+import { cardTypesDto } from '@/service/api/card'
 
 const dropAnimation: DropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
@@ -40,16 +53,129 @@ const dropAnimation: DropAnimation = {
   })
 }
 
-function SortableCardLists({ cardLists }: Props) {
+/**
+ * Defines a type for the transformed data structure used in drag and drop operations.
+ * Creates a mapping where each card list ID maps to an array of card IDs contained within that list.
+ */
+type TransformedItems = Record<UniqueIdentifier, UniqueIdentifier[]>
+
+/**
+ * Transforms the card lists array into a structure optimized for dnd-kit operations.
+ *
+ * @param {cardListTypes.CardLists} data - The original array of card list objects
+ * @returns {TransformedItems} An object where:
+ *   - Keys are card list IDs
+ *   - Values are arrays of card IDs that belong to each card list
+ */
+const transformCardListsToItems = (data: cardListTypes.CardLists): TransformedItems => {
+  return data.reduce<TransformedItems>((acc, cardList) => {
+    const cardListKey = cardList.id as UniqueIdentifier
+    acc[cardListKey] = cardList.cards.map((c) => c.id as UniqueIdentifier)
+    return acc
+  }, {})
+}
+
+/**
+ * Transforms an array of card lists into two separate lookup maps for efficient access.
+ *
+ * @param {cardListTypes.CardLists} data - Array of card list objects
+ * @returns {Object} Object containing two maps: cardListsMap and cardsMap
+ */
+const transformCardListsToMap = (data: cardListTypes.CardLists) => {
+  const cardListsMap: Record<string, cardListTypes.CardList> = {}
+  const cardsMap: Record<string, cardTypes.Card> = {}
+
+  data.forEach((cardList) => {
+    const cardListId = cardList.id
+    const cards = cardList.cards
+
+    cardListsMap[cardListId] = { ...cardList }
+
+    cards.forEach((card) => {
+      const cardId = card.id
+      cardsMap[cardId] = { ...card }
+    })
+  })
+
+  return { cardListsMap, cardsMap }
+}
+
+interface SortableCardListsProps {
+  cardLists: CardLists
+}
+
+function SortableCardLists({ cardLists }: SortableCardListsProps) {
   const { boardId } = useParams()
   const queryClient = useQueryClient()
 
-  // For updating cardlists on client screen
-  const [lists, setLists] = useState<CardLists>(cardLists)
-  const listIds = useMemo(() => lists.map((cardList) => cardList.id), [lists])
+  /**
+   * Transforms an array of card lists into two lookup maps:
+   * - `cardListsMap`: Maps card list IDs to their corresponding card list objects.
+   * - `cardsMap`: Maps card IDs to their corresponding card objects.
+   *
+   * This structure improves data access performance.
+   */
+  const { cardListsMap, cardsMap } = useMemo(() => {
+    return transformCardListsToMap(cardLists)
+  }, [cardLists])
 
-  // Active Dragging CardList
-  const [activeId, setActiveId] = useState<null | string>(null)
+  // Initialize lists state with transformed data structure for drag and drop with dndkit
+  const [lists, setLists] = useState<TransformedItems>(() => {
+    return transformCardListsToItems(cardLists)
+  })
+
+  // State to store container IDs (each representing a card list)
+  const [containers, setContainers] = useState(() => Object.keys(lists) as UniqueIdentifier[])
+
+  // For drag and drop of dnd-kit logic
+  const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null)
+  const lastOverId = useRef<UniqueIdentifier | null>(null)
+  const recentlyMovedToNewContainer = useRef(false)
+  const isSortingContainer = activeId != null ? containers.includes(activeId) : false
+
+  const { mutate: updateCardListRank } = useUpdateCardListRankMutation({
+    onMutate() {
+      const previousData = queryClient.getQueryData(
+        CardListQueries.cardListsByBoardQuery(boardId as string).queryKey
+      )
+      const previousLists = transformCardListsToItems(previousData as cardListTypes.CardLists)
+      const previousContainers = Object.keys(previousLists)
+
+      return { previousLists, previousContainers }
+    },
+    onSuccess(data, variables, context) {
+      queryClient.invalidateQueries({
+        queryKey: CardListQueries.cardListsByBoardQuery(boardId as string).queryKey
+      })
+    },
+    onError(error, variables, context) {
+      const { previousLists, previousContainers } = context
+      setLists(previousLists)
+      setContainers(previousContainers)
+      toastError("Failed to update card list's rank")
+    }
+  })
+
+  const { mutate: updateCardRank } = useUpdateCardRankMutation({
+    onMutate() {
+      const previousData = queryClient.getQueryData(
+        CardListQueries.cardListsByBoardQuery(boardId as string).queryKey
+      )
+      const previousLists = transformCardListsToItems(previousData as cardListTypes.CardLists)
+
+      return { previousLists }
+    },
+    onSuccess(data, variables, context) {
+      queryClient.invalidateQueries({
+        queryKey: CardListQueries.cardListsByBoardQuery(boardId as string).queryKey
+      })
+    },
+    onError(error, variables, context) {
+      const { previousLists } = context
+      setLists(previousLists)
+      toastError("Failed to update card's rank")
+    }
+  })
 
   // Adding sensors
   const pointerSensor = useSensor(PointerSensor, {
@@ -59,104 +185,293 @@ function SortableCardLists({ cardLists }: Props) {
     }
   })
   const sensors = useSensors(pointerSensor)
+  /**
+   * Custom collision detection strategy optimized for multiple containers
+   *
+   * - First, find any droppable containers intersecting with the pointer.
+   * - If there are none, find intersecting containers with the active draggable.
+   * - If there are no intersecting containers, return the last matched intersection
+   *
+   */
+  const collisionDetectionStrategy: CollisionDetection = useCallback(
+    (args) => {
+      if (activeId && activeId in lists) {
+        return closestCenter({
+          ...args,
+          droppableContainers: args.droppableContainers.filter((container) => container.id in lists)
+        })
+      }
 
-  const { mutate: updateCardListRank } = useUpdateCardListRankMutation({
-    onMutate() {
-      const previousCardLists = queryClient.getQueryData(
-        CardListQueries.cardListsByBoardQuery(boardId as string).queryKey
-      )
-      return { previousCardLists }
+      // Start by finding any intersecting droppable
+      const pointerIntersections = pointerWithin(args)
+      const intersections =
+        pointerIntersections.length > 0
+          ? // If there are droppables intersecting with the pointer, return those
+            pointerIntersections
+          : rectIntersection(args)
+      let overId = getFirstCollision(intersections, 'id')
+
+      if (overId != null) {
+        if (overId in lists) {
+          const containerItems = lists[overId]
+
+          // If a container is matched and it contains items (columns 'A', 'B', 'C')
+          if (containerItems.length > 0) {
+            // Return the closest droppable within that container
+            overId = closestCenter({
+              ...args,
+              droppableContainers: args.droppableContainers.filter(
+                (container) => container.id !== overId && containerItems.includes(container.id)
+              )
+            })[0]?.id
+          }
+        }
+
+        lastOverId.current = overId
+
+        return [{ id: overId }]
+      }
+
+      // When a draggable item moves to a new container, the layout may shift
+      // and the `overId` may become `null`. We manually set the cached `lastOverId`
+      // to the id of the draggable item that was moved to the new container, otherwise
+      // the previous `overId` will be returned which can cause items to incorrectly shift positions
+      if (recentlyMovedToNewContainer.current) {
+        lastOverId.current = activeId
+      }
+
+      // If no droppable is matched, return the last match
+      return lastOverId.current ? [{ id: lastOverId.current }] : []
     },
-    onSuccess(data, variables, context) {
-      queryClient.invalidateQueries({
-        queryKey: CardListQueries.cardListsByBoardQuery(boardId as string).queryKey
-      })
-    },
-    onError(error, variables, context) {
-      queryClient.setQueryData(
-        CardListQueries.cardListsByBoardQuery(boardId as string).queryKey,
-        context.previousCardLists
-      )
-      setLists(context.previousCardLists)
-      toastError("Failed to update card list's rank")
+    [activeId, lists]
+  )
+  const [clonedLists, setClonedLists] = useState<TransformedItems | null>(null)
+
+  const findContainer = (id: UniqueIdentifier) => {
+    if (id in lists) {
+      return id
     }
-  })
 
-  useEffect(() => {
-    setLists(cardLists)
-  }, [cardLists])
-
-  const handleDragStart = (event: DragStartEvent) => {
-    const { active } = event
-    setActiveId(active.id as string)
+    return Object.keys(lists).find((key) => lists[key].includes(id))
   }
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event
+  const getIndex = (id: UniqueIdentifier) => {
+    const container = findContainer(id)
 
-    if (active && over && active.id !== over.id) {
-      const overId = over.id as string
-      const activeId = active.id as string
-      const overIndex = lists.findIndex((list) => list.id === overId)
-      const activeIndex = lists.findIndex((list) => list.id === activeId)
+    if (!container) {
+      return -1
+    }
 
-      setLists((items) => {
-        const oldItems = [...items]
-        return arrayMove(oldItems, activeIndex, overIndex)
+    const index = lists[container].indexOf(id)
+
+    return index
+  }
+
+  const onDragCancel = () => {
+    if (clonedLists) {
+      // Reset items to their original state in case items have been
+      // Dragged across containers
+      setLists(clonedLists)
+    }
+
+    setActiveId(null)
+    setClonedLists(null)
+  }
+
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      recentlyMovedToNewContainer.current = false
+    })
+  }, [lists])
+
+  const onDragStart = ({ active }: DragStartEvent) => {
+    setActiveId(active.id)
+    setClonedLists(lists)
+  }
+
+  const onDragOver = ({ active, over }: DragOverEvent) => {
+    const overId = over?.id
+
+    if (overId == null || active.id in lists) {
+      return
+    }
+
+    const overContainer = findContainer(overId)
+    const activeContainer = findContainer(active.id)
+
+    if (!overContainer || !activeContainer) {
+      return
+    }
+
+    if (activeContainer !== overContainer) {
+      setLists((lists) => {
+        const activeItems = lists[activeContainer]
+        const overItems = lists[activeContainer]
+        const overIndex = overItems.indexOf(overId)
+        const activeIndex = activeItems.indexOf(active.id)
+
+        let newIndex: number
+
+        if (overId in lists) {
+          newIndex = overItems.length + 1
+        } else {
+          const isBelowOverItems =
+            over &&
+            active.rect.current.translated &&
+            active.rect.current.translated.top > over.rect.top + over.rect.height
+
+          const modifier = isBelowOverItems ? 1 : 0
+
+          newIndex = overIndex >= 0 ? overIndex + modifier : overItems.length + 1
+        }
+
+        recentlyMovedToNewContainer.current = true
+
+        return {
+          ...lists,
+          [activeContainer]: lists[activeContainer].filter((item) => item !== active.id),
+          [overContainer]: [
+            ...lists[overContainer].slice(0, newIndex),
+            lists[activeContainer][activeIndex],
+            ...lists[overContainer].slice(newIndex, lists[overContainer].length)
+          ]
+        }
+      })
+    }
+  }
+
+  const onDragEnd = ({ active, over }: DragEndEvent) => {
+    if (active.id in lists && over?.id) {
+      setContainers((containers) => {
+        const activeIndex = containers.indexOf(active.id)
+        const overIndex = containers.indexOf(over.id)
+
+        return arrayMove(containers, activeIndex, overIndex)
       })
 
-      // Calling to API to update in background
-      let updateCardListRankDto: cardListTypesDto.UpdateCardListRankDto = {
-        previousRank: null,
-        nextRank: null
-      }
+      // Handling calculation of cardlist's rank to call API to update cardlist's rank
+      const activeIndex = containers.indexOf(active.id)
+      const overIndex = containers.indexOf(over.id)
+      const isDraggingUpward = activeIndex > overIndex
 
-      if (activeIndex > overIndex) {
-        updateCardListRankDto = {
-          nextRank: lists[overIndex].rank,
-          previousRank: lists[overIndex - 1]?.rank ?? null
-        }
-      } else {
-        updateCardListRankDto = {
-          nextRank: lists[overIndex + 1]?.rank ?? null,
-          previousRank: lists[overIndex]?.rank
-        }
-      }
+      let updateCardListRankDto = {} as cardListTypesDto.UpdateCardListRankDto
+      updateCardListRankDto = isDraggingUpward
+        ? {
+            nextRank: cardListsMap[containers[overIndex]]?.rank,
+            previousRank: cardListsMap[containers[overIndex - 1]]?.rank ?? null
+          }
+        : {
+            nextRank: cardListsMap[containers[overIndex + 1]]?.rank ?? null,
+            previousRank: cardListsMap[containers[overIndex]]?.rank
+          }
 
       updateCardListRank({
-        id: activeId,
+        id: active.id as string,
         updateCardListRankDto
       })
+    }
+
+    const activeContainer = findContainer(active.id)
+
+    if (!activeContainer) {
+      setActiveId(null)
+      return
+    }
+
+    const overId = over?.id
+
+    if (overId == null) {
+      setActiveId(null)
+      return
+    }
+
+    const overContainer = findContainer(overId)
+
+    if (overContainer) {
+      const activeIndex = lists[activeContainer].indexOf(active.id)
+      const overIndex = lists[overContainer].indexOf(overId)
+
+      if (activeIndex !== overIndex) {
+        setLists((lists) => ({
+          ...lists,
+          [overContainer]: arrayMove(lists[overContainer], activeIndex, overIndex)
+        }))
+
+        // Call API to update card's rank
+        let updateCardRankDto = {} as cardTypesDto.UpdateCardRankDto
+        const isDraggingUpward = activeIndex > overIndex
+        const overContainerItems = lists[overContainer]
+        updateCardRankDto = isDraggingUpward
+          ? {
+              nextRank: cardsMap[overContainerItems[overIndex]]?.rank,
+              previousRank: cardsMap[overContainerItems[overIndex - 1]]?.rank ?? null
+            }
+          : {
+              nextRank: cardsMap[overContainerItems[overIndex + 1]]?.rank ?? null,
+              previousRank: cardsMap[overContainerItems[overIndex]]?.rank
+            }
+
+        updateCardRank({
+          id: active.id as string,
+          updateCardRankDto
+        })
+      }
     }
 
     setActiveId(null)
   }
 
-  // Active dragging cardlist
-  const draggingCardList = lists.find((cardList) => cardList.id === activeId)
+  const renderContainerDragOverlay = (containerId: UniqueIdentifier) => {
+    return (
+      <CardList cardListData={cardListsMap[containerId]}>
+        {lists[containerId].map((cardId) => (
+          <CardItem key={cardId} cardData={cardsMap[cardId]} />
+        ))}
+      </CardList>
+    )
+  }
+
+  const renderCardItemDragOverlay = (cardId: UniqueIdentifier) => {
+    return <CardItem cardData={cardsMap[cardId]} />
+  }
 
   return (
     <DndContext
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
+      collisionDetection={collisionDetectionStrategy}
+      measuring={{
+        droppable: {
+          strategy: MeasuringStrategy.Always
+        }
+      }}
+      onDragCancel={onDragCancel}
+      onDragStart={onDragStart}
+      onDragOver={onDragOver}
+      onDragEnd={onDragEnd}
       sensors={sensors}
-      collisionDetection={closestCenter}
     >
       <div className='absolute inset-0 overflow-x-auto'>
-        <SortableContext items={listIds} strategy={horizontalListSortingStrategy}>
-          <ul className='flex max-w-fit list-none gap-2 p-2'>
-            {lists?.map((cardList) => (
-              <li key={cardList.id}>
-                <SortableCardList cardListData={cardList} />
-              </li>
+        <SortableContext items={containers} strategy={horizontalListSortingStrategy}>
+          <div className='flex max-w-fit list-none gap-2 p-2'>
+            {containers?.map((containerId) => (
+              <SortableCardList key={containerId} cardListData={cardListsMap[containerId]}>
+                <SortableContext items={lists[containerId]} strategy={verticalListSortingStrategy}>
+                  {lists[containerId].map((cardId) => (
+                    <SortableCardItem key={cardId} cardData={cardsMap[cardId]} />
+                  ))}
+                </SortableContext>
+              </SortableCardList>
             ))}
             <CardListAddButton />
-          </ul>
+          </div>
         </SortableContext>
       </div>
       {createPortal(
         <DragOverlay dropAnimation={dropAnimation}>
-          {activeId !== null ? <CardList cardListData={draggingCardList} /> : null}
+          {activeId
+            ? containers.includes(activeId)
+              ? renderContainerDragOverlay(activeId)
+              : renderCardItemDragOverlay(activeId)
+            : null}
         </DragOverlay>,
         document.body
       )}
