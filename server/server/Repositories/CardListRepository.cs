@@ -15,9 +15,9 @@ namespace server.Repositories
         public async Task<IEnumerable<CardList>> GetCardListsByBoardIdAsync(Guid boardId)
         {
             var cardLists = await _context.CardLists
-                .Where(c => c.BoardId == boardId)
-                .Include(c => c.Cards)
-                .OrderBy(c => c.Rank)
+                .Where(cl => cl.BoardId == boardId)
+                .Include(cl => cl.Cards.OrderBy(c => c.Rank))
+                .OrderBy(cl => cl.Rank)
                 .ToListAsync();
 
             return cardLists;

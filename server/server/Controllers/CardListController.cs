@@ -120,7 +120,7 @@ namespace server.Controllers
         [HttpPut("[controller]/{id}/rank")]
         public async Task<IActionResult> UpdateCardListRankAsync(Guid id, [FromBody] UpdateCardListRankRequestDto requestDto)
         {
-            var updatedCardList = await _unitOfWork.CardLists.GetByIdAsync(id);
+            var updatedCardList = await _unitOfWork.CardLists.GetByIdAsync(id, cl => cl.Cards.OrderBy(c => c.Rank));
 
             if (updatedCardList == null)
             {
