@@ -141,12 +141,16 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
       const previousLists = transformCardListsToItems(previousData as cardListTypes.CardLists)
       const previousContainers = Object.keys(previousLists)
 
-      return { previousLists, previousContainers }
+      return { previousData, previousLists, previousContainers }
     },
     onSuccess(data, variables, context) {
-      queryClient.invalidateQueries({
-        queryKey: CardListQueries.cardListsByBoardQuery(boardId as string).queryKey
-      })
+      const { id: updatedCardListId } = data
+      queryClient.setQueryData(
+        CardListQueries.cardListsByBoardQuery(boardId as string).queryKey,
+        (oldData) => {
+          return oldData?.map((cardList) => (cardList.id === updatedCardListId ? data : cardList))
+        }
+      )
     },
     onError(error, variables, context) {
       const { previousLists, previousContainers } = context
@@ -166,11 +170,31 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
       return { previousLists }
     },
     onSuccess(data, variables, context) {
-      queryClient.invalidateQueries({
-        queryKey: CardListQueries.cardListsByBoardQuery(boardId as string).queryKey
-      })
+      const { cardListId, id } = data
+      queryClient.setQueryData(
+        CardListQueries.cardListsByBoardQuery(boardId as string).queryKey,
+        (oldData) => {
+          // Takes cardlist contains the updated card
+          const oldCardListContainer = oldData?.find((cardList) => cardList.id === cardListId)
+          const oldCardListContainerIndex = oldData?.findIndex((c) => c.id === cardListId) as number
+          // Creates new cardlist container because of changes in cards of old cardlist
+          const newCardListContainer = {
+            ...oldCardListContainer,
+            cards: oldCardListContainer?.cards
+              .map((card) => (card.id === id ? data : card))
+              .sort((a, b) => a.rank.localeCompare(b.rank))
+          } as cardListTypes.CardList
+
+          return [
+            ...(oldData?.slice(0, oldCardListContainerIndex) as cardListTypes.CardLists),
+            newCardListContainer,
+            ...(oldData?.slice(oldCardListContainerIndex + 1) as cardListTypes.CardLists)
+          ]
+        }
+      )
     },
     onError(error, variables, context) {
+      console.log(error)
       const { previousLists } = context
       setLists(previousLists)
       toastError("Failed to update card's rank")
@@ -341,7 +365,7 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
   }
 
   const onDragEnd = ({ active, over }: DragEndEvent) => {
-    if (active.id in lists && over?.id) {
+    if (active.id in lists && over?.id && active.id !== over?.id) {
       setContainers((containers) => {
         const activeIndex = containers.indexOf(active.id)
         const overIndex = containers.indexOf(over.id)
