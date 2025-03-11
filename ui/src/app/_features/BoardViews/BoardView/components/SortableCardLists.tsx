@@ -141,12 +141,19 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
       const previousLists = transformCardListsToItems(previousData as cardListTypes.CardLists)
       const previousContainers = Object.keys(previousLists)
 
-      return { previousLists, previousContainers }
+      return { previousData, previousLists, previousContainers }
     },
     onSuccess(data, variables, context) {
       queryClient.invalidateQueries({
         queryKey: CardListQueries.cardListsByBoardQuery(boardId as string).queryKey
       })
+      // const { id: cardListId, rank } = data
+      // queryClient.setQueryData(
+      //   CardListQueries.cardListsByBoardQuery(boardId as string).queryKey,
+      //   (oldData) => {
+      //     return oldData?.map(cardList => cardList.id === cardListId ? )
+      //   }
+      // )
     },
     onError(error, variables, context) {
       const { previousLists, previousContainers } = context
@@ -341,7 +348,9 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
   }
 
   const onDragEnd = ({ active, over }: DragEndEvent) => {
-    if (active.id in lists && over?.id) {
+    if (active.id in lists && over?.id && active.id !== over?.id) {
+      console.log('CONTAINER CHANGE')
+
       setContainers((containers) => {
         const activeIndex = containers.indexOf(active.id)
         const overIndex = containers.indexOf(over.id)
