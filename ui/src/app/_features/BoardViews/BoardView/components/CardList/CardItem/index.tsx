@@ -13,7 +13,7 @@ interface Props {
 
 const CardItem = React.forwardRef<HTMLDivElement, Props>(
   ({ cardData, dragging, transform, transition, listeners, ...props }, ref) => {
-    const { name } = cardData || {}
+    const { name, rank } = cardData || {}
 
     const style: React.CSSProperties = {
       transform: transform ? CSS.Translate.toString(transform) : undefined,
@@ -30,6 +30,7 @@ const CardItem = React.forwardRef<HTMLDivElement, Props>(
         {...listeners}
       >
         <span className='text-sm'>{name}</span>
+        <div className='text-xs'>{rank}</div>
       </div>
     )
   }
