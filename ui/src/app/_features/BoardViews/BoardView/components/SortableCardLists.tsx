@@ -119,6 +119,8 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
     return transformCardListsToMap(cardLists)
   }, [cardLists])
 
+  console.log('CARDS MAP', cardsMap)
+
   // Initialize lists state with transformed data structure for drag and drop with dndkit
   const [lists, setLists] = useState<TransformedItems>(() => {
     return transformCardListsToItems(cardLists)
