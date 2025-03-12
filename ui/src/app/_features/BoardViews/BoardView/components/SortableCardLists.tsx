@@ -119,13 +119,20 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
     return transformCardListsToMap(cardLists)
   }, [cardLists])
 
+  console.log('CARDS MAP', cardsMap)
+
   // Initialize lists state with transformed data structure for drag and drop with dndkit
   const [lists, setLists] = useState<TransformedItems>(() => {
     return transformCardListsToItems(cardLists)
   })
-
   // State to store container IDs (each representing a card list)
   const [containers, setContainers] = useState(() => Object.keys(lists) as UniqueIdentifier[])
+  // Updates lists and containers when fetched cardlists has changed
+  useEffect(() => {
+    const transformedLists = transformCardListsToItems(cardLists)
+    setLists(transformedLists)
+    setContainers(Object.keys(transformedLists) as UniqueIdentifier[])
+  }, [cardLists])
 
   // For drag and drop of dnd-kit logic
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null)

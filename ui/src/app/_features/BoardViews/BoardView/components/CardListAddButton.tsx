@@ -35,9 +35,11 @@ function CardListAddForm({ hideForm }: { hideForm: () => void }) {
 
   const { mutate: createCardList, isPending } = useCreateCardListMutation({
     onSuccess: (data) => {
-      queryClient.setQueryData<cardListTypes.CardLists>(
+      queryClient.setQueryData(
         CardListQueries.cardListsByBoardQuery(boardId as string).queryKey,
-        (old = []) => [...old, data]
+        (old) => {
+          return [...(old as cardListTypes.CardLists), data]
+        }
       )
     },
     onSettled: () => {

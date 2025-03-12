@@ -11,6 +11,8 @@ import { HiOutlineXMark } from 'react-icons/hi2'
 import { toastError } from '@/ui'
 import PrimaryInputText from '@/app/_components/PrimaryInputText'
 import CustomizableButton from '@/ui/components/CustomizableButton'
+import { useParams } from 'next/navigation'
+import { CardListQueries, cardListTypes } from '@/entities/cardList'
 
 interface Props {
   hideFormFn: () => void
@@ -23,18 +25,36 @@ const FormValueSchema = z.object({
 type FormValues = z.infer<typeof FormValueSchema>
 
 function CardAddForm({ hideFormFn }: Props) {
+  const { boardId } = useParams()
   const queryClient = useQueryClient()
   const inputRef = useRef<HTMLInputElement>(null)
   const formRef = useRef<HTMLFormElement>(null)
   const { cardListData } = useCardListContext()
+
   const { reset, control, handleSubmit } = useForm<FormValues>()
+
   const { mutate: createCard, isPending } = useCreateCardMutation({
+    onMutate() {},
     onSuccess(data, variables) {
-      // Optimistic update
+      const { cardListId, id: cardId } = data
       queryClient.setQueryData(
-        CardQueries.cardsByCardListQuery(cardListData?.id as string).queryKey,
-        (oldCards) => {
-          return [...(oldCards as cardTypes.Cards), data]
+        CardListQueries.cardListsByBoardQuery(boardId as string).queryKey,
+        (oldCardLists) => {
+          // Takes container which contains created card
+          const oldCardListContainer = oldCardLists?.find((cardList) => cardList.id === cardListId)
+          const oldCardListContainerIndex = oldCardLists?.findIndex(
+            (cardList) => cardList.id === cardListId
+          ) as number
+          const newCardListContainer = {
+            ...oldCardListContainer,
+            cards: [...(oldCardListContainer?.cards || []), data]
+          } as cardListTypes.CardList
+
+          return [
+            ...(oldCardLists?.slice(0, oldCardListContainerIndex) || []),
+            newCardListContainer,
+            ...(oldCardLists?.slice(oldCardListContainerIndex + 1) || [])
+          ]
         }
       )
     },
