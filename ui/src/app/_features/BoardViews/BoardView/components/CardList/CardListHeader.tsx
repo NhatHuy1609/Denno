@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
+import { useParams } from 'next/navigation'
 import { useQueryClient } from '@tanstack/react-query'
 import { useOnClickOutSide } from '@/app/_hooks/useOnClickOutSide'
 import useUpdateCardListMutation from '../../mutations/updateCardList.mutation'
-import { DraggableSyntheticListeners } from '@dnd-kit/core'
-import { HiOutlineDotsHorizontal } from 'react-icons/hi'
 import { cardListTypesDto } from '@/service/api/cardList'
 import { CardListQueries, cardListTypes } from '@/entities/cardList'
-import { toastError, toastSuccess } from '@/ui'
+import { toastError } from '@/ui'
+import { DraggableSyntheticListeners } from '@dnd-kit/core'
+import { HiOutlineDotsHorizontal } from 'react-icons/hi'
 import PrimaryInputText from '@/app/_components/PrimaryInputText'
 
 interface IProps {
@@ -44,50 +45,55 @@ function HeaderName({
   listeners?: DraggableSyntheticListeners
   setActivatorNodeRef?: (element: HTMLElement | null) => void
 }) {
+  const { boardId } = useParams()
   const queryClient = useQueryClient()
-
-  const inputRef = useRef<HTMLInputElement>(null)
-
   const [isShowingInput, setShowingInput] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+  /**
+   * State is used to store the previous card list name before updating to the new name.
+   * The cardListName cannot be used to capture the old name in the onError callback of useUpdateCardListMutation for rollback purposes.
+   */
+  const oldCardListName = useRef<string>(cardListData?.name || '')
 
   // For optimistic update cardlist's name
   const [cardListName, setCardListName] = useState(cardListData?.name)
 
   const { mutate: updateCardList } = useUpdateCardListMutation({
-    onMutate() {
-      // Consider to refractor this code to handle get cardlist's old name
-      const prevCardLists = queryClient.getQueryData(
-        CardListQueries.cardListsByBoardQuery(cardListData?.boardId as string).queryKey
-      )
-      const previousCardListName = prevCardLists?.find(
-        (cardList) => cardList.id === cardListData?.id
-      )?.name
-
-      return { previousCardListName }
+    onSuccess() {
+      queryClient.invalidateQueries({
+        queryKey: CardListQueries.cardListsByBoardQuery(boardId as string).queryKey
+      })
     },
     onError(error, variables, context) {
-      setCardListName(context.previousCardListName)
+      setCardListName(oldCardListName.current)
       toastError("Failed to update card list's name")
     }
   })
 
   const handleHideInput = useCallback(() => {
     setShowingInput(false)
-    // Calling API to update card list's name in background
-    const updateCardListDto: cardListTypesDto.UpdateCardListDto = {
-      name: inputRef.current?.value || '',
-      rank: cardListData?.rank || ''
-    }
-    updateCardList({
-      id: cardListData?.id || '',
-      updateCardListDto
-    })
+    if (oldCardListName.current !== inputRef.current?.value) {
+      const updateCardListDto = {
+        name: inputRef.current?.value || '',
+        rank: cardListData?.rank || ''
+      } as cardListTypesDto.UpdateCardListDto
 
-    setCardListName(inputRef.current?.value)
+      // Calling API to update card list's name in background
+      updateCardList({
+        id: cardListData?.id || '',
+        updateCardListDto
+      })
+
+      // Store old cardlist's name before updating
+      oldCardListName.current = cardListName || ''
+
+      setCardListName(inputRef.current?.value)
+    }
   }, [cardListData])
 
   useOnClickOutSide(inputRef, handleHideInput)
 
+  // Auto select input when it is opened
   useEffect(() => {
     if (inputRef && isShowingInput) {
       inputRef.current?.select()
