@@ -119,8 +119,6 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
     return transformCardListsToMap(cardLists)
   }, [cardLists])
 
-  console.log('CARDS MAP', cardsMap)
-
   // Initialize lists state with transformed data structure for drag and drop with dndkit
   const [lists, setLists] = useState<TransformedItems>(() => {
     return transformCardListsToItems(cardLists)
@@ -155,11 +153,14 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
       queryClient.setQueryData(
         CardListQueries.cardListsByBoardQuery(boardId as string).queryKey,
         (oldData) => {
-          return oldData?.map((cardList) => (cardList.id === updatedCardListId ? data : cardList))
+          return oldData
+            ?.map((cardList) => (cardList.id === updatedCardListId ? data : cardList))
+            .sort((a, b) => a.rank.localeCompare(b.rank))
         }
       )
     },
     onError(error, variables, context) {
+      console.error(error)
       const { previousLists, previousContainers } = context
       setLists(previousLists)
       setContainers(previousContainers)
