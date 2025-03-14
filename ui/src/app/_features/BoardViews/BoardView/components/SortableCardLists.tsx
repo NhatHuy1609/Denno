@@ -332,6 +332,7 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
     return Object.keys(lists).find((key) => lists[key].includes(id))
   }
 
+  // This function is created because in onDragEnd function couldn't capture right activeContainer and overContainer
   const findContainer2 = (id: UniqueIdentifier) => {
     if (!clonedLists) {
       return
@@ -462,7 +463,7 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
       return
     }
 
-    // Handling user dragged card to another cardList
+    // Handling dragged card to another cardList container
     if (!over || !over.id) {
       return
     }
@@ -493,10 +494,6 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
           nextRank: cardsMap[overContainerItems[overIndex + 1]]?.rank ?? null,
           previousRank: cardsMap[overContainerItems[overIndex - 1]]?.rank ?? null
         }
-
-        // console.group('CASE 1: CONTAINER1 # CONTAINER2')
-        // console.log('DTO: ', updateCardRankDto)
-        // console.groupEnd()
 
         updateCardRank({
           id: active.id as string,
@@ -530,10 +527,6 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
             nextRank: cardsMap[overContainerItems[overIndex + 1]]?.rank ?? null,
             previousRank: cardsMap[overContainerItems[overIndex]]?.rank
           }
-
-      // console.group('CASE 2: CONTAINER 1 = CONTAINER 2')
-      // console.log('DTO: ', updateCardRankDto)
-      // console.groupEnd()
 
       updateCardRank({
         id: active.id as string,
