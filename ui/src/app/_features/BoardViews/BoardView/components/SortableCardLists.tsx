@@ -132,7 +132,7 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
     setContainers(Object.keys(transformedLists) as UniqueIdentifier[])
   }, [cardLists])
 
-  // For drag and drop of dnd-kit logic
+  // For drag and drop of dnd-kit
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null)
   const lastOverId = useRef<UniqueIdentifier | null>(null)
   const recentlyMovedToNewContainer = useRef(false)
@@ -216,7 +216,13 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
       tolerance: 50
     }
   })
-  const sensors = useSensors(pointerSensor)
+  const mouseSensor = useSensor(MouseSensor, {
+    activationConstraint: {
+      delay: 80,
+      tolerance: 50
+    }
+  })
+  const sensors = useSensors(pointerSensor, mouseSensor)
   /**
    * Custom collision detection strategy optimized for multiple containers
    *
@@ -287,6 +293,18 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
     return Object.keys(lists).find((key) => lists[key].includes(id))
   }
 
+  const findContainer2 = (id: UniqueIdentifier) => {
+    if (!clonedLists) {
+      return
+    }
+
+    if (id in clonedLists) {
+      return id
+    }
+
+    return Object.keys(clonedLists).find((key) => clonedLists[key].includes(id))
+  }
+
   const getIndex = (id: UniqueIdentifier) => {
     const container = findContainer(id)
 
@@ -338,7 +356,7 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
     if (activeContainer !== overContainer) {
       setLists((lists) => {
         const activeItems = lists[activeContainer]
-        const overItems = lists[activeContainer]
+        const overItems = lists[overContainer]
         const overIndex = overItems.indexOf(overId)
         const activeIndex = activeItems.indexOf(active.id)
 
@@ -356,6 +374,15 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
 
           newIndex = overIndex >= 0 ? overIndex + modifier : overItems.length + 1
         }
+
+        // console.group('DRAG OVER')
+        // console.log('ACTIVE CONTAINER: ', activeContainer)
+        // console.log('OVER CONTAINER: ', overContainer)
+        // console.log('OVERCONTAINER ITEMS: ', overItems)
+        // console.log('OVERCONTAINER LEN: ', overItems.length)
+        // console.log('OVERINDEX: ', overIndex)
+        // console.log('NEW INDEX: ', newIndex)
+        // console.groupEnd()
 
         recentlyMovedToNewContainer.current = true
 
@@ -397,59 +424,99 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
             previousRank: cardListsMap[containers[overIndex]]?.rank
           }
 
-      updateCardListRank({
-        id: active.id as string,
-        updateCardListRankDto
-      })
+      // updateCardListRank({
+      //   id: active.id as string,
+      //   updateCardListRankDto
+      // })
+
+      return
     }
 
-    const activeContainer = findContainer(active.id)
+    // ======================================================
+    if (!over || !over.id) {
+      return
+    }
 
-    if (!activeContainer) {
+    const activeContainer = findContainer2(activeId || '')
+    const overContainer = findContainer(over?.id as UniqueIdentifier)
+
+    if (!activeContainer || !overContainer) {
       setActiveId(null)
       return
     }
 
-    const overId = over?.id
+    if (activeContainer !== overContainer) {
+      const overIndex = lists[overContainer].indexOf(over.id)
+      const activeIndex = lists[overContainer].indexOf(active.id)
 
-    if (overId == null) {
-      setActiveId(null)
-      return
-    }
+      // console.group('CASE 1: CONTAINER1 # CONTAINER2')
+      // console.log('ACTIVE-INDEX: ', activeIndex)
+      // console.log('OVER-INDEX: ', overIndex)
+      // console.log('ACTIVE-CONTAINER: ', originalContainer)
+      // console.log('OVER-CONTAINER: ', targetContainer)
+      // console.groupEnd()
 
-    const overContainer = findContainer(overId)
-
-    if (overContainer) {
-      const activeIndex = lists[activeContainer].indexOf(active.id)
-      const overIndex = lists[overContainer].indexOf(overId)
-
-      if (activeIndex !== overIndex) {
+      if (activeIndex !== -1 && overIndex !== -1) {
         setLists((lists) => ({
           ...lists,
           [overContainer]: arrayMove(lists[overContainer], activeIndex, overIndex)
         }))
 
-        // Call API to update card's rank
         let updateCardRankDto = {} as cardTypesDto.UpdateCardRankDto
-        const isDraggingUpward = activeIndex > overIndex
         const overContainerItems = lists[overContainer]
-        updateCardRankDto = isDraggingUpward
-          ? {
-              nextRank: cardsMap[overContainerItems[overIndex]]?.rank,
-              previousRank: cardsMap[overContainerItems[overIndex - 1]]?.rank ?? null
-            }
-          : {
-              nextRank: cardsMap[overContainerItems[overIndex + 1]]?.rank ?? null,
-              previousRank: cardsMap[overContainerItems[overIndex]]?.rank
-            }
+        updateCardRankDto = {
+          nextRank: cardsMap[overContainerItems[overIndex + 1]]?.rank ?? null,
+          previousRank: cardsMap[overContainerItems[overIndex - 1]]?.rank ?? null
+        }
 
-        updateCardRank({
-          id: active.id as string,
-          updateCardRankDto
-        })
+        console.group('CASE 1: CONTAINER1 # CONTAINER2')
+        console.log('DTO: ', updateCardRankDto)
+        console.groupEnd()
+
+        // updateCardRank({
+        //   id: active.id as string,
+        //   updateCardRankDto
+        // })
       }
-    }
+    } else {
+      const activeIndex = lists[activeContainer].indexOf(active.id)
+      const overIndex = lists[activeContainer].indexOf(over.id)
 
+      // console.group('CASE 2: CONTAINER 1 = CONTAINER 2')
+      // console.log('ACTIVE-INDEX: ', activeIndex)
+      // console.log('OVER-INDEX: ', overIndex)
+      // console.log('ACTIVE-CONTAINER: ', originalContainer)
+      // console.log('OVER-CONTAINER: ', targetContainer)
+      // console.groupEnd()
+
+      setLists((lists) => ({
+        ...lists,
+        [overContainer]: arrayMove(lists[overContainer], activeIndex, overIndex)
+      }))
+
+      let updateCardRankDto = {} as cardTypesDto.UpdateCardRankDto
+      const isDraggingUpward = activeIndex > overIndex
+      const overContainerItems = lists[overContainer]
+      updateCardRankDto = isDraggingUpward
+        ? {
+            nextRank: cardsMap[overContainerItems[overIndex]]?.rank,
+            previousRank: cardsMap[overContainerItems[overIndex - 1]]?.rank ?? null
+          }
+        : {
+            nextRank: cardsMap[overContainerItems[overIndex + 1]]?.rank ?? null,
+            previousRank: cardsMap[overContainerItems[overIndex]]?.rank
+          }
+
+      console.group('CASE 2: CONTAINER 1 = CONTAINER 2')
+      console.log('DTO: ', updateCardRankDto)
+      console.groupEnd()
+
+      // updateCardRank({
+      //   id: active.id as string,
+      //   updateCardRankDto
+      // })
+    }
+    // ======================================================
     setActiveId(null)
   }
 
@@ -482,11 +549,14 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
       sensors={sensors}
     >
       <div className='absolute inset-0 overflow-x-auto'>
-        <SortableContext items={containers} strategy={horizontalListSortingStrategy}>
+        <SortableContext items={[...containers]} strategy={horizontalListSortingStrategy}>
           <div className='flex max-w-fit list-none gap-2 p-2'>
             {containers?.map((containerId) => (
               <SortableCardList key={containerId} cardListData={cardListsMap[containerId]}>
-                <SortableContext items={lists[containerId]} strategy={verticalListSortingStrategy}>
+                <SortableContext
+                  items={[...lists[containerId]]}
+                  strategy={verticalListSortingStrategy}
+                >
                   {lists[containerId].map((cardId) => (
                     <SortableCardItem key={cardId} cardData={cardsMap[cardId]} />
                   ))}
