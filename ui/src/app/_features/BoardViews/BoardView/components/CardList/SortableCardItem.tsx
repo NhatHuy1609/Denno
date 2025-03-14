@@ -13,7 +13,10 @@ function SortableCardItem({ cardData }: Props) {
 
   const { setNodeRef, listeners, isDragging, isSorting, over, overIndex, transform, transition } =
     useSortable({
-      id
+      id,
+      data: {
+        cardData
+      }
     })
 
   return (
