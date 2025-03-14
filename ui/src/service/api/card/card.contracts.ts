@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { nullable, z } from 'zod'
 
 // Base Schema
 const CardBaseDtoSchema = z.object({
@@ -31,5 +31,7 @@ export const CreateCardDtoSchema = CardBaseDtoSchema.pick({
 
 export const UpdateCardRankDtoSchema = z.object({
   previousRank: z.string().nullable(),
-  nextRank: z.string().nullable()
+  nextRank: z.string().nullable(),
+  oldCardListId: z.string(),
+  newCardListId: z.string().nullable().default(null)
 }).describe("UpdateCardRankDtoSchema")
