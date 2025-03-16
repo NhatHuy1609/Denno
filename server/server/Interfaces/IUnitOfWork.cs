@@ -8,6 +8,7 @@
         IFileUploadRepository FileUploads { get; }
         ICardListRepository CardLists { get; }
         ICardRepository Cards { get; }
+        IWorkspaceMemberRepository WorkspaceMembers { get; }
         int Complete();
     }
 }
