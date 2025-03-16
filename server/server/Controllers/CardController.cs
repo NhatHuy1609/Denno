@@ -1,11 +1,9 @@
 ﻿using Asp.Versioning;
 using AutoMapper;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using server.Dtos.Requests.Card;
 using server.Dtos.Response;
 using server.Dtos.Response.Card;
-using server.Dtos.Response.CardList;
 using server.Helpers.LexoRank;
 using server.Interfaces;
 using server.Models;
@@ -100,6 +98,11 @@ namespace server.Controllers
                 {
                     StatusMessage = "Card not found"
                 });
+            }
+
+            if (requestDto.NewCardListId.HasValue)
+            {
+                updatedCard.CardListId = requestDto.NewCardListId.Value;
             }
 
             var lexorankGen = new LexoRankGenerator();
