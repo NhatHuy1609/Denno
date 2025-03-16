@@ -1,4 +1,3 @@
-using Amazon.S3;
 using Newtonsoft.Json.Converters;
 using Serilog;
 using server.Exceptions;
