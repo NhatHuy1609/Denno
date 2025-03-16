@@ -20,7 +20,10 @@ function SortableCardList({ cardListData, children }: Props) {
     transition,
     setActivatorNodeRef
   } = useSortable({
-    id
+    id,
+    data: {
+      cardListData
+    }
   })
 
   return (
