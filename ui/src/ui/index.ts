@@ -8,6 +8,7 @@ import * as FormControls from './components/Controls'
 import * as PopoverContainer from './components/Popover'
 import * as CollapsibleContainer from './components/Collapsible'
 import DropdownMenuContainer from './components/Dropdown'
+import * as DialogContainer from './components/Dialog'
 
 export { setFixLoading } from './components/Loading'
 export {
@@ -30,3 +31,4 @@ export const DropdownMenu = DropdownMenuContainer
 export const FormGroup = FormGroupContainer
 export const Popover = PopoverContainer
 export const Collapsible = CollapsibleContainer
+export const Dialog = DialogContainer
