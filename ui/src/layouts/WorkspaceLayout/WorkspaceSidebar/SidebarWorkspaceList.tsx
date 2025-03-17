@@ -29,7 +29,7 @@ function SidebarWorkspaceSubContent({ workspaceId }: { workspaceId: string }) {
     {
       title: 'Boards',
       icon: <HiViewBoards className={iconClass} />,
-      href: `/w/${workspaceId}/home`,
+      href: `/workspace/${workspaceId}/home`,
       onClick: () => {
         setLocalStorageItem(PersistedStateKey.RecentAccessWorkspace, workspaceId)
       }
@@ -47,7 +47,7 @@ function SidebarWorkspaceSubContent({ workspaceId }: { workspaceId: string }) {
     {
       title: 'Members',
       icon: <LuUsers className={iconClass} />,
-      href: '/'
+      href: `/workspace/${workspaceId}/members`
     },
     {
       title: 'Settings',

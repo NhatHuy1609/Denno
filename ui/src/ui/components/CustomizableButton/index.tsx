@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react'
 import { cn } from '@/lib/styles/utils'
 import { cva, type VariantProps } from 'class-variance-authority'
 
-const buttonVariants = cva('inline-flex items-center gap-2 rounded-sm', {
+const buttonVariants = cva('inline-flex items-center gap-2 rounded-sm hover:opacity-80', {
   variants: {
     intent: {
       primary: ['bg-blue-600 text-white'],

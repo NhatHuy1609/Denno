@@ -1,9 +1,7 @@
 import React from 'react'
 import { useParams } from 'next/navigation'
-import { useQuery } from '@tanstack/react-query'
-import { WorkspaceQueries } from '@/entities/workspace'
 import { LuPencil } from 'react-icons/lu'
-import { MdLockOutline, MdOutlineErrorOutline } from 'react-icons/md'
+import { MdLockOutline } from 'react-icons/md'
 import WorkspaceInfoLogo from './WorkspaceInfoLogo'
 import { useWorkspaceQuery } from '@/app/_hooks/query'
 
@@ -33,9 +31,11 @@ function WorkspaceInfoDetail({
 }
 
 function WorkspaceInfoCard({
-  setShowWorkspaceUpdateForm
+  setShowWorkspaceUpdateForm,
+  showDescription = true
 }: {
   setShowWorkspaceUpdateForm: React.Dispatch<React.SetStateAction<boolean>>
+  showDescription?: boolean
 }) {
   const { workspaceId } = useParams()
   const { data } = useWorkspaceQuery(workspaceId as string)
@@ -56,10 +56,12 @@ function WorkspaceInfoCard({
           onClickShowUpdateForm={handleShowUpdateWorkspaceForm}
         />
       </div>
-      <div className='mt-4 w-full'>
-        <h4 className='mb-1 text-sm font-medium text-blue-500'>Description:</h4>
-        <p className='text-sm text-gray-500'>{description}</p>
-      </div>
+      {showDescription && (
+        <div className='mt-4 w-full'>
+          <h4 className='mb-1 text-sm font-medium text-blue-500'>Description:</h4>
+          <p className='text-sm text-gray-500'>{description}</p>
+        </div>
+      )}
     </div>
   )
 }

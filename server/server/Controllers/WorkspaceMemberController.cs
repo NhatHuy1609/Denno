@@ -33,6 +33,7 @@ namespace server.Controllers
             var newWorkspaceMember = _mapper.Map<WorkspaceMember>(requestDto);
 
             _unitOfWork.WorkspaceMembers.Add(newWorkspaceMember);
+            _unitOfWork.Complete();
 
             return CreatedAtAction(nameof(Create), newWorkspaceMember);
         }

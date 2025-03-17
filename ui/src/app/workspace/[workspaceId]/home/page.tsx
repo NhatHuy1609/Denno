@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useParams } from 'next/navigation'
 import WorkspaceBoardList from '@/app/_features/Board/List/WorkspaceBoardList'
 import WorkspaceInfoCard from '@/app/_features/Workspaces/Info'
@@ -21,7 +21,7 @@ function page() {
     <div className='w-full'>
       <section className='border-b border-gray-300 p-8 pb-6'>
         {showWorkspaceUpdateForm ? (
-          <WorkspaceUpdateForm hideForm={handleHideForm} />
+          <WorkspaceUpdateForm hideFormFn={handleHideForm} />
         ) : (
           <WorkspaceInfoCard setShowWorkspaceUpdateForm={setShowWorkspaceUpdateForm} />
         )}
