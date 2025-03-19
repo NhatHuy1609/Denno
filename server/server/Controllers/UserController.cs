@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using server.Dtos.Response;
 using server.Dtos.Response.Users;
 using server.Interfaces;
+using server.Models.Pagination;
 using server.Models.Query;
 using System.Security.Claims;
 
@@ -53,11 +54,17 @@ namespace server.Controllers
         [Route("[controller]")]
         public async Task<IActionResult> GetUsersAsync([FromQuery] UserQueryModel query)
         {
-            var users = await _unitOfWork.Users.GetUsersAsync(query);
+            var paginatedUsers = await _unitOfWork.Users.GetUsersAsync(query);
 
-            var mappedUsers = _mapper.Map<List<GetUserResponseDto>>(users);
+            var result = new PaginatedResult<GetUserResponseDto>
+            {
+                Items = _mapper.Map<List<GetUserResponseDto>>(paginatedUsers.Items),
+                TotalCount = paginatedUsers.TotalCount,
+                PageNumber = paginatedUsers.PageNumber,
+                PageSize = paginatedUsers.PageSize
+            };
 
-            return Ok(mappedUsers);
+            return Ok(result);
         }
     }
 }
