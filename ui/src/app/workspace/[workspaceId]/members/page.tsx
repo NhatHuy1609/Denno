@@ -1,9 +1,9 @@
 'use client'
 
 import React, { useState } from 'react'
+import InviteMemberModal from './components/InviteMemberModal'
 import WorkspaceInfoCard from '@/app/_features/Workspaces/Info'
 import WorkspaceUpdateForm from '@/app/_features/Workspaces/Update/WorkspaceUpdateForm'
-import InviteMemberModal from './components/InviteMemberModal'
 
 function WorkspaceMembersPage() {
   const [showWorkspaceUpdateForm, setShowWorkspaceUpdateForm] = useState(false)
@@ -26,7 +26,7 @@ function WorkspaceMembersPage() {
           )}
         </div>
 
-        <div>
+        <div className=''>
           <InviteMemberModal />
         </div>
       </div>

@@ -1,8 +1,8 @@
 'use client'
 
 import React from 'react'
-import BoardLayoutComp from '@/layouts/BoardLayout'
+import WorkspaceLayout2 from '@/layouts/WorkspaceLayout2'
 
 export default function WorkspaceHomeLayout({ children }: { children: React.ReactNode }) {
-  return <BoardLayoutComp>{children}</BoardLayoutComp>
+  return <WorkspaceLayout2>{children}</WorkspaceLayout2>
 }
