@@ -19,12 +19,12 @@ namespace server.Repositories
 
             if (!string.IsNullOrEmpty(query.Name))
             {
-                userQuery.Where(u => u.FullName.Contains(query.Name));
+                userQuery = userQuery.Where(u => u.FullName.Contains(query.Name));
             }
 
             if (!string.IsNullOrEmpty(query.Email))
             {
-                userQuery.Where(u => u.Email.Equals(query.Email));
+                userQuery = userQuery.Where(u => u.Email.Equals(query.Email));
             }
 
             int totalCount = await userQuery.CountAsync();
