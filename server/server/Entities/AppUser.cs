@@ -31,5 +31,7 @@ namespace server.Models
         public virtual ICollection<CardComment> CardComments { get; set; } = new List<CardComment>();
 
         public virtual ICollection<CardActivity> CardActivities { get; set; } = new List<CardActivity>();
+
+        public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
     }
 }

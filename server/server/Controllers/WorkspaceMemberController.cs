@@ -9,8 +9,8 @@ namespace server.Controllers
 {
     [ApiController]
     [ApiVersion("1.0")]
-    [ControllerName("workspaceMembers")]
-    [Route("api/v{version:apiVersion}/[controller]")]
+    [ControllerName("workspace-members")]
+    [Route("api/v{version:apiVersion}/workspaces/{workspaceId}/members")]
     public class WorkspaceMemberController: ControllerBase
     {
         private readonly ILogger<WorkspaceMemberController> _logger;
@@ -27,8 +27,8 @@ namespace server.Controllers
             _mapper = mapper;
         }
 
-        [HttpPost("[controller]")]
-        public IActionResult Create([FromBody] CreateWorkspaceMemberRequestDto requestDto)
+        [HttpPost]
+        public IActionResult Create([FromBody] AddWorkspaceMemberRequestDto requestDto)
         {
             var newWorkspaceMember = _mapper.Map<WorkspaceMember>(requestDto);
 
