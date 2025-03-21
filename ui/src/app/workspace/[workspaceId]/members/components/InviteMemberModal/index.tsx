@@ -16,7 +16,7 @@ function InviteMemberModal() {
           startIcon={<AiOutlineUserAdd />}
         />
       </Dialog.DialogTrigger>
-      <Dialog.DialogContent aria-describedby={undefined}>
+      <Dialog.DialogContent aria-describedby={undefined} className='min-w-[640px]'>
         <Dialog.DialogHeader>
           <Dialog.DialogTitle>
             <span className='text-xl font-normal'>Invite to Workspace</span>

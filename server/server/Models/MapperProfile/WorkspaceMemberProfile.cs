@@ -7,7 +7,7 @@ namespace server.Models.MapperProfile
     {
         public WorkspaceMemberProfile()
         {
-            CreateMap<CreateWorkspaceMemberRequestDto, WorkspaceMember>()
+            CreateMap<AddWorkspaceMemberRequestDto, WorkspaceMember>()
                 .ForMember(dest => dest.AppUserId, opt => opt.MapFrom(src => src.UserId));
         }
     }

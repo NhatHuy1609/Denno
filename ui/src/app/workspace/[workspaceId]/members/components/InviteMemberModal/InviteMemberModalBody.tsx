@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import PrimaryInputText from '@/app/_components/PrimaryInputText'
 import { useUsersQuery } from '@/app/_hooks/query/user/useUsersQuery'
 import { userTypes } from '@/entities/user'
@@ -38,32 +38,38 @@ export default function InviteMemberModalBody() {
     setShowSearchedUsersResult(false)
   }
 
-  const handleSelectUser = (user: userTypes.User) => {
-    const isValidToSelect = !selectedUsers.find((user) => user.email === searchTerm)
-    if (isValidToSelect) {
-      setSelectedUsers((prev) => [...prev, user])
+  const handleSelectUser = useCallback(
+    (user: userTypes.User) => {
+      const isValidToSelect = !selectedUsers.find((user) => user.email === searchTerm)
+      if (isValidToSelect) {
+        setSelectedUsers((prev) => [...prev, user])
 
-      // Reset search input
-      if (inputRef.current) {
-        inputRef.current.value = ''
+        // Reset search input
+        if (inputRef.current) {
+          inputRef.current.value = ''
+        }
+        setSearchTerm('')
       }
-      setSearchTerm('')
-    }
-  }
+    },
+    [selectedUsers]
+  )
 
-  const handleRemoveSelectedUser = (user: userTypes.User) => {
-    const removedUserIndex = selectedUsers.findIndex(
-      (selectedUser) => selectedUser.email === user.email
-    )
+  const handleRemoveSelectedUser = useCallback(
+    (user: userTypes.User) => {
+      const removedUserIndex = selectedUsers.findIndex(
+        (selectedUser) => selectedUser.email === user.email
+      )
 
-    if (removedUserIndex !== -1) {
-      setSelectedUsers((prev) => {
-        const newSelectedUsers = [...prev]
-        newSelectedUsers.splice(removedUserIndex, 1)
-        return newSelectedUsers
-      })
-    }
-  }
+      if (removedUserIndex !== -1) {
+        setSelectedUsers((prev) => {
+          const newSelectedUsers = [...prev]
+          newSelectedUsers.splice(removedUserIndex, 1)
+          return newSelectedUsers
+        })
+      }
+    },
+    [selectedUsers]
+  )
 
   return (
     <div className='relative w-full'>
@@ -75,12 +81,20 @@ export default function InviteMemberModalBody() {
         />
       )}
 
-      <PrimaryInputText
-        ref={inputRef}
-        onInput={handleInputChange}
-        className='w-full border-[1.5px] border-gray-500 p-2'
-        placeholder='Email address or name'
-      />
+      <div className='flex items-center justify-between gap-2'>
+        <PrimaryInputText
+          ref={inputRef}
+          onInput={handleInputChange}
+          className='w-full border-[1.5px] border-gray-500 p-2'
+          placeholder='Email address or name'
+        />
+        {selectedUsers.length > 0 && (
+          <CustomizableButton
+            value='Send invite'
+            className='h-full min-w-[120px] justify-center py-[10px]'
+          />
+        )}
+      </div>
 
       {searchTerm && searchedUsers && showSearchedUsersResult ? (
         <SearchedUsersResult
@@ -114,27 +128,33 @@ interface SelectedUsersDisplayProps {
   removeSelectedUserFn: (user: userTypes.User) => void
 }
 
-function SelectedUsersDisplay({ selectedUsers, removeSelectedUserFn }: SelectedUsersDisplayProps) {
-  const handleRemoveSelectedUser = (user: userTypes.User) => {
-    removeSelectedUserFn && removeSelectedUserFn(user)
-  }
+const SelectedUsersDisplay = React.memo(
+  ({ selectedUsers, removeSelectedUserFn }: SelectedUsersDisplayProps) => {
+    const handleRemoveSelectedUser = (user: userTypes.User) => {
+      removeSelectedUserFn && removeSelectedUserFn(user)
+    }
 
-  return (
-    <div className='mb-3 border-l-2 border-blue-600 pl-2'>
-      <h4 className='mb-1 text-sm text-blue-600'>Selected users</h4>
-      <div className='flex w-full items-center gap-2'>
-        {selectedUsers.map((user) => (
-          <div
-            key={user.id}
-            className='flex max-w-fit items-center gap-2 rounded-sm bg-gray-200 p-1'
-          >
-            <span className='text-sm'>{user.fullName}</span>
-            <button type='button' className='group' onClick={() => handleRemoveSelectedUser(user)}>
-              <HiOutlineXMark className='text-lg group-hover:text-blue-600' />
-            </button>
-          </div>
-        ))}
+    return (
+      <div className='mb-3 border-l-2 border-blue-600 pl-2'>
+        <h4 className='mb-1 text-sm text-blue-600'>Selected users</h4>
+        <div className='flex w-full items-center gap-2'>
+          {selectedUsers.map((user) => (
+            <div
+              key={user.id}
+              className='flex max-w-fit items-center gap-2 rounded-sm bg-gray-200 p-1'
+            >
+              <span className='text-sm'>{user.fullName}</span>
+              <button
+                type='button'
+                className='group'
+                onClick={() => handleRemoveSelectedUser(user)}
+              >
+                <HiOutlineXMark className='text-lg group-hover:text-blue-600' />
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
-  )
-}
+    )
+  }
+)

@@ -9,7 +9,7 @@ interface SearchedUsersResultProps {
   hideSearchedUsersResultFn: () => void
 }
 
-export default function SearchedUsersResult({
+function SearchedUsersResult({
   searchedUserData,
   selectUserFn,
   hideSearchedUsersResultFn
@@ -37,6 +37,8 @@ export default function SearchedUsersResult({
     </div>
   )
 }
+
+export default React.memo(SearchedUsersResult)
 
 interface SearchedUsersListProps {
   users: userTypes.Users

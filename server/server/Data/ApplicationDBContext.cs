@@ -30,6 +30,9 @@ namespace server.Data
         public DbSet<CardActivity> CardActivites { get; set; }
         public DbSet<GoogleAuthDataStore> GoogleAuthDataStores { get; set; }
         public DbSet<FileUpload> FileUploads { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
+        public DbSet<NotificationObject> NotificationObjects { get; set; }
+        public DbSet<NotificationChange> NotificationChanges { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -171,6 +174,27 @@ namespace server.Data
                 .WithMany(e => e.CardActivities)
                 .HasForeignKey(e => e.AppUserId)
                 .OnDelete(DeleteBehavior.ClientCascade);
+
+            // Configure notification relationships
+            modelBuilder.Entity<Notification>()
+                .HasOne(n => n.NotificationObject)
+                .WithMany(no => no.Notifications)
+                .HasForeignKey(n => n.NotificationObjectId);
+
+            modelBuilder.Entity<Notification>()
+                .HasOne(n => n.Notifier)
+                .WithMany(u => u.Notifications)
+                .HasForeignKey(n => n.NotifierId);
+
+            modelBuilder.Entity<NotificationChange>()
+                .HasOne(nc => nc.NotificationObject)
+                .WithMany(no => no.NotificationChanges)
+                .HasForeignKey(nc => nc.NotificationObjectId);
+
+            modelBuilder.Entity<NotificationChange>()
+                .HasOne(nc => nc.Actor)
+                .WithMany()
+                .HasForeignKey(nc => nc.ActorId);
         }
     }
 }
