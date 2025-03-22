@@ -13,6 +13,11 @@ namespace server.Repositories
         {
         }
 
+        public async Task<AppUser?> GetUserByEmailAsync(string email)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Email.Equals(email));
+        }
+
         public async Task<PaginatedResult<AppUser>> GetUsersAsync(UserQueryModel query)
         {
             IQueryable<AppUser> userQuery = _context.Users.AsQueryable();

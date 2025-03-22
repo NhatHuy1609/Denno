@@ -1,8 +1,11 @@
-﻿namespace server.Dtos.Requests.WorkspaceMember
+﻿using server.Enums;
+
+namespace server.Dtos.Requests.WorkspaceMember
 {
     public class AddWorkspaceMemberRequestDto
     {
-        public Guid WorkspaceId { get; set; }
-        public string UserId { get; set; }
+        public string Email { get; set; }
+        public string Description { get; set; } = string.Empty;
+        public MemberRole Role { get; set; } = MemberRole.Normal;
     }
 }
