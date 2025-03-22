@@ -8,7 +8,7 @@ namespace server.Entities
     {
         [Key]
         public int Id { get; set; }
-
+        public bool IsRead { get; set; }
         public NotificationStatus Status { get; set; }
 
         public int NotificationObjectId { get; set; }

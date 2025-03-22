@@ -10,6 +10,6 @@ namespace server.Models
         public string AppUserId { get; set; } = string.Empty;
         public AppUser? AppUser { get; set; }
 
-        public MemberRole Role { get; set; } = MemberRole.Member;
+        public MemberRole Role { get; set; } = MemberRole.Normal;
     }
 }

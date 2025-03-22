@@ -9,6 +9,7 @@
         ICardListRepository CardLists { get; }
         ICardRepository Cards { get; }
         IWorkspaceMemberRepository WorkspaceMembers { get; }
+        INotificationRepository Notifications { get; }
         int Complete();
     }
 }

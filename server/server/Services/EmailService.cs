@@ -3,9 +3,13 @@ using Google.Apis.Util.Store;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using Polly;
+using server.Data;
+using server.Entities;
+using server.Enums;
 using server.Infrastructure.Configurations;
 using server.Interfaces;
 using server.Models;
@@ -17,17 +21,23 @@ namespace server.Services
         private readonly ILogger<EmailService> _logger;
         private readonly MailSettings _mailSettings;
         private readonly UserManager<AppUser> _userManager;
+        private readonly INotificationService _notificationService;
+        private readonly ApplicationDBContext _dbContext;
         private readonly FrontendUrlsConfiguration _frontendUrlsConfig;
 
         public EmailService(
             ILogger<EmailService> logger,
             IOptions<MailSettings> mailSettings,
             UserManager<AppUser> userManager,
-            IOptions<FrontendUrlsConfiguration> frontendUrls)
+            IOptions<FrontendUrlsConfiguration> frontendUrls,
+            INotificationService notificationService,
+            ApplicationDBContext dbContext)
         {
             _mailSettings = mailSettings.Value;
             _logger = logger;
             _userManager = userManager;
+            _notificationService = notificationService;
+            _dbContext = dbContext;
             _frontendUrlsConfig = frontendUrls.Value;
         }
 
@@ -97,6 +107,50 @@ namespace server.Services
             };
 
             await SendEmailAsync(emailData, true);
+        }
+
+        public async Task SendNotificationEmailAsync(int notificaitonObjectId, string notifierId)
+        {
+            var notificationWithChange = await _dbContext.NotificationObjects
+                .Include(n => n.NotificationChanges)
+                .FirstOrDefaultAsync(n => n.Id == notificaitonObjectId);
+
+            var notifier = await _dbContext.Users.FindAsync(notifierId);
+
+            var emailData = await BuildNotificationEmailData(notificationWithChange, notifier);
+
+            await SendEmailAsync( emailData, true);
+        }
+
+        private async Task<EmailData> BuildNotificationEmailData(NotificationObject notificationObject, AppUser notifier)
+        {
+            var (message, isSuccess) = await _notificationService.GenerateNotificationMessage(notificationObject.Id);
+            var entityType = notificationObject.EntityType;
+            var actionType = notificationObject.ActionType;
+
+            string id = notifier.Email;
+            string name = notifier.Email;
+            string subject = message;
+            string body = "";
+
+            switch (entityType)
+            {
+                case EntityType.Workspace:
+                    if (actionType == ActionType.Invited)
+                    {
+                        subject = "";
+                        body = "";
+                    }
+                    break;
+            }
+
+            return new EmailData()
+            {
+                EmailToId = id,
+                EmailToName = name,
+                EmailSubject = subject,
+                EmailBody = body
+            };
         }
     }
 }
