@@ -1,12 +1,11 @@
-﻿using Google.Apis.Auth.OAuth2;
-using Google.Apis.Util.Store;
-using MailKit.Net.Smtp;
-using MailKit.Security;
+﻿using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using Polly;
+using RazorEngine;
+using RazorEngine.Templating;
 using server.Data;
 using server.Entities;
 using server.Enums;
@@ -109,20 +108,21 @@ namespace server.Services
             await SendEmailAsync(emailData, true);
         }
 
-        public async Task SendNotificationEmailAsync(int notificaitonObjectId, string notifierId)
+        public async Task SendNotificationEmailAsync(int notificaitonObjectId, string notifierId, string senderId, string? noteFromSender)
         {
             var notificationWithChange = await _dbContext.NotificationObjects
                 .Include(n => n.NotificationChanges)
                 .FirstOrDefaultAsync(n => n.Id == notificaitonObjectId);
 
             var notifier = await _dbContext.Users.FindAsync(notifierId);
+            var sender = await _dbContext.Users.FindAsync(senderId);
 
-            var emailData = await BuildNotificationEmailData(notificationWithChange, notifier);
+            var emailData = await BuildNotificationEmailData(notificationWithChange, notifier, sender, noteFromSender);
 
-            await SendEmailAsync( emailData, true);
+            await SendEmailAsync(emailData, true);
         }
 
-        private async Task<EmailData> BuildNotificationEmailData(NotificationObject notificationObject, AppUser notifier)
+        private async Task<EmailData> BuildNotificationEmailData(NotificationObject notificationObject, AppUser notifier, AppUser sender, string? noteFromSender)
         {
             var (message, isSuccess) = await _notificationService.GenerateNotificationMessage(notificationObject.Id);
             var entityType = notificationObject.EntityType;
@@ -133,13 +133,21 @@ namespace server.Services
             string subject = message;
             string body = "";
 
+            var notificationEmailModel = new NotificationTemplateModel()
+            {
+                Message = message,
+                SenderName = sender.FullName,
+                SenderAvatar = sender.Avatar,
+                Description = noteFromSender ?? ""
+            };
+
             switch (entityType)
             {
                 case EntityType.Workspace:
                     if (actionType == ActionType.Invited)
                     {
-                        subject = "";
-                        body = "";
+                        var templatePath = File.ReadAllText(GetTemplatePath("NotificationTemplate.cshtml"));
+                        body = Engine.Razor.RunCompile(templatePath, "invitedEmailTemplate", typeof(NotificationTemplateModel), notificationEmailModel);
                     }
                     break;
             }
@@ -151,6 +159,11 @@ namespace server.Services
                 EmailSubject = subject,
                 EmailBody = body
             };
+        }
+
+        public static string GetTemplatePath(string templateFileName)
+        {
+            return Path.Combine(Directory.GetCurrentDirectory(), "Helpers", "HtmlTemplates", templateFileName);
         }
     }
 }

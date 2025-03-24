@@ -66,5 +66,24 @@ namespace server.Controllers
 
             return Ok(result);
         }
+
+        [HttpGet]
+        [Route("[controller]/{id}/notifications")]
+        public async Task<IActionResult> GetNotificationsAsync([FromRoute] string id)
+        {
+            var user = _unitOfWork.Users.GetByIdAsync(id);
+
+            if (user == null)
+            {
+                return NotFound(new ApiErrorResponse()
+                {
+                    StatusMessage = $"Not found user with id: {id}"
+                });
+            }
+
+            var notifications = await _unitOfWork.Notifications.GetNotificationsByUserIdAsync(id);
+
+            return Ok();
+        }
     }
 }

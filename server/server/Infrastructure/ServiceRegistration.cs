@@ -29,6 +29,7 @@ namespace server.Infrastructure
             services.AddScoped<IGoogleService, GoogleService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IDataStore, EFGoogleDataStore>();
             services.AddScoped<IFileUploadService, FileUploadService>();
             #region Repositories
