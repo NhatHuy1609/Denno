@@ -1,5 +1,6 @@
 ﻿using Asp.Versioning;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using server.Dtos.Requests.WorkspaceMember;
 using server.Dtos.Response;
@@ -10,6 +11,7 @@ using System.Security.Claims;
 
 namespace server.Controllers
 {
+    [Authorize]
     [ApiController]
     [ApiVersion("1.0")]
     [ControllerName("workspace-members")]
@@ -19,15 +21,18 @@ namespace server.Controllers
         private readonly ILogger<WorkspaceMemberController> _logger;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IEmailService _emailService;
 
         public WorkspaceMemberController(
             ILogger<WorkspaceMemberController> logger,
             IUnitOfWork unitOfWork,
-            IMapper mapper)
+            IMapper mapper,
+            IEmailService emailService)
         {
             _logger = logger;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _emailService = emailService;
         }
 
         [HttpPost]
@@ -69,7 +74,7 @@ namespace server.Controllers
 
             var userIdsToNotify = new List<string> { addedUser.Id };
 
-            var notificationSuccess = await _unitOfWork.Notifications.CreateNotificationAsync(
+            var (createdNotificationObject, isCreatedNotificationSuccess) = await _unitOfWork.Notifications.CreateNotificationAsync(
                 entityType: EntityType.Workspace,
                 entityId: workspace.Id,
                 actionType: ActionType.Invited,
@@ -77,13 +82,23 @@ namespace server.Controllers
                 userIdsToNotify: userIdsToNotify
             );
 
-            if (!notificationSuccess)
+            if (!isCreatedNotificationSuccess)
             {
                 return Ok(new { Message = "Member invited, but failed to create notification or send email" });
             }
 
             // Create email for notifying when added new member to workspace
-
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await _emailService.SendNotificationEmailAsync(createdNotificationObject.Id, addedUser.Id, userId, requestDto.Description);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Failed to send email after retries: {ex.Message}", ex);
+                }
+            });
 
             return CreatedAtAction(nameof(Create), newMember);
         }

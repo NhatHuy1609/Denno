@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using server.Data;
 using server.Entities;
 using server.Enums;
@@ -15,7 +16,7 @@ namespace server.Repositories
             _context = context;
         }
 
-        public async Task<bool> CreateNotificationAsync(EntityType entityType, Guid entityId, ActionType actionType, string actorId, List<string> userIdsToNotify)
+        public async Task<(NotificationObject? NotificationObject, bool IsSuccess)> CreateNotificationAsync(EntityType entityType, Guid entityId, ActionType actionType, string actorId, List<string> userIdsToNotify)
         {
             using (IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync())
             {
@@ -53,15 +54,26 @@ namespace server.Repositories
                     await _context.SaveChangesAsync();
 
                     await transaction.CommitAsync();
-                    return true;
+                    return (notificationObject, true);
                 }
                 catch (Exception ex)
                 {
                     // Rollback if an error occurs
                     await transaction.RollbackAsync();
-                    return false;
+                    return (null, false);
                 }
             }
+        }
+
+        public async Task<List<Notification>> GetNotificationsByUserIdAsync(string id)
+        {
+            var notifications = await _context.Notifications
+                .Where(n => n.NotifierId == id)
+                .Include(n => n.NotificationObject)
+                .ThenInclude(no => no.NotificationChanges)
+                .ToListAsync();
+                
+            return notifications;
         }
     }
 }

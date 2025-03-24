@@ -74,7 +74,7 @@ namespace server.Services
                 return ("Failed to generate message from template", false);
             }
 
-            return message;
+            return (message, true);
         }
 
         private string GenerateMessageFromTemplate(EntityType entityType, ActionType actionType, string actorName, string actionMessage, dynamic entityDetails)
