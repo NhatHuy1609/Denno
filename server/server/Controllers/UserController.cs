@@ -3,7 +3,12 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using server.Dtos.Response;
+using server.Dtos.Response.Board;
+using server.Dtos.Response.Card;
+using server.Dtos.Response.Notification;
 using server.Dtos.Response.Users;
+using server.Dtos.Response.Workspace;
+using server.Enums;
 using server.Interfaces;
 using server.Models.Pagination;
 using server.Models.Query;
@@ -21,15 +26,18 @@ namespace server.Controllers
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<UserController> _logger;
+        private readonly INotificationService _notificationService;
 
         public UserController(
             IMapper mapper,
             IUnitOfWork unitOfWork,
-            ILogger<UserController> logger)
+            ILogger<UserController> logger,
+            INotificationService notificationService)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _logger = logger;
+            _notificationService = notificationService;
         }
 
         [HttpGet]
@@ -65,25 +73,6 @@ namespace server.Controllers
             };
 
             return Ok(result);
-        }
-
-        [HttpGet]
-        [Route("[controller]/{id}/notifications")]
-        public async Task<IActionResult> GetNotificationsAsync([FromRoute] string id)
-        {
-            var user = _unitOfWork.Users.GetByIdAsync(id);
-
-            if (user == null)
-            {
-                return NotFound(new ApiErrorResponse()
-                {
-                    StatusMessage = $"Not found user with id: {id}"
-                });
-            }
-
-            var notifications = await _unitOfWork.Notifications.GetNotificationsByUserIdAsync(id);
-
-            return Ok();
         }
     }
 }

@@ -16,64 +16,53 @@ namespace server.Repositories
             _context = context;
         }
 
-        public async Task<(NotificationObject? NotificationObject, bool IsSuccess)> CreateNotificationAsync(EntityType entityType, Guid entityId, ActionType actionType, string actorId, List<string> userIdsToNotify)
-        {
-            using (IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync())
-            {
-                try
-                {
-                    var notificationObject = new NotificationObject()
-                    {
-                        EntityType = entityType,
-                        EntityId = entityId,
-                        ActionType = actionType,
-                        CreatedAt = DateTime.Now,
-                    };
-                    _context.NotificationObjects.Add(notificationObject);
-                    await _context.SaveChangesAsync();
+        //public async Task<(NotificationObject? NotificationObject, bool IsSuccess)> CreateNotificationAsync(EntityType entityType, Guid entityId, ActionType actionType, string actorId, List<string> userIdsToNotify)
+        //{
+        //    using (IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync())
+        //    {
+        //        try
+        //        {
+        //            var notificationObject = new NotificationObject()
+        //            {
+        //                EntityType = entityType,
+        //                EntityId = entityId,
+        //                ActionType = actionType,
+        //                CreatedAt = DateTime.Now,
+        //            };
+        //            _context.NotificationObjects.Add(notificationObject);
+        //            await _context.SaveChangesAsync();
 
-                    var notificationChange = new NotificationChange()
-                    {
-                        ActorId = actorId,
-                        NotificationObjectId = notificationObject.Id,
-                    };
-                    _context.NotificationChanges.Add(notificationChange);
-                    await _context.SaveChangesAsync();
+        //            var notificationChange = new NotificationChange()
+        //            {
+        //                ActorId = actorId,
+        //                NotificationObjectId = notificationObject.Id,
+        //            };
+        //            _context.NotificationChanges.Add(notificationChange);
+        //            await _context.SaveChangesAsync();
 
-                    foreach (var userId in userIdsToNotify)
-                    {
-                        var notification = new Notification()
-                        {
-                            NotificationObjectId = notificationObject.Id,
-                            NotifierId = userId,
-                            IsRead = false
-                        };
+        //            foreach (var userId in userIdsToNotify)
+        //            {
+        //                var notification = new Notification()
+        //                {
+        //                    NotificationObjectId = notificationObject.Id,
+        //                    NotifierId = userId,
+        //                    IsRead = false
+        //                };
 
-                        _context.Notifications.Add(notification);
-                    }
-                    await _context.SaveChangesAsync();
+        //                _context.Notifications.Add(notification);
+        //            }
+        //            await _context.SaveChangesAsync();
 
-                    await transaction.CommitAsync();
-                    return (notificationObject, true);
-                }
-                catch (Exception ex)
-                {
-                    // Rollback if an error occurs
-                    await transaction.RollbackAsync();
-                    return (null, false);
-                }
-            }
-        }
-
-        public async Task<List<Notification>> GetNotificationsByUserIdAsync(string id)
-        {
-            var notifications = await _context.Notifications
-                .Where(n => n.NotifierId == id)
-                .Include(n => n.NotificationObject)
-                .ThenInclude(no => no.NotificationChanges)
-                .ToListAsync();
-                
-            return notifications;
-        }
+        //            await transaction.CommitAsync();
+        //            return (notificationObject, true);
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            // Rollback if an error occurs
+        //            await transaction.RollbackAsync();
+        //            return (null, false);
+        //        }
+        //    }
+        //}
     }
 }

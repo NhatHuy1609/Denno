@@ -108,62 +108,67 @@ namespace server.Services
             await SendEmailAsync(emailData, true);
         }
 
-        public async Task SendNotificationEmailAsync(int notificaitonObjectId, string notifierId, string senderId, string? noteFromSender)
-        {
-            var notificationWithChange = await _dbContext.NotificationObjects
-                .Include(n => n.NotificationChanges)
-                .FirstOrDefaultAsync(n => n.Id == notificaitonObjectId);
+        //public async Task SendNotificationEmailAsync(int notificaitonObjectId, string notifierId, string senderId, string? noteFromSender)
+        //{
+        //    var notificationWithChange = await _dbContext.NotificationObjects
+        //        .Include(n => n.NotificationChanges)
+        //        .FirstOrDefaultAsync(n => n.Id == notificaitonObjectId);
 
-            var notifier = await _dbContext.Users.FindAsync(notifierId);
-            var sender = await _dbContext.Users.FindAsync(senderId);
+        //    var notifier = await _dbContext.Users.FindAsync(notifierId);
+        //    var sender = await _dbContext.Users.FindAsync(senderId);
 
-            var emailData = await BuildNotificationEmailData(notificationWithChange, notifier, sender, noteFromSender);
+        //    var emailData = await BuildNotificationEmailData(notificationWithChange, notifier, sender, noteFromSender);
 
-            await SendEmailAsync(emailData, true);
-        }
+        //    await SendEmailAsync(emailData, true);
+        //}
 
-        private async Task<EmailData> BuildNotificationEmailData(NotificationObject notificationObject, AppUser notifier, AppUser sender, string? noteFromSender)
-        {
-            var (message, isSuccess) = await _notificationService.GenerateNotificationMessage(notificationObject.Id);
-            var entityType = notificationObject.EntityType;
-            var actionType = notificationObject.ActionType;
+        //private async Task<EmailData> BuildNotificationEmailData(NotificationObject notificationObject, AppUser notifier, AppUser sender, string? noteFromSender)
+        //{
+        //    var (message, isSuccess) = await _notificationService.GenerateNotificationMessage(notificationObject.Id);
+        //    var entityType = notificationObject.EntityType;
+        //    var actionType = notificationObject.ActionType;
 
-            string id = notifier.Email;
-            string name = notifier.Email;
-            string subject = message;
-            string body = "";
+        //    string id = notifier.Email;
+        //    string name = notifier.Email;
+        //    string subject = message;
+        //    string body = "";
 
-            var notificationEmailModel = new NotificationTemplateModel()
-            {
-                Message = message,
-                SenderName = sender.FullName,
-                SenderAvatar = sender.Avatar,
-                Description = noteFromSender ?? ""
-            };
+        //    var notificationEmailModel = new NotificationTemplateModel()
+        //    {
+        //        Message = message,
+        //        SenderName = sender.FullName,
+        //        SenderAvatar = sender.Avatar,
+        //        Description = noteFromSender ?? ""
+        //    };
 
-            switch (entityType)
-            {
-                case EntityType.Workspace:
-                    if (actionType == ActionType.Invited)
-                    {
-                        var templatePath = File.ReadAllText(GetTemplatePath("NotificationTemplate.cshtml"));
-                        body = Engine.Razor.RunCompile(templatePath, "invitedEmailTemplate", typeof(NotificationTemplateModel), notificationEmailModel);
-                    }
-                    break;
-            }
+        //    switch (entityType)
+        //    {
+        //        case EntityType.Workspace:
+        //            if (actionType == ActionType.Invited)
+        //            {
+        //                var templatePath = File.ReadAllText(GetTemplatePath("NotificationTemplate.cshtml"));
+        //                body = Engine.Razor.RunCompile(templatePath, "invitedEmailTemplate", typeof(NotificationTemplateModel), notificationEmailModel);
+        //            }
+        //            break;
+        //    }
 
-            return new EmailData()
-            {
-                EmailToId = id,
-                EmailToName = name,
-                EmailSubject = subject,
-                EmailBody = body
-            };
-        }
+        //    return new EmailData()
+        //    {
+        //        EmailToId = id,
+        //        EmailToName = name,
+        //        EmailSubject = subject,
+        //        EmailBody = body
+        //    };
+        //}
 
         public static string GetTemplatePath(string templateFileName)
         {
             return Path.Combine(Directory.GetCurrentDirectory(), "Helpers", "HtmlTemplates", templateFileName);
+        }
+
+        public Task SendNotificationEmailAsync(int notificationObjectId, string notifierId, string senderId, string? noteFromSender)
+        {
+            throw new NotImplementedException();
         }
     }
 }

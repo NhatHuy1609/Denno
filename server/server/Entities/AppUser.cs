@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using server.Data.Enums;
 using server.Entities;
+using server.Repositories;
 
 namespace server.Models
 {
@@ -30,8 +31,8 @@ namespace server.Models
 
         public virtual ICollection<CardComment> CardComments { get; set; } = new List<CardComment>();
 
-        public virtual ICollection<CardActivity> CardActivities { get; set; } = new List<CardActivity>();
+        public virtual ICollection<DennoAction> Actions { get; set; } = new List<DennoAction>();
 
-        public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+        public virtual ICollection<NotificationRecipient> NotificationRecipients { get; set; } = new List<NotificationRecipient>();
     }
 }

@@ -28,54 +28,54 @@ namespace server.Services
             };
         }
 
-        public async Task<(string Message, bool IsSuccess)> GenerateNotificationMessage(int notificationObjectId)
-        {
-            var notificationWithChange = await _context.NotificationObjects
-                .Include(n => n.NotificationChanges)
-                .FirstOrDefaultAsync(n => n.Id == notificationObjectId);
+        //public async Task<(string Message, bool IsSuccess)> GenerateNotificationMessage(int notificationObjectId)
+        //{
+        //    var notificationWithChange = await _context.NotificationObjects
+        //        .Include(n => n.NotificationChanges)
+        //        .FirstOrDefaultAsync(n => n.Id == notificationObjectId);
 
-            if (notificationWithChange == null) 
-            {
-                return ("Notification object not found for ID: " + notificationObjectId, false);
-            }
+        //    if (notificationWithChange == null) 
+        //    {
+        //        return ("Notification object not found for ID: " + notificationObjectId, false);
+        //    }
 
-            var change = notificationWithChange.NotificationChanges.FirstOrDefault();
-            if (change == null)
-            {
-                return ("No changes found for notification ID: " + notificationObjectId, false);
-            }
+        //    var change = notificationWithChange.NotificationChanges.FirstOrDefault();
+        //    if (change == null)
+        //    {
+        //        return ("No changes found for notification ID: " + notificationObjectId, false);
+        //    }
 
-            string actorName = await GetActorName(change.ActorId);
-            if (string.IsNullOrEmpty(actorName))
-            {
-                return ("Actor not found for ID: " + change.ActorId, false);
-            }
+        //    string actorName = await GetActorName(change.ActorId);
+        //    if (string.IsNullOrEmpty(actorName))
+        //    {
+        //        return ("Actor not found for ID: " + change.ActorId, false);
+        //    }
 
-            string actionMessage = GetActionMessage(notificationWithChange.ActionType);
+        //    string actionMessage = GetActionMessage(notificationWithChange.ActionType);
 
-            var entityDetails = await GetEntityDetails(
-                    notificationWithChange.EntityType,
-                    notificationWithChange.EntityId);
+        //    var entityDetails = await GetEntityDetails(
+        //            notificationWithChange.EntityType,
+        //            notificationWithChange.EntityId);
 
-            if (entityDetails == null)
-            {
-                return ($"Entity details not found for type {notificationWithChange.EntityType} and ID {notificationWithChange.EntityId}", false);
-            }
+        //    if (entityDetails == null)
+        //    {
+        //        return ($"Entity details not found for type {notificationWithChange.EntityType} and ID {notificationWithChange.EntityId}", false);
+        //    }
 
-            var message = GenerateMessageFromTemplate(
-                notificationWithChange.EntityType,
-                notificationWithChange.ActionType,
-                actorName,
-                actionMessage,
-                entityDetails);
+        //    var message = GenerateMessageFromTemplate(
+        //        notificationWithChange.EntityType,
+        //        notificationWithChange.ActionType,
+        //        actorName,
+        //        actionMessage,
+        //        entityDetails);
 
-            if (string.IsNullOrEmpty(message))
-            {
-                return ("Failed to generate message from template", false);
-            }
+        //    if (string.IsNullOrEmpty(message))
+        //    {
+        //        return ("Failed to generate message from template", false);
+        //    }
 
-            return (message, true);
-        }
+        //    return (message, true);
+        //}
 
         private string GenerateMessageFromTemplate(EntityType entityType, ActionType actionType, string actorName, string actionMessage, dynamic entityDetails)
         {
@@ -110,6 +110,11 @@ namespace server.Services
             return _actionTypeMap.TryGetValue(actionType, out var actionMessage)
                 ? actionMessage
                 : "interacted with the";
+        }
+
+        public Task<(string Message, bool IsSuccess)> GenerateNotificationMessage(int notificationObjectId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

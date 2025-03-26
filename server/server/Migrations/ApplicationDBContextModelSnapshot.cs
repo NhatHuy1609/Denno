@@ -155,6 +155,74 @@ namespace server.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("server.Entities.DennoAction", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ActionType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("BoardId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CardId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CommentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("ListId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("MemberCreatorId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid?>("TargetBoardId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("TargetCardId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("TargetListId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("TargetUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid?>("WorkspaceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BoardId");
+
+                    b.HasIndex("CardId");
+
+                    b.HasIndex("CommentId");
+
+                    b.HasIndex("ListId");
+
+                    b.HasIndex("MemberCreatorId");
+
+                    b.HasIndex("TargetBoardId");
+
+                    b.HasIndex("TargetCardId");
+
+                    b.HasIndex("TargetListId");
+
+                    b.HasIndex("TargetUserId");
+
+                    b.HasIndex("WorkspaceId");
+
+                    b.ToTable("Actions");
+                });
+
             modelBuilder.Entity("server.Entities.FileUpload", b =>
                 {
                     b.Property<int>("Id")
@@ -210,75 +278,35 @@ namespace server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<Guid>("ActionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("IsRead")
                         .HasColumnType("bit");
 
-                    b.Property<int>("NotificationObjectId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("NotifierId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("NotificationObjectId");
-
-                    b.HasIndex("NotifierId");
+                    b.HasIndex("ActionId");
 
                     b.ToTable("Notifications");
                 });
 
-            modelBuilder.Entity("server.Entities.NotificationChange", b =>
+            modelBuilder.Entity("server.Entities.NotificationRecipient", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ActorId")
-                        .IsRequired()
+                    b.Property<string>("RecipientId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("NotificationObjectId")
+                    b.Property<int>("NotificationId")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.HasKey("RecipientId", "NotificationId");
 
-                    b.HasIndex("ActorId");
+                    b.HasIndex("NotificationId");
 
-                    b.HasIndex("NotificationObjectId");
-
-                    b.ToTable("NotificationChanges");
-                });
-
-            modelBuilder.Entity("server.Entities.NotificationObject", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ActionType")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("EntityId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("EntityType")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("NotificationObjects");
+                    b.ToTable("NotificationRecipients");
                 });
 
             modelBuilder.Entity("server.Entities.UserVisibilitySettings", b =>
@@ -546,40 +574,6 @@ namespace server.Migrations
                     b.HasIndex("CardListId");
 
                     b.ToTable("Cards");
-                });
-
-            modelBuilder.Entity("server.Models.CardActivity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("ActionType")
-                        .HasColumnType("int");
-
-                    b.Property<string>("AppUserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<Guid>("CardId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Id"), false);
-
-                    b.HasIndex("AppUserId");
-
-                    b.HasIndex("CardId");
-
-                    b.ToTable("CardActivites");
                 });
 
             modelBuilder.Entity("server.Models.CardAttachment", b =>
@@ -900,6 +894,79 @@ namespace server.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("server.Entities.DennoAction", b =>
+                {
+                    b.HasOne("server.Models.Board", "Board")
+                        .WithMany("Actions")
+                        .HasForeignKey("BoardId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("server.Models.Card", "Card")
+                        .WithMany("Actions")
+                        .HasForeignKey("CardId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("server.Models.CardComment", "Comment")
+                        .WithMany()
+                        .HasForeignKey("CommentId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("server.Models.CardList", "List")
+                        .WithMany()
+                        .HasForeignKey("ListId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("server.Models.AppUser", "MemberCreator")
+                        .WithMany("Actions")
+                        .HasForeignKey("MemberCreatorId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("server.Models.Board", "TargetBoard")
+                        .WithMany()
+                        .HasForeignKey("TargetBoardId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("server.Models.Card", "TargetCard")
+                        .WithMany()
+                        .HasForeignKey("TargetCardId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("server.Models.CardList", "TargetList")
+                        .WithMany()
+                        .HasForeignKey("TargetListId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("server.Models.AppUser", "TargetUser")
+                        .WithMany()
+                        .HasForeignKey("TargetUserId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("server.Models.Workspace", "Workspace")
+                        .WithMany("Actions")
+                        .HasForeignKey("WorkspaceId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("Board");
+
+                    b.Navigation("Card");
+
+                    b.Navigation("Comment");
+
+                    b.Navigation("List");
+
+                    b.Navigation("MemberCreator");
+
+                    b.Navigation("TargetBoard");
+
+                    b.Navigation("TargetCard");
+
+                    b.Navigation("TargetList");
+
+                    b.Navigation("TargetUser");
+
+                    b.Navigation("Workspace");
+                });
+
             modelBuilder.Entity("server.Entities.FileUpload", b =>
                 {
                     b.HasOne("server.Models.Workspace", "Workspace")
@@ -913,40 +980,32 @@ namespace server.Migrations
 
             modelBuilder.Entity("server.Entities.Notification", b =>
                 {
-                    b.HasOne("server.Entities.NotificationObject", "NotificationObject")
-                        .WithMany("Notifications")
-                        .HasForeignKey("NotificationObjectId")
+                    b.HasOne("server.Entities.DennoAction", "Action")
+                        .WithMany()
+                        .HasForeignKey("ActionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("server.Models.AppUser", "Notifier")
-                        .WithMany("Notifications")
-                        .HasForeignKey("NotifierId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("NotificationObject");
-
-                    b.Navigation("Notifier");
+                    b.Navigation("Action");
                 });
 
-            modelBuilder.Entity("server.Entities.NotificationChange", b =>
+            modelBuilder.Entity("server.Entities.NotificationRecipient", b =>
                 {
-                    b.HasOne("server.Models.AppUser", "Actor")
+                    b.HasOne("server.Entities.Notification", "Notification")
                         .WithMany()
-                        .HasForeignKey("ActorId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("NotificationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("server.Entities.NotificationObject", "NotificationObject")
-                        .WithMany("NotificationChanges")
-                        .HasForeignKey("NotificationObjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("server.Models.AppUser", "Recipient")
+                        .WithMany("NotificationRecipients")
+                        .HasForeignKey("RecipientId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("Actor");
+                    b.Navigation("Notification");
 
-                    b.Navigation("NotificationObject");
+                    b.Navigation("Recipient");
                 });
 
             modelBuilder.Entity("server.Entities.UserVisibilitySettings", b =>
@@ -1027,25 +1086,6 @@ namespace server.Migrations
                         .IsRequired();
 
                     b.Navigation("CardList");
-                });
-
-            modelBuilder.Entity("server.Models.CardActivity", b =>
-                {
-                    b.HasOne("server.Models.AppUser", "AppUser")
-                        .WithMany("CardActivities")
-                        .HasForeignKey("AppUserId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
-                        .IsRequired();
-
-                    b.HasOne("server.Models.Card", "Card")
-                        .WithMany("CardActivities")
-                        .HasForeignKey("CardId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AppUser");
-
-                    b.Navigation("Card");
                 });
 
             modelBuilder.Entity("server.Models.CardAttachment", b =>
@@ -1187,18 +1227,11 @@ namespace server.Migrations
                     b.Navigation("Workspace");
                 });
 
-            modelBuilder.Entity("server.Entities.NotificationObject", b =>
-                {
-                    b.Navigation("NotificationChanges");
-
-                    b.Navigation("Notifications");
-                });
-
             modelBuilder.Entity("server.Models.AppUser", b =>
                 {
-                    b.Navigation("BoardMembers");
+                    b.Navigation("Actions");
 
-                    b.Navigation("CardActivities");
+                    b.Navigation("BoardMembers");
 
                     b.Navigation("CardCheckListItems");
 
@@ -1206,7 +1239,7 @@ namespace server.Migrations
 
                     b.Navigation("CardMembers");
 
-                    b.Navigation("Notifications");
+                    b.Navigation("NotificationRecipients");
 
                     b.Navigation("OwnedWorkspaces");
 
@@ -1218,6 +1251,8 @@ namespace server.Migrations
 
             modelBuilder.Entity("server.Models.Board", b =>
                 {
+                    b.Navigation("Actions");
+
                     b.Navigation("BoardLabels");
 
                     b.Navigation("BoardMembers");
@@ -1234,7 +1269,7 @@ namespace server.Migrations
 
             modelBuilder.Entity("server.Models.Card", b =>
                 {
-                    b.Navigation("CardActivities");
+                    b.Navigation("Actions");
 
                     b.Navigation("CardAttachments");
 
@@ -1264,6 +1299,8 @@ namespace server.Migrations
 
             modelBuilder.Entity("server.Models.Workspace", b =>
                 {
+                    b.Navigation("Actions");
+
                     b.Navigation("Boards");
 
                     b.Navigation("Logo")
