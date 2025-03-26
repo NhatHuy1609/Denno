@@ -13,7 +13,7 @@ namespace server.Repositories
             _context = context;
         }
 
-        public void Add(WorkspaceMember workspaceMember)
+        public void AddMember(WorkspaceMember workspaceMember)
         {
             _context.WorkspaceMembers.Add(workspaceMember);
         }

@@ -1,15 +1,16 @@
 ﻿using Asp.Versioning;
 using AutoMapper;
-using CloudinaryDotNet.Actions;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using server.Constants;
 using server.Dtos.Requests.Workspace;
+using server.Dtos.Requests.WorkspaceMember;
 using server.Dtos.Response;
 using server.Dtos.Response.Workspace;
 using server.Interfaces;
 using server.Models;
+using server.Strategies.ActionStrategy;
 using System.Security.Claims;
 
 namespace server.Controllers
@@ -24,16 +25,19 @@ namespace server.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<AppUser> _userManager;
         private readonly IFileUploadService _uploadService;
+        private readonly IActionService _actionService;
 
         public WorkspacesController(
             IMapper mapper,
             IUnitOfWork unitOfWork,
             UserManager<AppUser> userManager,
-            IFileUploadService uploadService)
+            IFileUploadService uploadService,
+            IActionService actionService)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
             _uploadService = uploadService;
+            _actionService = actionService;
             _mapper = mapper;
         }
 
@@ -220,6 +224,53 @@ namespace server.Controllers
             _unitOfWork.Complete();
 
             return NoContent();
+        }
+
+        [HttpPost("[controller]/{id}/members")]
+        public async Task<IActionResult> AddWorkspaceMemberAsync(Guid id, [FromBody] AddWorkspaceMemberRequestDto requestDto)
+        {
+            var workspace = await _unitOfWork.Workspaces.GetByIdAsync(id);
+
+            if (workspace == null)
+            {
+                return NotFound(new ApiErrorResponse()
+                {
+                    StatusMessage = "Not found workspace"
+                });
+            }
+
+            var addedUser = await _unitOfWork.Users.GetUserByEmailAsync(requestDto.Email);
+
+            if (addedUser == null)
+            {
+                return NotFound(new ApiErrorResponse()
+                {
+                    StatusMessage = "User to be added not found"
+                });
+            }
+
+            var workspaceMember = new WorkspaceMember()
+            {
+                WorkspaceId = id,
+                AppUserId = addedUser.Id
+            };
+
+            _unitOfWork.WorkspaceMembers.AddMember(workspaceMember);
+            
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var actionContext = new DennoActionContext
+            {
+                MemberCreatorId = userId,
+                WorkspaceId = workspace.Id,
+            };
+
+            var createdAction = await _actionService.CreateActionAsync(ActionTypes.AddMemberToWorkspace, actionContext);
+
+            _unitOfWork.Complete();
+
+            return Ok(createdAction);
         }
     }
 }

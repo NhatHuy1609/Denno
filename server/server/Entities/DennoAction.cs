@@ -31,13 +31,13 @@ namespace server.Entities
         public AppUser? TargetUser { get; set; }
 
         public Guid? TargetCardId { get; set; }
-        public virtual Card? TargetCard { get; set; }
+        public Card? TargetCard { get; set; }
 
         public Guid? TargetBoardId { get; set; }
-        public virtual Board? TargetBoard { get; set; }
+        public Board? TargetBoard { get; set; }
 
         public Guid? TargetListId { get; set; }
-        public virtual CardList? TargetList { get; set; }
+        public CardList? TargetList { get; set; }
 
         public Guid? CommentId { get; set; }
         public CardComment? Comment { get; set; }

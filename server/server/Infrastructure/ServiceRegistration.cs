@@ -11,6 +11,7 @@ using Polly.Retry;
 using server.Data;
 using server.Dtos.Response;
 using server.Enums;
+using server.Factories;
 using server.Infrastructure.Configurations;
 using server.Infrastructure.Providers;
 using server.Interfaces;
@@ -36,6 +37,8 @@ namespace server.Infrastructure
             services.AddTransient<IWorkspaceRepository, WorkspaceRepository>();
             #endregion
             services.AddTransient<IUnitOfWork, UnitOfWork>();
+            services.AddTransient<IActionService, ActionService>();
+            services.AddTransient<ActionFactory, ActionFactory>();
 
             services.AddDbContext<ApplicationDBContext>(options =>
             {
