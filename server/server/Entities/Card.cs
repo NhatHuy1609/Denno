@@ -1,4 +1,6 @@
-﻿namespace server.Models
+﻿using server.Entities;
+
+namespace server.Models
 {
     public class Card
     {
@@ -27,6 +29,6 @@
 
         public virtual ICollection<CardComment> CardComments { get; set; } = new List<CardComment>();
 
-        public virtual ICollection<CardActivity> CardActivities { get; set; } = new List<CardActivity>();
+        public virtual ICollection<DennoAction> Actions { get; set; } = new List<DennoAction>();
     }
 }

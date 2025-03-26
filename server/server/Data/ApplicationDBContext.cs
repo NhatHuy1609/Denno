@@ -27,13 +27,11 @@ namespace server.Data
         public DbSet<CardCheckListItem> CardCheckListItems { get; set; }
         public DbSet<CardAttachment> CardAttachments { get; set; }
         public DbSet<CardComment> CardComments { get; set; }
-        public DbSet<CardActivity> CardActivites { get; set; }
         public DbSet<GoogleAuthDataStore> GoogleAuthDataStores { get; set; }
         public DbSet<FileUpload> FileUploads { get; set; }
+        public DbSet<DennoAction> Actions { get; set; }
         public DbSet<Notification> Notifications { get; set; }
-        public DbSet<NotificationObject> NotificationObjects { get; set; }
-        public DbSet<NotificationChange> NotificationChanges { get; set; }
-
+        public DbSet<NotificationRecipient> NotificationRecipients { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -165,36 +163,83 @@ namespace server.Data
                 .HasForeignKey(e => e.AppUserId)
                 .OnDelete(DeleteBehavior.ClientCascade);
 
-            modelBuilder.Entity<CardActivity>()
-                .HasKey(e => e.Id)
-                .IsClustered(false);
+            // Configure DennoAction's RelationShips
 
-            modelBuilder.Entity<CardActivity>()
-                .HasOne(e => e.AppUser)
-                .WithMany(e => e.CardActivities)
-                .HasForeignKey(e => e.AppUserId)
-                .OnDelete(DeleteBehavior.ClientCascade);
+            modelBuilder.Entity<DennoAction>()
+               .HasOne(d => d.MemberCreator)
+               .WithMany(m => m.Actions)
+               .HasForeignKey(d => d.MemberCreatorId)
+               .OnDelete(DeleteBehavior.NoAction);
 
-            // Configure notification relationships
-            modelBuilder.Entity<Notification>()
-                .HasOne(n => n.NotificationObject)
-                .WithMany(no => no.Notifications)
-                .HasForeignKey(n => n.NotificationObjectId);
+            modelBuilder.Entity<DennoAction>()
+                .HasOne(d => d.Card)
+                .WithMany(c => c.Actions)
+                .HasForeignKey(d => d.CardId)
+                .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<Notification>()
-                .HasOne(n => n.Notifier)
-                .WithMany(u => u.Notifications)
-                .HasForeignKey(n => n.NotifierId);
+            modelBuilder.Entity<DennoAction>()
+                .HasOne(d => d.Board)
+                .WithMany(b => b.Actions)
+                .HasForeignKey(d => d.BoardId)
+                .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<NotificationChange>()
-                .HasOne(nc => nc.NotificationObject)
-                .WithMany(no => no.NotificationChanges)
-                .HasForeignKey(nc => nc.NotificationObjectId);
-
-            modelBuilder.Entity<NotificationChange>()
-                .HasOne(nc => nc.Actor)
+            modelBuilder.Entity<DennoAction>()
+                .HasOne(d => d.List)
                 .WithMany()
-                .HasForeignKey(nc => nc.ActorId);
+                .HasForeignKey(d => d.ListId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<DennoAction>()
+                .HasOne(d => d.Workspace)
+                .WithMany(w => w.Actions)
+                .HasForeignKey(d => d.WorkspaceId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<DennoAction>()
+                .HasOne(d => d.TargetUser)
+                .WithMany()
+                .HasForeignKey(d => d.TargetUserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<DennoAction>()
+                .HasOne(d => d.TargetCard)
+                .WithMany()
+                .HasForeignKey(d => d.TargetCardId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<DennoAction>()
+                .HasOne(d => d.TargetBoard)
+                .WithMany()
+                .HasForeignKey(d => d.TargetBoardId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<DennoAction>()
+                .HasOne(d => d.TargetList)
+                .WithMany()
+                .HasForeignKey(d => d.TargetListId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<DennoAction>()
+                .HasOne(d => d.Comment)
+                .WithMany()
+                .HasForeignKey(d => d.CommentId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            // Configure Notification's RelationShips
+            modelBuilder.Entity<NotificationRecipient>()
+                .HasKey(nr => new { nr.RecipientId, nr.NotificationId });
+
+            modelBuilder.Entity<NotificationRecipient>()
+                .HasOne(n => n.Recipient)
+                .WithMany(r => r.NotificationRecipients)
+                .HasForeignKey(n => n.RecipientId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<NotificationRecipient>()
+                .HasOne(n => n.Notification)
+                .WithMany()
+                .HasForeignKey(n => n.NotificationId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }
