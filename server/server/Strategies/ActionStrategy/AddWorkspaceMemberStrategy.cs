@@ -45,9 +45,23 @@ namespace server.Strategies.ActionStrategy
                 WorkspaceId = context.WorkspaceId,
                 Date = DateTime.Now,
             };
-
-            _dbContext.WorkspaceMembers.Add(newMember);
             _dbContext.Actions.Add(action);
+
+            var notification = new Notification
+            {
+                Date = DateTime.Now,
+                ActionId = action.Id,
+            };
+            _dbContext.Notifications.Add(notification);
+
+            var recipient = new NotificationRecipient
+            {
+                NotificationId = notification.Id,
+                RecipientId = context.TargetUserId
+            };
+
+            _dbContext.NotificationRecipients.Add(recipient);
+            _dbContext.WorkspaceMembers.Add(newMember);
 
             return action;
         }

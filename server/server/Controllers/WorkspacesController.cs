@@ -27,18 +27,24 @@ namespace server.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly IFileUploadService _uploadService;
         private readonly IActionService _actionService;
+        private readonly ILogger<WorkspacesController> _logger;
+        private readonly IEmailService _emailService;
 
         public WorkspacesController(
             IMapper mapper,
             IUnitOfWork unitOfWork,
             UserManager<AppUser> userManager,
             IFileUploadService uploadService,
-            IActionService actionService)
+            IActionService actionService,
+            ILogger<WorkspacesController> logger,
+            IEmailService emailService)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
             _uploadService = uploadService;
             _actionService = actionService;
+            _logger = logger;
+            _emailService = emailService;
             _mapper = mapper;
         }
 
@@ -253,6 +259,23 @@ namespace server.Controllers
             };
 
             var action = await _actionService.CreateActionAsync(ActionTypes.AddMemberToWorkspace, actionContext);
+
+            // Send email after creating new action successfully
+            if (action != null)
+            {
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await _emailService.SendActionEmailAsync(action);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError("Failed to send action notification email after retries: {ex.Message}", ex);
+                    }
+                });
+            }
+
             return Ok(action);
         }
     }

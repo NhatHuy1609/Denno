@@ -1,7 +1,9 @@
-﻿namespace server.Interfaces
+﻿using server.Entities;
+
+namespace server.Interfaces
 {
     public interface INotificationService
     {
-        Task<(string Message, bool IsSuccess)> GenerateNotificationMessage(int notificationObjectId);
+        string? BuildActionNotificationMessage(DennoAction action);
     }
 }
