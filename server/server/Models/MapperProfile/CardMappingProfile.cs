@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using server.Dtos.Response.Card;
+using server.Entities;
 
 namespace server.Models.MapperProfile
 {

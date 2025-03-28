@@ -1,6 +1,6 @@
 ﻿using server.Enums;
 
-namespace server.Models
+namespace server.Entities
 {
     public class WorkspaceMember
     {

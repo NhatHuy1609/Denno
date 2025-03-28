@@ -1,6 +1,4 @@
-﻿using server.Entities;
-
-namespace server.Models
+﻿namespace server.Entities
 {
     public class Card
     {

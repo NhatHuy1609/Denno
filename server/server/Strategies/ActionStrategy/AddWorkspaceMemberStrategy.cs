@@ -1,4 +1,5 @@
-﻿using server.Constants;
+﻿using Microsoft.EntityFrameworkCore;
+using server.Constants;
 using server.Data;
 using server.Entities;
 
@@ -6,15 +7,37 @@ namespace server.Strategies.ActionStrategy
 {
     public class AddWorkspaceMemberStrategy : IDennoActionStrategy
     {
-        private readonly ApplicationDBContext _dBContext;
+        private readonly ApplicationDBContext _dbContext;
 
-        public AddWorkspaceMemberStrategy(ApplicationDBContext dBContext)
+        public AddWorkspaceMemberStrategy(ApplicationDBContext dbContext)
         {
-            _dBContext = dBContext;
+            _dbContext = dbContext;
         }
 
         public DennoAction Execute(DennoActionContext context)
         {
+            if (!context.WorkspaceId.HasValue)
+                throw new ArgumentNullException(nameof(context.WorkspaceId), "WorkspaceId is required");
+
+            if (string.IsNullOrEmpty(context.TargetUserId))
+                throw new ArgumentNullException(nameof(context.TargetUserId), "TargetUserId is required");
+
+            if (string.IsNullOrEmpty(context.MemberCreatorId))
+                throw new ArgumentNullException(nameof(context.MemberCreatorId), "MemberCreatorId is required");
+
+            // Action-specific business rules
+            if (context.MemberCreatorId == context.TargetUserId)
+                throw new InvalidOperationException("User cannot add themselves as a member");
+
+            if (_dbContext.WorkspaceMembers.Any(m => m.WorkspaceId == context.WorkspaceId && m.AppUserId == context.TargetUserId))
+                throw new InvalidOperationException("User is already a member of this workspace");
+
+            var newMember = new WorkspaceMember()
+            {
+                WorkspaceId = context.WorkspaceId.Value,
+                AppUserId = context.TargetUserId
+            };
+
             var action = new DennoAction()
             {
                 MemberCreatorId = context.MemberCreatorId,
@@ -23,7 +46,8 @@ namespace server.Strategies.ActionStrategy
                 Date = DateTime.Now,
             };
 
-            _dBContext.Actions.Add(action);
+            _dbContext.WorkspaceMembers.Add(newMember);
+            _dbContext.Actions.Add(action);
 
             return action;
         }

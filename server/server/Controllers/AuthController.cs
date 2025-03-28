@@ -8,6 +8,7 @@ using server.Dtos.Requests.Auth;
 using server.Dtos.Requests.Users;
 using server.Dtos.Response;
 using server.Dtos.Response.Users;
+using server.Entities;
 using server.Infrastructure.Providers;
 using server.Interfaces;
 using server.Models;

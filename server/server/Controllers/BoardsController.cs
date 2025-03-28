@@ -3,11 +3,11 @@ using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using server.Interfaces;
-using server.Models;
 using server.Dtos.Requests.Board;
 using server.Dtos.Response;
 using server.Dtos.Response.Board;
 using server.Enums;
+using server.Entities;
 
 namespace server.Controllers
 {

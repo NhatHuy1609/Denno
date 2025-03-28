@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using server.Dtos.Requests.Board;
 using server.Dtos.Response.Board;
+using server.Entities;
 
 namespace server.Models.MapperProfile;
 
