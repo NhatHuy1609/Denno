@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using server.Data.Enums;
-using server.Entities;
 using server.Repositories;
 
-namespace server.Models
+namespace server.Entities
 {
-    public class AppUser: IdentityUser
+    public class AppUser : IdentityUser
     {
         public string? FullName { get; set; } = string.Empty;
         public string? JobTitle { get; set; } = string.Empty;

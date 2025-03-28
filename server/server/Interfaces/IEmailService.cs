@@ -1,4 +1,5 @@
-﻿using server.Enums;
+﻿using server.Entities;
+using server.Enums;
 using server.Models;
 
 namespace server.Interfaces

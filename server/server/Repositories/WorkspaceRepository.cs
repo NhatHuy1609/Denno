@@ -1,6 +1,6 @@
 ﻿using server.Data;
+using server.Entities;
 using server.Interfaces;
-using server.Models;
 
 namespace server.Repositories
 {

@@ -13,7 +13,7 @@ namespace server.Factories
             _dBContext = dBContext;
         }
 
-        public IActionStategy CreateStrategy(string actionType)
+        public IDennoActionStrategy CreateStrategy(string actionType)
         {
             return actionType switch
             {

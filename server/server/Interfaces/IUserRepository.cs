@@ -1,4 +1,4 @@
-﻿using server.Models;
+﻿using server.Entities;
 using server.Models.Pagination;
 using server.Models.Query;
 

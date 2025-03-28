@@ -8,6 +8,7 @@ using server.Dtos.Requests.Workspace;
 using server.Dtos.Requests.WorkspaceMember;
 using server.Dtos.Response;
 using server.Dtos.Response.Workspace;
+using server.Entities;
 using server.Interfaces;
 using server.Models;
 using server.Strategies.ActionStrategy;
@@ -229,48 +230,30 @@ namespace server.Controllers
         [HttpPost("[controller]/{id}/members")]
         public async Task<IActionResult> AddWorkspaceMemberAsync(Guid id, [FromBody] AddWorkspaceMemberRequestDto requestDto)
         {
-            var workspace = await _unitOfWork.Workspaces.GetByIdAsync(id);
-
-            if (workspace == null)
-            {
-                return NotFound(new ApiErrorResponse()
-                {
-                    StatusMessage = "Not found workspace"
-                });
-            }
-
-            var addedUser = await _unitOfWork.Users.GetUserByEmailAsync(requestDto.Email);
-
-            if (addedUser == null)
-            {
-                return NotFound(new ApiErrorResponse()
-                {
-                    StatusMessage = "User to be added not found"
-                });
-            }
-
-            var workspaceMember = new WorkspaceMember()
-            {
-                WorkspaceId = id,
-                AppUserId = addedUser.Id
-            };
-
-            _unitOfWork.WorkspaceMembers.AddMember(workspaceMember);
-            
+            if (requestDto == null || string.IsNullOrEmpty(requestDto.Email))
+                return BadRequest(new ApiErrorResponse { StatusMessage = "Invalid request data" });
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized(new ApiErrorResponse { StatusMessage = "User not authenticated" });
+
+            var workspace = await _unitOfWork.Workspaces.GetByIdAsync(id);
+            if (workspace == null)
+                return NotFound(new ApiErrorResponse { StatusMessage = "Workspace not found" });
+
+            var addedUser = await _unitOfWork.Users.GetUserByEmailAsync(requestDto.Email);
+            if (addedUser == null)
+                return NotFound(new ApiErrorResponse { StatusMessage = "User not found" });
 
             var actionContext = new DennoActionContext
             {
                 MemberCreatorId = userId,
                 WorkspaceId = workspace.Id,
+                TargetUserId = addedUser.Id
             };
 
-            var createdAction = await _actionService.CreateActionAsync(ActionTypes.AddMemberToWorkspace, actionContext);
-
-            _unitOfWork.Complete();
-
-            return Ok(createdAction);
+            var action = await _actionService.CreateActionAsync(ActionTypes.AddMemberToWorkspace, actionContext);
+            return Ok(action);
         }
     }
 }

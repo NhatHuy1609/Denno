@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using server.Models;
+using server.Entities;
 
 namespace server.Dtos.Response.Users
 {

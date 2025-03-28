@@ -1,6 +1,4 @@
-﻿using server.Models;
-
-namespace server.Entities
+﻿namespace server.Entities
 {
     public class NotificationRecipient
     {

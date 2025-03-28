@@ -1,7 +1,6 @@
-﻿using server.Entities;
-using server.Enums;
+﻿using server.Enums;
 
-namespace server.Models
+namespace server.Entities
 {
     public class Board
     {
