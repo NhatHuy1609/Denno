@@ -7,7 +7,7 @@ namespace server.Interfaces
     public interface IEmailService
     {
         Task<bool> SendEmailAsync(EmailData mailData, bool isHtmlBody);
-        Task SendNotificationEmailAsync(int notificationObjectId, string notifierId, string senderId, string? noteFromSender);
+        Task SendActionEmailAsync(DennoAction action);
         Task SendConfirmationRegisterAccountEmailAsync(string email, AppUser user);
     }
 }

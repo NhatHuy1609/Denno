@@ -6,6 +6,7 @@ using MimeKit;
 using Polly;
 using RazorEngine;
 using RazorEngine.Templating;
+using server.Constants;
 using server.Data;
 using server.Entities;
 using server.Enums;
@@ -94,7 +95,7 @@ namespace server.Services
 
         public async Task SendConfirmationRegisterAccountEmailAsync(string email, AppUser user)
         {
-            var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Helpers", "HtmlTemplates", "UserRegisterConfimationEmail.html");
+            var templatePath = GetTemplatePath("UserRegisterConfimationEmail.html");
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
             var emailData = new EmailData()
@@ -108,67 +109,60 @@ namespace server.Services
             await SendEmailAsync(emailData, true);
         }
 
-        //public async Task SendNotificationEmailAsync(int notificaitonObjectId, string notifierId, string senderId, string? noteFromSender)
-        //{
-        //    var notificationWithChange = await _dbContext.NotificationObjects
-        //        .Include(n => n.NotificationChanges)
-        //        .FirstOrDefaultAsync(n => n.Id == notificaitonObjectId);
+        private EmailData BuildNotificationEmailData(DennoAction action)
+        {
+            if (action == null)
+                throw new ArgumentNullException(nameof(action), "Action cannot be null");
 
-        //    var notifier = await _dbContext.Users.FindAsync(notifierId);
-        //    var sender = await _dbContext.Users.FindAsync(senderId);
+            if (action.TargetUser == null)
+                throw new ArgumentNullException(nameof(action.TargetUser), "Recipient cannot be null");
 
-        //    var emailData = await BuildNotificationEmailData(notificationWithChange, notifier, sender, noteFromSender);
+            var message = _notificationService?.BuildActionNotificationMessage(action)
+                ?? throw new ArgumentNullException(nameof(_notificationService), "Notification service cannot be null");
 
-        //    await SendEmailAsync(emailData, true);
-        //}
+            if (string.IsNullOrEmpty(action.TargetUser.Email))
+                throw new ArgumentException("Target user email cannot be null or empty", nameof(action.TargetUser.Email));
 
-        //private async Task<EmailData> BuildNotificationEmailData(NotificationObject notificationObject, AppUser notifier, AppUser sender, string? noteFromSender)
-        //{
-        //    var (message, isSuccess) = await _notificationService.GenerateNotificationMessage(notificationObject.Id);
-        //    var entityType = notificationObject.EntityType;
-        //    var actionType = notificationObject.ActionType;
+            string id = action.TargetUser.Email;
+            string name = action.TargetUser.Email;
+            string subject = message;
+            string body = "";
 
-        //    string id = notifier.Email;
-        //    string name = notifier.Email;
-        //    string subject = message;
-        //    string body = "";
+            var notificationEmailModel = new NotificationTemplateModel
+            {
+                Message = message,
+                SenderName = action.MemberCreator?.FullName ?? "Unknown Sender"
+            };
 
-        //    var notificationEmailModel = new NotificationTemplateModel()
-        //    {
-        //        Message = message,
-        //        SenderName = sender.FullName,
-        //        SenderAvatar = sender.Avatar,
-        //        Description = noteFromSender ?? ""
-        //    };
+            switch (action.ActionType)
+            {
+                case ActionTypes.AddMemberToWorkspace:
+                    var templatePath = File.ReadAllText(GetTemplatePath("NotificationTemplate.cshtml"));
+                    body = Engine.Razor.RunCompile(templatePath, "addMemberToWorkspaceTemplate", typeof(NotificationTemplateModel), notificationEmailModel);
+                    break;
+                default:
+                    throw new ArgumentException("Failed to build notification email due to action not being found.");
+            }
 
-        //    switch (entityType)
-        //    {
-        //        case EntityType.Workspace:
-        //            if (actionType == ActionType.Invited)
-        //            {
-        //                var templatePath = File.ReadAllText(GetTemplatePath("NotificationTemplate.cshtml"));
-        //                body = Engine.Razor.RunCompile(templatePath, "invitedEmailTemplate", typeof(NotificationTemplateModel), notificationEmailModel);
-        //            }
-        //            break;
-        //    }
-
-        //    return new EmailData()
-        //    {
-        //        EmailToId = id,
-        //        EmailToName = name,
-        //        EmailSubject = subject,
-        //        EmailBody = body
-        //    };
-        //}
+            return new EmailData()
+            {
+                EmailToId = id,
+                EmailToName = name,
+                EmailSubject = subject,
+                EmailBody = body
+            };
+        }
 
         public static string GetTemplatePath(string templateFileName)
         {
             return Path.Combine(Directory.GetCurrentDirectory(), "Helpers", "HtmlTemplates", templateFileName);
         }
 
-        public Task SendNotificationEmailAsync(int notificationObjectId, string notifierId, string senderId, string? noteFromSender)
+        public async Task SendActionEmailAsync(DennoAction action)
         {
-            throw new NotImplementedException();
+            var emailData = BuildNotificationEmailData(action);
+
+            await SendEmailAsync(emailData, true);
         }
     }
 }
