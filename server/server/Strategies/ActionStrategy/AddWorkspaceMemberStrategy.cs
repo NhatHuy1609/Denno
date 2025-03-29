@@ -14,7 +14,7 @@ namespace server.Strategies.ActionStrategy
             _dbContext = dbContext;
         }
 
-        public DennoAction Execute(DennoActionContext context)
+        public async Task<DennoAction> Execute(DennoActionContext context)
         {
             if (!context.WorkspaceId.HasValue)
                 throw new ArgumentNullException(nameof(context.WorkspaceId), "WorkspaceId is required");
@@ -43,25 +43,29 @@ namespace server.Strategies.ActionStrategy
                 MemberCreatorId = context.MemberCreatorId,
                 ActionType = ActionTypes.AddMemberToWorkspace,
                 WorkspaceId = context.WorkspaceId,
-                Date = DateTime.Now,
+                TargetUserId = context.TargetUserId,
+                Date = DateTime.Now
             };
-            _dbContext.Actions.Add(action);
 
             var notification = new Notification
             {
                 Date = DateTime.Now,
-                ActionId = action.Id,
+                Action = action
             };
-            _dbContext.Notifications.Add(notification);
 
             var recipient = new NotificationRecipient
             {
-                NotificationId = notification.Id,
+                Notification = notification,
                 RecipientId = context.TargetUserId
             };
 
+            _dbContext.Actions.Add(action);
+            _dbContext.Notifications.Add(notification);
             _dbContext.NotificationRecipients.Add(recipient);
             _dbContext.WorkspaceMembers.Add(newMember);
+
+            // Load needed navigation properties
+            action.MemberCreator = await _dbContext.Users.FindAsync(context.MemberCreatorId);
 
             return action;
         }

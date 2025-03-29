@@ -271,7 +271,7 @@ namespace server.Controllers
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError("Failed to send action notification email after retries: {ex.Message}", ex);
+                        _logger.LogError($"Failed to send action notification email after retries: {ex.Message}");
                     }
                 });
             }

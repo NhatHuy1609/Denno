@@ -38,7 +38,7 @@ namespace server.Services
             {
                 try
                 {
-                    var action = strategy.Execute(context);
+                    var action = await strategy.Execute(context);
                     await _dbContext.SaveChangesAsync();
                     await transaction.CommitAsync();
                     return action;
