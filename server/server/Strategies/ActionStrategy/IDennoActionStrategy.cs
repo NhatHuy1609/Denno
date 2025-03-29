@@ -4,6 +4,6 @@ namespace server.Strategies.ActionStrategy
 {
     public interface IDennoActionStrategy
     {
-        DennoAction Execute(DennoActionContext context);
+        Task<DennoAction> Execute(DennoActionContext context);
     }
 }
