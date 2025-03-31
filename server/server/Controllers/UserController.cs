@@ -3,12 +3,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using server.Dtos.Response;
-using server.Dtos.Response.Board;
-using server.Dtos.Response.Card;
-using server.Dtos.Response.Notification;
 using server.Dtos.Response.Users;
-using server.Dtos.Response.Workspace;
-using server.Enums;
 using server.Interfaces;
 using server.Models.Pagination;
 using server.Models.Query;
@@ -73,6 +68,15 @@ namespace server.Controllers
             };
 
             return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("[controller]/{id}/notifications")]
+        public async Task<IActionResult> GetUserNotificationsAsync([FromRoute] string id)
+        {
+            var notificationResponses = await _notificationService.GetUserNotificationResponseDtos(id);
+            
+            return Ok(notificationResponses);
         }
     }
 }

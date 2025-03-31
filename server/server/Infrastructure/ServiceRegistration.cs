@@ -13,6 +13,7 @@ using server.Dtos.Response;
 using server.Entities;
 using server.Enums;
 using server.Factories;
+using server.Factories.NotificationResponseFactory;
 using server.Infrastructure.Configurations;
 using server.Infrastructure.Providers;
 using server.Interfaces;
@@ -44,6 +45,10 @@ namespace server.Infrastructure
             {
                 options.UseSqlServer(connectionStringConfigName);
             });
+
+            // Factories
+            services.AddScoped<NotificationResponseFactoryResolver>();
+            services.AddScoped<AddedMemberWorkspaceNotificationResponseFactory>();
 
             return services;
         }

@@ -4,7 +4,6 @@
     {
         public int Id { get; set; }
         public DateTime Date { get; set; }
-        public bool IsRead { get; set; } = false;
 
         public Guid ActionId { get; set; }
         public DennoAction Action { get; set; }
