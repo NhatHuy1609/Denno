@@ -268,6 +268,7 @@ namespace server.Controllers
                     try
                     {
                         await _emailService.SendActionEmailAsync(action);
+                        _logger.LogInformation("Successfully sent email to notify that user was added to new workspace");
                     }
                     catch (Exception ex)
                     {
