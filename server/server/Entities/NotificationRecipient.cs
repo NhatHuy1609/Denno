@@ -9,6 +9,6 @@
         public Notification Notification { get; set; }
 
         public bool IsRead { get; set; } = false;
-        public DateTime DateRead { get; set; }
+        public DateTime? DateRead { get; set; } = null;
     }
 }

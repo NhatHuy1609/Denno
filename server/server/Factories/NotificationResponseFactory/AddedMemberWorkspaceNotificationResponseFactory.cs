@@ -4,6 +4,8 @@ using Microsoft.Extensions.Logging;
 using server.Constants;
 using server.Data;
 using server.Dtos.Response.Notification;
+using server.Dtos.Response.Notification.Interfaces;
+using server.Dtos.Response.Notification.Models;
 using server.Dtos.Response.Users;
 using server.Entities;
 
@@ -25,7 +27,7 @@ namespace server.Factories.NotificationResponseFactory
             _logger = logger;
         }
 
-        public async Task<NotificationResponseDto> CreateNotificationResponse(NotificationRecipient notification)
+        public async Task<INotificationResponseDto> CreateNotificationResponse(NotificationRecipient notification)
         {
             var notiDetails = await _dbContext.Notifications
                 .Include(n => n.Action)
@@ -71,13 +73,9 @@ namespace server.Factories.NotificationResponseFactory
                 ActionId = notiDetails.ActionId,
                 MemberCreator = _mapper.Map<GetUserResponseDto>(notiDetails.Action.MemberCreator),
 
-                Data = new NotificationData
+                Data = new AddedToWorkspaceData
                 {
-                    Workspace = new Dtos.Response.Notification.Workspace
-                    {
-                        Id = notiDetails.Action.WorkspaceId.Value,
-                        Name = notiDetails.Action.Workspace.Name
-                    },
+                    WorkspaceId = notiDetails.Action.WorkspaceId.Value,
                     AddedMemberId = notiDetails.Action.TargetUserId,
                     MemberCreatorId = notiDetails.Action.MemberCreatorId
                 },
@@ -85,23 +83,23 @@ namespace server.Factories.NotificationResponseFactory
                 Display = new NotificationDisplay
                 {
                     TranslationKey = TranslationKeys.AddMemberToWorkspace,
-                    Entities = new Dictionary<string, EntityType>
+                    Entities = new Dictionary<string, EntityTypeDisplay>
                     {
-                        { EntityTypes.Workspace, new EntityType
+                        { EntityTypes.Workspace, new EntityTypeDisplay
                             {
                                 Type = EntityTypes.Workspace,
                                 Id = notiDetails.Action.Workspace.Id,
                                 Text = notiDetails.Action.Workspace.Name
                             }
                         },
-                        { EntityTypes.MemberCreator, new EntityType
+                        { EntityTypes.MemberCreator, new EntityTypeDisplay
                             {
                                 Type = EntityTypes.User,
                                 Id = notiDetails.Action.MemberCreatorId,
                                 Text = notiDetails.Action.MemberCreator.FullName
                             }
                         },
-                        { EntityTypes.AddedMember, new EntityType
+                        { EntityTypes.AddedMember, new EntityTypeDisplay
                             {
                                 Type = EntityTypes.User,
                                 Id = notiDetails.Action.TargetUser.FullName

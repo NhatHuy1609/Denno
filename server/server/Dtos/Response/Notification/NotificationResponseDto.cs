@@ -1,11 +1,9 @@
-﻿using server.Dtos.Response.Board;
-using server.Dtos.Response.Card;
+﻿using server.Dtos.Response.Notification.Interfaces;
 using server.Dtos.Response.Users;
-using server.Dtos.Response.Workspace;
 
 namespace server.Dtos.Response.Notification
 {
-    public abstract class NotificationResponseDto
+    public class NotificationResponseDto<TData, TDisplay>: INotificationResponseDto
     {
         public int Id { get; set; }
         public bool IsRead { get; set; }
@@ -15,5 +13,8 @@ namespace server.Dtos.Response.Notification
         public string MemberCreatorId { get; set; }
         public Guid ActionId { get; set; }
         public GetUserResponseDto MemberCreator { get; set; }
+
+        public TData Data { get; set; }
+        public TDisplay Display { get; set; }
     }
 }
