@@ -8,19 +8,32 @@ import InviteMemberDescriptionInput from './InviteMemberDescriptionInput'
 import { FaLink } from 'react-icons/fa6'
 import { HiOutlineXMark } from 'react-icons/hi2'
 import CustomizableButton from '@/ui/components/CustomizableButton'
-import useAddWorkspaceMemberMutation from '@/app/_hooks/mutation/workspace/useAddWorkspaceMemberMutation'
+import useAddMultipleWorkspaceMemberMutation from '@/app/_hooks/mutation/workspace/useAddMultipleWorkspaceMember'
+import { useParams } from 'next/navigation'
 
 type SearchedUserFilter = Pick<userTypes.UsersFilterQuery, 'email'>
 
 export default function InviteMemberModalBody() {
+  const { workspaceId } = useParams()
+
   const inputRef = useRef<HTMLInputElement>(null)
+  const descriptionInputRef = useRef<HTMLInputElement>(null)
+
   const [selectedUsers, setSelectedUsers] = useState<Array<userTypes.User>>([])
 
   const [showSearchedUsersResult, setShowSearchedUsersResult] = useState(false)
   const [searchTerm, setSearchTerm] = useState<string>('')
   const debouncedSearchTerm = useDebounce(searchTerm, 650)
 
-  const { mutate: addWorkspaceMember } = useAddWorkspaceMemberMutation({})
+  const { mutate: addWorkspaceMember } = useAddMultipleWorkspaceMemberMutation({
+    mutationKey: [workspaceId],
+    onSuccess: (data) => {
+      console.log('Added members:', data)
+    },
+    onError: (error) => {
+      console.error('Error adding members:', error)
+    }
+  })
 
   const searchedUserFilter: SearchedUserFilter = {
     email: debouncedSearchTerm
@@ -73,7 +86,13 @@ export default function InviteMemberModalBody() {
     [selectedUsers]
   )
 
-  const handleAddWorkspaceMember = () => {}
+  const handleAddWorkspaceMember = () => {
+    addWorkspaceMember({
+      workspaceId: workspaceId as string,
+      description: descriptionInputRef.current?.value || '',
+      memberEmails: []
+    })
+  }
 
   return (
     <div className='relative w-full'>
@@ -94,6 +113,7 @@ export default function InviteMemberModalBody() {
         />
         {selectedUsers.length > 0 && (
           <CustomizableButton
+            onClick={handleAddWorkspaceMember}
             value='Send invite'
             className='h-full min-w-[120px] justify-center py-[10px]'
           />
@@ -108,7 +128,7 @@ export default function InviteMemberModalBody() {
         />
       ) : null}
 
-      {selectedUsers.length > 0 ? <InviteMemberDescriptionInput /> : null}
+      {selectedUsers.length > 0 ? <InviteMemberDescriptionInput ref={descriptionInputRef} /> : null}
 
       <div className='mt-6 flex w-full justify-between'>
         <div className='flex flex-col gap-1'>

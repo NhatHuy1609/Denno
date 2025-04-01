@@ -1,6 +1,6 @@
 import { httpPost, httpGet, httpPut } from '../_req'
 import { AxiosContracts } from '@/lib/axios/AxiosContracts'
-import { AddWorkspaceMemberDto, CreateWorkspaceDto, UpdateWorkspaceDto, UpdateWorkspaceLogoDto } from './workspace.types'
+import { AddWorkspaceMemberDto, AddWorkspaceMemberResponseDto, CreateWorkspaceDto, UpdateWorkspaceDto, UpdateWorkspaceLogoDto } from './workspace.types'
 import { 
   AddWorkspaceMemberDtoSchema,
   CreateWorkspaceDtoSchema,
@@ -57,6 +57,6 @@ export class WorkspaceService {
       data.addWorkspaceMemberDto
     )
 
-    return httpPost(`/workspaces/${data.workspaceId}/members`, addWorkspaceMemberDto)
+    return httpPost<AddWorkspaceMemberResponseDto>(`/workspaces/${data.workspaceId}/members`, addWorkspaceMemberDto)
   }
 }
