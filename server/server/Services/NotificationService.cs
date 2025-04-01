@@ -2,10 +2,8 @@
 using Serilog.Events;
 using server.Constants;
 using server.Data;
-using server.Dtos.Response.Notification;
 using server.Dtos.Response.Notification.Interfaces;
 using server.Entities;
-using server.Enums;
 using server.Factories.NotificationResponseFactory;
 using server.Interfaces;
 

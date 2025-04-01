@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using server.Dtos.Requests.WorkspaceMember;
+using server.Dtos.Requests.Workspace;
 using server.Entities;
 
 namespace server.Models.MapperProfile
