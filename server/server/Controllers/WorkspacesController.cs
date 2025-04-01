@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using server.Constants;
 using server.Dtos.Requests.Workspace;
-using server.Dtos.Requests.WorkspaceMember;
 using server.Dtos.Response;
 using server.Dtos.Response.Workspace;
 using server.Entities;
@@ -277,7 +276,7 @@ namespace server.Controllers
                 });
             }
 
-            return Ok(action);
+            return Ok(_mapper.Map<AddWorkspaceResponseDto>(action));
         }
     }
 }

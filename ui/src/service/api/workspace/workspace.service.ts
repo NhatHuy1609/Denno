@@ -1,7 +1,8 @@
 import { httpPost, httpGet, httpPut } from '../_req'
 import { AxiosContracts } from '@/lib/axios/AxiosContracts'
-import { CreateWorkspaceDto, UpdateWorkspaceDto, UpdateWorkspaceLogoDto } from './workspace.types'
+import { AddWorkspaceMemberDto, CreateWorkspaceDto, UpdateWorkspaceDto, UpdateWorkspaceLogoDto } from './workspace.types'
 import { 
+  AddWorkspaceMemberDtoSchema,
   CreateWorkspaceDtoSchema,
   UpdateWorkspaceDtoSchema,
   UpdateWorkspaceLogoDtoSchema,
@@ -10,6 +11,16 @@ import {
 } from './workspace.contracts'
 
 export class WorkspaceService {
+  static currentUserWorkspacesQuery(config: { signal?: AbortSignal }) {
+    return httpGet('/users/me/workspaces')
+            .then(AxiosContracts.responseContract(WorkspacesResponseDtoSchema))
+  }
+
+  static workspaceQuery(workspaceId: string) {
+    return httpGet(`/workspaces/${workspaceId}`)
+            .then(AxiosContracts.responseContract(WorkspaceResponseDtoSchema))
+  }
+
   static CreateWorkspaceMutation(data: { createWorkspaceDto: CreateWorkspaceDto }) {
     const createWorkspaceDto = AxiosContracts.requestContract(
       CreateWorkspaceDtoSchema,
@@ -27,7 +38,7 @@ export class WorkspaceService {
     return httpPut(`/workspaces/${data.workspaceId}`, updateWorkspaceDto)
   }
 
-  static updateWorkspaceLogoMutation(data: {workspaceId: string, updateWorkspaceLogoDto: UpdateWorkspaceLogoDto}) {
+  static updateWorkspaceLogoMutation(data: { workspaceId: string, updateWorkspaceLogoDto: UpdateWorkspaceLogoDto }) {
     const updateWorkspaceLogoDto = AxiosContracts.requestContract(
       UpdateWorkspaceLogoDtoSchema,
       data.updateWorkspaceLogoDto
@@ -40,13 +51,12 @@ export class WorkspaceService {
     })
   }
 
-  static currentUserWorkspacesQuery(config: { signal?: AbortSignal }) {
-    return httpGet('/users/me/workspaces')
-            .then(AxiosContracts.responseContract(WorkspacesResponseDtoSchema))
-  }
+  static addWorkspaceMemberMutation(data: { workspaceId: string, addWorkspaceMemberDto: AddWorkspaceMemberDto }) {
+    const addWorkspaceMemberDto = AxiosContracts.requestContract(
+      AddWorkspaceMemberDtoSchema,
+      data.addWorkspaceMemberDto
+    )
 
-  static workspaceQuery(workspaceId: string) {
-    return httpGet(`/workspaces/${workspaceId}`)
-            .then(AxiosContracts.responseContract(WorkspaceResponseDtoSchema))
+    return httpPost(`/workspaces/${data.workspaceId}/members`, addWorkspaceMemberDto)
   }
 }

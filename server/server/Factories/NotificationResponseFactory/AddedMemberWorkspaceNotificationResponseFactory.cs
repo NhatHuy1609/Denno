@@ -31,11 +31,11 @@ namespace server.Factories.NotificationResponseFactory
         {
             var notiDetails = await _dbContext.Notifications
                 .Include(n => n.Action)
-                .ThenInclude(a => a.Workspace)
+                    .ThenInclude(a => a.Workspace)
                 .Include(n => n.Action)
-                .ThenInclude(a => a.MemberCreator)
+                    .ThenInclude(a => a.MemberCreator)
                 .Include(n => n.Action)
-                .ThenInclude(a => a.TargetUser)
+                    .ThenInclude(a => a.TargetUser)
                 .FirstOrDefaultAsync(n => n.Id == notification.NotificationId);
 
             if (notiDetails == null)

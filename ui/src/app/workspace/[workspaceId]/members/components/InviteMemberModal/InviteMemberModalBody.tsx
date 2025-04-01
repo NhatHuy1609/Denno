@@ -8,17 +8,19 @@ import InviteMemberDescriptionInput from './InviteMemberDescriptionInput'
 import { FaLink } from 'react-icons/fa6'
 import { HiOutlineXMark } from 'react-icons/hi2'
 import CustomizableButton from '@/ui/components/CustomizableButton'
+import useAddWorkspaceMemberMutation from '@/app/_hooks/mutation/workspace/useAddWorkspaceMemberMutation'
 
 type SearchedUserFilter = Pick<userTypes.UsersFilterQuery, 'email'>
 
 export default function InviteMemberModalBody() {
   const inputRef = useRef<HTMLInputElement>(null)
-
   const [selectedUsers, setSelectedUsers] = useState<Array<userTypes.User>>([])
 
   const [showSearchedUsersResult, setShowSearchedUsersResult] = useState(false)
   const [searchTerm, setSearchTerm] = useState<string>('')
   const debouncedSearchTerm = useDebounce(searchTerm, 650)
+
+  const { mutate: addWorkspaceMember } = useAddWorkspaceMemberMutation({})
 
   const searchedUserFilter: SearchedUserFilter = {
     email: debouncedSearchTerm
@@ -70,6 +72,8 @@ export default function InviteMemberModalBody() {
     },
     [selectedUsers]
   )
+
+  const handleAddWorkspaceMember = () => {}
 
   return (
     <div className='relative w-full'>

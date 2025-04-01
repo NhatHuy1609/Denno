@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { MemberRoleEnumSchema } from '../_enums/enums.contracts'
 
 const WorkspaceDto = z.object({
   id: z.string(),
@@ -28,7 +29,22 @@ export const UpdateWorkspaceLogoDtoSchema = z.object({
   logoFile: z.instanceof(Blob).optional().nullable()
 }).describe("UpdateWorkspaceLogoDtoSchema")
 
+export const AddWorkspaceMemberDtoSchema = z.object({
+  email: z.string().email(),
+  description: z.string().optional().default(""),
+  role: MemberRoleEnumSchema.optional().default('Normal')
+}).describe("AddWorkspaceMemberDtoSchema")
+
 // Response
 export const WorkspaceResponseDtoSchema = WorkspaceDto.describe("WorkspaceResponseDtoSchema")
 
 export const WorkspacesResponseDtoSchema = z.array(WorkspaceDto).describe('WorkspacesResponseDtoSchema')
+
+export const AddWorkspaceMemberResponseDtoSchema = z.object({
+  actionId: z.string().uuid(),
+  date: z.string().datetime(),
+  actionType: z.string(),
+  workspaceId: z.string(),
+  memberCreatorId: z.string(),
+  targetUserId: z.string()
+}).describe("AddWorkspaceMemberResponseDtoSchema")
