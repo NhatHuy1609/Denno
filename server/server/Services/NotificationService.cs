@@ -3,6 +3,7 @@ using Serilog.Events;
 using server.Constants;
 using server.Data;
 using server.Dtos.Response.Notification;
+using server.Dtos.Response.Notification.Interfaces;
 using server.Entities;
 using server.Enums;
 using server.Factories.NotificationResponseFactory;
@@ -41,9 +42,9 @@ namespace server.Services
             return null;
         }
 
-        public async Task<List<NotificationResponseDto>> GetUserNotificationResponseDtos(string userId)
+        public async Task<List<INotificationResponseDto>> GetUserNotificationResponseDtos(string userId)
         {
-            var responses = new List<NotificationResponseDto>();
+            var responses = new List<INotificationResponseDto>();
 
             if (string.IsNullOrEmpty(userId))
                 throw new ArgumentNullException(nameof(userId), "User ID cannot be null or empty");

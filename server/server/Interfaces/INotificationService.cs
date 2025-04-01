@@ -1,4 +1,5 @@
 ﻿using server.Dtos.Response.Notification;
+using server.Dtos.Response.Notification.Interfaces;
 using server.Entities;
 
 namespace server.Interfaces
@@ -6,6 +7,6 @@ namespace server.Interfaces
     public interface INotificationService
     {
         string? BuildActionNotificationMessage(DennoAction action);
-        Task<List<NotificationResponseDto>> GetUserNotificationResponseDtos(string userId);
+        Task<List<INotificationResponseDto>> GetUserNotificationResponseDtos(string userId);
     }
 }
