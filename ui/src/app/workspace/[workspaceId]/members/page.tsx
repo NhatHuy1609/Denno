@@ -14,7 +14,7 @@ function WorkspaceMembersPage() {
 
   return (
     <section className='w-full p-8 pb-6'>
-      <div className='flex w-full justify-between gap-3 border-b border-gray-300 pb-4'>
+      <div className='flex w-full justify-between gap-3 border-b border-gray-300 px-12 pb-4'>
         <div>
           {showWorkspaceUpdateForm ? (
             <WorkspaceUpdateForm hideFormFn={handleHideForm} />
@@ -26,7 +26,7 @@ function WorkspaceMembersPage() {
           )}
         </div>
 
-        <div className=''>
+        <div className='size-auto'>
           <InviteMemberModal />
         </div>
       </div>

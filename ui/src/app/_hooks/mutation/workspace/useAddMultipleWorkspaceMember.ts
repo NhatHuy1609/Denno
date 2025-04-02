@@ -12,7 +12,7 @@ type AddMultipleWorkspaceMemberParams = {
 
 type AddMultipleWorkspaceMemberData = {
   addedMembers: Array<workspaceTypesDto.AddWorkspaceMemberResponseDto['targetUserId']>
-} & Omit<workspaceTypesDto.AddWorkspaceMemberResponseDto, 'targetUserId' | 'date'>
+} & Omit<workspaceTypesDto.AddWorkspaceMemberResponseDto, 'targetUserId'>
 
 function useAddMultipleWorkspaceMemberMutation(
   options: Pick<
@@ -43,6 +43,9 @@ function useAddMultipleWorkspaceMemberMutation(
         role: 'Normal'
       }))
 
+      console.log(addWorkspaceMemberDtos)
+
+      // // Send multiple requests in parallel
       const responses = await Promise.all(
         addWorkspaceMemberDtos.map((addWorkspaceMemberDto) =>
           WorkspaceService.addWorkspaceMemberMutation({ workspaceId, addWorkspaceMemberDto })
@@ -51,8 +54,21 @@ function useAddMultipleWorkspaceMemberMutation(
 
       // Take the first response for creating shape of AddMultipleWorkspaceMemberData
       const firstResponse = responses[0]
+      // Getting data shape from first response
+      const { 
+        actionId,
+        date,
+        actionType,
+        memberCreatorId,
+      } = firstResponse.data
+
       const addedMembersResponseData = {
-        ...firstResponse.data,
+        actionId,
+        date,
+        actionType,
+        workspaceId,
+        memberCreatorId,
+        // Map the targetUserId from each response to create an array of added members
         addedMembers: responses.map((response) => response.data.targetUserId)
       }
 

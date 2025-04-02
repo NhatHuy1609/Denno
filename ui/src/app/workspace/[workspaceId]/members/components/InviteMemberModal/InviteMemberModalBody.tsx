@@ -10,10 +10,15 @@ import { HiOutlineXMark } from 'react-icons/hi2'
 import CustomizableButton from '@/ui/components/CustomizableButton'
 import useAddMultipleWorkspaceMemberMutation from '@/app/_hooks/mutation/workspace/useAddMultipleWorkspaceMember'
 import { useParams } from 'next/navigation'
+import { toastError, toastSuccess } from '@/ui'
 
 type SearchedUserFilter = Pick<userTypes.UsersFilterQuery, 'email'>
 
-export default function InviteMemberModalBody() {
+type Props = {
+  closeModalFn: () => void
+}
+
+export default function InviteMemberModalBody({ closeModalFn }: Props) {
   const { workspaceId } = useParams()
 
   const inputRef = useRef<HTMLInputElement>(null)
@@ -28,10 +33,14 @@ export default function InviteMemberModalBody() {
   const { mutate: addWorkspaceMember } = useAddMultipleWorkspaceMemberMutation({
     mutationKey: [workspaceId],
     onSuccess: (data) => {
-      console.log('Added members:', data)
+      toastSuccess('Members added successfully')
     },
     onError: (error) => {
       console.error('Error adding members:', error)
+      toastError('Failed to add members')
+    },
+    onSettled: () => {
+      closeModalFn && closeModalFn()
     }
   })
 
@@ -90,7 +99,7 @@ export default function InviteMemberModalBody() {
     addWorkspaceMember({
       workspaceId: workspaceId as string,
       description: descriptionInputRef.current?.value || '',
-      memberEmails: []
+      memberEmails: selectedUsers.map((user) => user.email)
     })
   }
 

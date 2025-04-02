@@ -1,6 +1,6 @@
 import { httpPost, httpGet, httpPut } from '../_req'
 import { AxiosContracts } from '@/lib/axios/AxiosContracts'
-import { AddWorkspaceMemberDto, AddWorkspaceMemberResponseDto, CreateWorkspaceDto, UpdateWorkspaceDto, UpdateWorkspaceLogoDto } from './workspace.types'
+import { AddWorkspaceMemberDto, AddWorkspaceMemberResponseDto, CreateWorkspaceDto, UpdateWorkspaceDto, UpdateWorkspaceLogoDto, WorkspaceResponseDto } from './workspace.types'
 import { 
   AddWorkspaceMemberDtoSchema,
   CreateWorkspaceDtoSchema,
@@ -26,7 +26,7 @@ export class WorkspaceService {
       CreateWorkspaceDtoSchema,
       data.createWorkspaceDto)
 
-    return httpPost('/workspaces', createWorkspaceDto)
+    return httpPost<WorkspaceResponseDto>('/workspaces', data.createWorkspaceDto)
   }
 
   static updateWorkspaceMutation(data: { workspaceId: string, updateWorkspaceDto: UpdateWorkspaceDto }) {
