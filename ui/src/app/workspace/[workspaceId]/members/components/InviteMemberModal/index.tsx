@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { AiOutlineUserAdd } from 'react-icons/ai'
 import { Dialog } from '@/ui'
 import CustomizableButton from '@/ui/components/CustomizableButton'
@@ -6,8 +6,14 @@ import CustomizableButton from '@/ui/components/CustomizableButton'
 import InviteMemberModalBody from './InviteMemberModalBody'
 
 function InviteMemberModal() {
+  const [showInviteMemberModal, setShowInviteMemberModal] = useState(false)
+
+  const handleCloseModal = () => {
+    setShowInviteMemberModal(false)
+  }
+
   return (
-    <Dialog.Dialog>
+    <Dialog.Dialog onOpenChange={setShowInviteMemberModal} open={showInviteMemberModal}>
       <Dialog.DialogTrigger asChild>
         <CustomizableButton
           value='Invite Workspace members'
@@ -23,7 +29,7 @@ function InviteMemberModal() {
           </Dialog.DialogTitle>
         </Dialog.DialogHeader>
         {/* Body */}
-        <InviteMemberModalBody />
+        <InviteMemberModalBody closeModalFn={handleCloseModal} />
       </Dialog.DialogContent>
     </Dialog.Dialog>
   )

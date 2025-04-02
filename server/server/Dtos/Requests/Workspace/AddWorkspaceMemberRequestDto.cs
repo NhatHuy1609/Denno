@@ -1,6 +1,6 @@
 ﻿using server.Enums;
 
-namespace server.Dtos.Requests.WorkspaceMember
+namespace server.Dtos.Requests.Workspace
 {
     public class AddWorkspaceMemberRequestDto
     {
