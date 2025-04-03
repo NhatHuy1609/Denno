@@ -1,7 +1,6 @@
-import { useRouter } from "next/router"
-import { useState, useCallback } from "react"
+import { useRouter, usePathname, useSearchParams} from "next/navigation"
+import { useState, useCallback, useEffect } from "react"
 import { attempt, withFallback } from "@/utils/attempt"
-import { useHandleQueryParams } from "./useHandleQueryParams"
 
 const parseValue = <T>(value: any): T => 
   withFallback(
@@ -9,38 +8,35 @@ const parseValue = <T>(value: any): T =>
     value as T
   )
 
-
 export const useQueryParamState = <T extends number | string>(
   key: string,
   defaultValue: T
 ) => {
-  const [value, setValue] = useState<T>(defaultValue)
+  const [value, setValue] = useState<T>(defaultValue);
 
-  const { push, query, pathname } = useRouter()
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  useEffect(() => {
+    const paramValue = searchParams.get(key);
+    if (paramValue !== null) {
+      const newValue = parseValue<T>(paramValue);
+      if (newValue !== value) {
+        setValue(newValue);
+      }
+    }
+  }, [searchParams, key, value]);
 
   const onChange = useCallback(
     (newValue: T) => {
-      push({
-        pathname,
-        query: {
-          ...query,
-          [key]: value
-        }
-      })
+      const params = new URLSearchParams(searchParams.toString())
+      params.set(key, String(newValue))
+
+      router.push(`${pathname}?${params.toString()}`)
     },
-    [key, pathname, query, push]
+    [key, pathname, searchParams, router]
   )
-
-  useHandleQueryParams<Record<string, T | undefined>>((params) => {
-    if (params[key] === undefined) {
-      return
-    }
-
-    const newValue = parseValue<T>(params[key])
-    if (newValue === value) return
-
-    setValue(newValue)
-  })
 
   return [value, onChange] as const
 }

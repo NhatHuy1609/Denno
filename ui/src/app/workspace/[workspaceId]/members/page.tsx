@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import InviteMemberModal from './components/InviteMemberModal'
 import WorkspaceInfoCard from '@/app/_features/Workspaces/Info'
 import WorkspaceUpdateForm from '@/app/_features/Workspaces/Update/WorkspaceUpdateForm'
+import CollaboratorsDisplay from './components/CollaboratorsDisplay'
 
 function WorkspaceMembersPage() {
   const [showWorkspaceUpdateForm, setShowWorkspaceUpdateForm] = useState(false)
@@ -30,6 +31,8 @@ function WorkspaceMembersPage() {
           <InviteMemberModal />
         </div>
       </div>
+
+      <CollaboratorsDisplay />
     </section>
   )
 }
