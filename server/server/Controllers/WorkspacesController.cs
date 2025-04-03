@@ -107,7 +107,7 @@ namespace server.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public IActionResult Create([FromForm] CreateWorkspaceRequestDto request)
+        public IActionResult Create([FromBody] CreateWorkspaceRequestDto request)
         {
             if (!ModelState.IsValid)
             {
