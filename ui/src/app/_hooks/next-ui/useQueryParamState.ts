@@ -19,6 +19,15 @@ export const useQueryParamState = <T extends number | string>(
   const router = useRouter();
 
   useEffect(() => {
+    if (defaultValue) {
+      const params = new URLSearchParams(searchParams.toString())
+      params.set(key, String(defaultValue))
+
+      router.replace(`${pathname}?${params.toString()}`)
+    }
+  }, [defaultValue])
+
+  useEffect(() => {
     const paramValue = searchParams.get(key);
     if (paramValue !== null) {
       const newValue = parseValue<T>(paramValue);

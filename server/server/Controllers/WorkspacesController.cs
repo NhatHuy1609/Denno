@@ -278,6 +278,22 @@ namespace server.Controllers
 
             return Ok(_mapper.Map<AddWorkspaceResponseDto>(action));
         }
+
+        [HttpGet("[controller]/{id}/members")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(List<WorkspaceMemberResponseDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetWorkspaceMembersAsync(Guid id)
+        {
+            var workspace = await _unitOfWork.Workspaces.GetByIdAsync(id);
+
+            if (workspace == null)
+                return NotFound(new ApiErrorResponse() { StatusMessage = "Workspace not found" });
+
+            var workspaceMembers = await _unitOfWork.WorkspaceMembers.GetWorkspaceMembersAsync(id);
+
+            return Ok(_mapper.Map<List<WorkspaceMemberResponseDto>>(workspaceMembers));
+        }
+
     }
 }
 

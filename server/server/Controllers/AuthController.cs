@@ -98,7 +98,7 @@ namespace server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> Register([FromBody] RegisterRequestDto registerDto)
+        public async Task<IActionResult> Register([FromForm] RegisterRequestDto registerDto)
         {
             if (!ModelState.IsValid)
             {

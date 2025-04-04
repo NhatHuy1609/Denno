@@ -14,7 +14,6 @@ namespace server.UnitOfWorks
         public ICardListRepository CardLists { get; private set; }
         public ICardRepository Cards { get; private set; }
         public IWorkspaceMemberRepository WorkspaceMembers { get; set; }
-
         public INotificationRepository Notifications { get; set; }
 
         public UnitOfWork(ApplicationDBContext context)

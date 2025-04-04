@@ -11,6 +11,7 @@ import { authApiLib } from '@/service/api/auth'
 import { LuMail, LuUser2, LuLock } from 'react-icons/lu'
 import { Button, Form, messageError, setFixLoading } from '@/ui'
 import SignInGoogleButton from '../../Signin/SignInForm/SignInGoogleButton'
+import AvatarInput from '@/app/(auth)/sign-up/complete-signup/AvatarInput'
 
 type RegisterUserFormData = authTypesDto.RegisterUserDto
 
@@ -63,6 +64,17 @@ export default function SignUpForm() {
         <span className='h-px flex-1 bg-stone-300'></span>
       </div>
       <form className='flex flex-col gap-4' onSubmit={handleSubmit(onSubmit)}>
+        <div className='flex w-full flex-col items-center gap-2'>
+          <Controller
+            name='avatar'
+            control={control}
+            render={({ field: { onChange, ref } }) => (
+              <AvatarInput size='lg' onChange={onChange} ref={ref} />
+            )}
+          />
+          <span className='text-sm font-medium text-black'>Choose your avatar</span>
+        </div>
+
         <Controller
           name='fullName'
           control={control}

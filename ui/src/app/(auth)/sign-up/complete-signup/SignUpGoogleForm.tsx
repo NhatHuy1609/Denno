@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { z } from 'zod'
 import { useRouter } from 'next/navigation'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -8,22 +8,22 @@ import { authApiLib, authTypesDto } from '@/service/api/auth'
 import { useAppSelector, useAppDispatch } from '@/store/hooks'
 import { sessionStoreLib, updateSession } from '@/store/features/session'
 import { useForm, Controller } from 'react-hook-form'
-import { useRegisterUserMutation } from '../SignUpForm/signup.mutation'
+import { useRegisterUserMutation } from '../../../_features/Signup/SignUpForm/signup.mutation'
 import { LuLock } from 'react-icons/lu'
-import { Avatar, Button, Form, messageError } from '@/ui'
+import { Button, Form, messageError } from '@/ui'
+import AvatarInput from './AvatarInput'
 
 const SignUpGoogleSchema = z.object({
   password: z
     .string({ required_error: 'Password required!' })
-    .min(8, { message: 'Password must be 8 characters or longer!' })
+    .min(8, { message: 'Password must be 8 characters or longer!' }),
+  avatar: z.instanceof(File, { message: 'Avatar must be a file' })
 })
 
 type FormValues = z.infer<typeof SignUpGoogleSchema>
 
 function SignUpGoogleForm() {
-  const { email, avatar, fullName } = useAppSelector(
-    (state) => state.session.currentUser
-  )
+  const { email, avatar, fullName } = useAppSelector((state) => state.session.currentUser)
   const router = useRouter()
   const dispatch = useAppDispatch()
 
@@ -38,11 +38,9 @@ function SignUpGoogleForm() {
 
   const { mutate: registerUser, isPending } = useRegisterUserMutation({
     onSuccess: async (response) => {
-      const sessionData = sessionStoreLib.transformRegisterResponseDtoToSession(
-        response.data
-      )
-
+      const sessionData = sessionStoreLib.transformRegisterResponseDtoToSession(response.data)
       dispatch(updateSession(sessionData))
+
       router.push('/general')
     },
     onError: (error) => {
@@ -65,7 +63,8 @@ function SignUpGoogleForm() {
     const user: authTypesDto.RegisterUserDto = {
       email,
       fullName,
-      password: data.password
+      password: data.password,
+      avatar: data.avatar
     }
 
     registerUser(user)
@@ -79,14 +78,21 @@ function SignUpGoogleForm() {
           sign up!
         </span>
       </div>
-      <div className='mt-6 flex flex-col items-center gap-4'>
-        <Avatar src={avatar} name={fullName} size='lg' />
-        <p className='text-center'>
-          Hi <span className='font-medium text-sky-500'>{fullName}</span>,
-          complete your account registration by entering a password
-        </p>
-      </div>
       <form className='mt-6 w-full' onSubmit={handleSubmit(onSubmit)}>
+        <div className='mb-6 flex flex-col items-center gap-4'>
+          <Controller
+            name='avatar'
+            control={control}
+            render={({ field: { onChange, ref } }) => (
+              <AvatarInput size='lg' initialImage={avatar} onChange={onChange} ref={ref} />
+            )}
+          />
+          <p className='text-center'>
+            Hi <span className='font-medium text-sky-500'>{fullName}</span>, complete your account
+            registration by entering a password
+          </p>
+        </div>
+
         <Controller
           name='password'
           control={control}
