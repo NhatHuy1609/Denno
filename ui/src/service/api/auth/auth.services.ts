@@ -22,7 +22,16 @@ export class AuthService {
       RegisterUserDtoSchema,
       data.registerUserDto
     )
-    return httpPost('/auth/register', registerUserDto)
+    const formData = new FormData();
+    Object.entries(registerUserDto).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+    
+    return httpPost('/auth/register', formData, {
+      headers: {
+      'Content-Type': 'multipart/form-data'
+      }
+    });
   }
 
   static validateRegisterUserMutation(data: { validateRegisterUserDto: ValidateRegisterUserDto }) {

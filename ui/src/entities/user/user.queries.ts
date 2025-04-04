@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query"
 import { UserService } from "@/service/api/user/user.service"
 import { UsersFilterQuery } from "./user.types"
-import { transformUsersDtoToUsers } from "./user.lib"
+import { transformUserDtoToUser, transformUsersDtoToUsers } from "./user.lib"
 
 export class UserQueries {
   static readonly keys = {
@@ -20,6 +20,16 @@ export class UserQueries {
 
         const response = await UserService.usersQuery(config)
         return transformUsersDtoToUsers(response.data)
+      }
+    })
+  }
+
+  static loggedInUserQuery() {
+    return queryOptions({
+      queryKey: [...this.keys.root, 'me'],
+      queryFn: async ({ signal }) => {
+        const response = await UserService.loggedInUserQuery()
+        return transformUserDtoToUser(response.data)
       }
     })
   }

@@ -1,12 +1,14 @@
 import React from 'react'
 import { Avatar } from '@/ui'
-import { useUser } from '@/app/_providers/AuthProvider/useUser'
+import { useMe } from '@/app/_hooks/query/user/useMe'
 import DefaultAvatarUser from 'public/default-avatar-user.png'
 
 function HeaderUserInfo() {
-  const { user } = useUser()
+  const { data: loggedInUserData } = useMe()
 
-  const { avatar = '' } = user || {}
+  console.log('USER: ', loggedInUserData)
+
+  const { avatar = '' } = loggedInUserData || {}
 
   return (
     <Avatar

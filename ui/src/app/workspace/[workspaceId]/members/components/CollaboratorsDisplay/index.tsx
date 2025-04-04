@@ -1,6 +1,6 @@
 import React from 'react'
 import type { Tabs } from './types'
-import { useQueryParamState } from '@/app/_hooks/mutation/next-ui/useQueryParamState'
+import { useQueryParamState } from '@/app/_hooks/next-ui/useQueryParamState'
 import CollaboratorTabs from './CollaboratorsTabs'
 import MembersTabDisplay from './MembersTabDisplay'
 import RequestsTabDisplay from './RequestsTabDisplay'

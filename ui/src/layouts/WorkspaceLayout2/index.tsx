@@ -8,7 +8,7 @@ function WorkspaceLayout2({ children }: { children: React.ReactNode }) {
       <PrimaryHeader />
       <section className='max-w-screen relative z-[1] flex h-[calc(100%-var(--header-height))]'>
         <PrimarySidebar />
-        <div className='h-full flex-1'>{children}</div>
+        <div className='h-full flex-1 overflow-y-scroll'>{children}</div>
       </section>
     </main>
   )

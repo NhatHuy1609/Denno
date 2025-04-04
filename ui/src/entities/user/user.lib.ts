@@ -1,5 +1,13 @@
 import type { userTypesDto } from "@/service/api/user";
-import { Users } from "./user.types";
+import { User, Users } from "./user.types";
+
+export function transformUserDtoToUser(
+  userDto: userTypesDto.GetUserResponseDto
+): User {
+  return {
+    ...userDto
+  }
+}
 
 export function transformUsersDtoToUsers(
   usersDto: userTypesDto.UsersResponseDto

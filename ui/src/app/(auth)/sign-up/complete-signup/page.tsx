@@ -1,5 +1,5 @@
 import React from 'react'
-import SignUpGoogleForm from '@/app/_features/Signup/SignUpGoogleForm/SignUpGoogleForm'
+import SignUpGoogleForm from '@/app/(auth)/sign-up/complete-signup/SignUpGoogleForm'
 
 function page() {
   return <SignUpGoogleForm />
