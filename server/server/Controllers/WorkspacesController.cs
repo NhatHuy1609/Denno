@@ -10,6 +10,7 @@ using server.Dtos.Response.Workspace;
 using server.Entities;
 using server.Interfaces;
 using server.Models;
+using server.Models.Query;
 using server.Strategies.ActionStrategy;
 using System.Security.Claims;
 
@@ -28,6 +29,7 @@ namespace server.Controllers
         private readonly IActionService _actionService;
         private readonly ILogger<WorkspacesController> _logger;
         private readonly IEmailService _emailService;
+        private readonly IWorkspaceService _workspaceService;
 
         public WorkspacesController(
             IMapper mapper,
@@ -36,7 +38,8 @@ namespace server.Controllers
             IFileUploadService uploadService,
             IActionService actionService,
             ILogger<WorkspacesController> logger,
-            IEmailService emailService)
+            IEmailService emailService,
+            IWorkspaceService workspaceService)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
@@ -44,6 +47,7 @@ namespace server.Controllers
             _actionService = actionService;
             _logger = logger;
             _emailService = emailService;
+            _workspaceService = workspaceService;
             _mapper = mapper;
         }
 
@@ -82,25 +86,43 @@ namespace server.Controllers
             return Ok(workspacesDto);
         }
 
+        //[HttpGet("[controller]/{id}")]
+        //[ProducesResponseType(StatusCodes.Status404NotFound)]
+        //[ProducesResponseType(typeof(Workspace), StatusCodes.Status200OK)]
+        //public async Task<IActionResult> Get(Guid id)
+        //{
+        //    var workspace = await _unitOfWork.Workspaces.GetByIdAsync(id, w => w.Logo);
+
+        //    if (workspace == null)
+        //    {
+        //        return NotFound(new ApiErrorResponse()
+        //        {
+        //            StatusCode = Enums.ApiStatusCode.NotFound,
+        //            StatusMessage = "Workspace not found"
+        //        });
+        //    }
+
+        //    var workspaceDto = _mapper.Map<WorkspaceResponseDto>(workspace);
+
+        //    return Ok(workspaceDto);
+        //}
+
         [HttpGet("[controller]/{id}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(Workspace), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Get(Guid id)
+        public async Task<IActionResult> Get(Guid id, [FromQuery] WorkspaceQuery query)
         {
-            var workspace = await _unitOfWork.Workspaces.GetByIdAsync(id, w => w.Logo);
+            var workspace = await _workspaceService.GetWorkspaceByIdAsync(id, query);
 
             if (workspace == null)
             {
                 return NotFound(new ApiErrorResponse()
                 {
-                    StatusCode = Enums.ApiStatusCode.NotFound,
                     StatusMessage = "Workspace not found"
                 });
             }
 
-            var workspaceDto = _mapper.Map<WorkspaceResponseDto>(workspace);
-            
-            return Ok(workspaceDto);
+            return Ok(workspace);
         }
 
         [HttpPost("[controller]")]
@@ -281,7 +303,6 @@ namespace server.Controllers
 
         [HttpGet("[controller]/{id}/members")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(List<WorkspaceMemberResponseDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetWorkspaceMembersAsync(Guid id)
         {
             var workspace = await _unitOfWork.Workspaces.GetByIdAsync(id);
@@ -289,11 +310,8 @@ namespace server.Controllers
             if (workspace == null)
                 return NotFound(new ApiErrorResponse() { StatusMessage = "Workspace not found" });
 
-            var workspaceMembers = await _unitOfWork.WorkspaceMembers.GetWorkspaceMembersAsync(id);
-
-            return Ok(_mapper.Map<List<WorkspaceMemberResponseDto>>(workspaceMembers));
+            return Ok();
         }
-
     }
 }
 
