@@ -6,6 +6,6 @@ namespace server.Interfaces
 {
     public interface IWorkspaceService
     {
-        Task<WorkspaceResponseDto2?> GetWorkspaceByIdAsync(Guid id, WorkspaceQuery query);
+        Task<WorkspaceResponseDto2?> GetWorkspaceResponseAsync(Guid id, WorkspaceQuery query);
     }
 }

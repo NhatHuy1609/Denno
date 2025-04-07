@@ -1,12 +1,16 @@
 ﻿using Asp.Versioning;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using server.Dtos.Response;
 using server.Dtos.Response.Users;
+using server.Dtos.Response.Workspace;
+using server.Entities;
 using server.Interfaces;
 using server.Models.Pagination;
 using server.Models.Query;
+using server.Models.Query.UserWorkspacesQuery;
 using System.Security.Claims;
 
 namespace server.Controllers
@@ -21,18 +25,24 @@ namespace server.Controllers
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<UserController> _logger;
+        private readonly UserManager<AppUser> _userManager;
         private readonly INotificationService _notificationService;
+        private readonly IUserService _userService;
 
         public UserController(
             IMapper mapper,
             IUnitOfWork unitOfWork,
             ILogger<UserController> logger,
-            INotificationService notificationService)
+            UserManager<AppUser> userManager,
+            INotificationService notificationService,
+            IUserService userService)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _logger = logger;
+            _userManager = userManager;
             _notificationService = notificationService;
+            _userService = userService;
         }
 
         [HttpGet]
@@ -68,6 +78,25 @@ namespace server.Controllers
             };
 
             return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("[controller]/{id}/workspaces")]
+        [ProducesResponseType(typeof(IEnumerable<UserWorkspaceResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> GetUserWorkspacesAsync(string id, [FromQuery] UserWorkspacesQuery query)
+        {
+            var responses = await _userService.GetUserWorkspacesResponse(id, query);
+
+            if (responses == null)
+            {
+                return NotFound(new ApiErrorResponse()
+                {
+                    StatusMessage = "Not found user"
+                });
+            }
+
+            return Ok(responses);
         }
 
         [HttpGet]
