@@ -17,10 +17,9 @@ namespace server.Services
             _dbContext = dbContext;
         }
 
-        public async Task<WorkspaceResponseDto2?> GetWorkspaceByIdAsync(Guid id, WorkspaceQuery query)
+        public async Task<WorkspaceResponseDto2?> GetWorkspaceResponseAsync(Guid id, WorkspaceQuery query)
         {
             var workspace = await _dbContext.Workspaces
-                .Include(w => w.Logo)
                 .FirstOrDefaultAsync(w => w.Id == id);
 
             if (workspace == null) return null;
@@ -44,12 +43,12 @@ namespace server.Services
                 response.IdOwner = workspace.OwnerId;
 
             if (getAllFields || requestedFields.Contains("logo"))
-                response.Logo = workspace.Logo.Url;
+                response.Logo = workspace.Logo?.Url;
 
             if (getAllFields || requestedFields.Contains("visibility"))
                 response.Visibility = workspace.Visibility;
 
-            // Handle BoardCounts field
+            // Handle Members field
             if (query.Members)
             {
                 var members = workspace.WorkspaceMembers
@@ -63,6 +62,23 @@ namespace server.Services
                     .ToList();
 
                 response.Members = members;
+            }
+
+            // Handle BoardCounts field
+            if (query.BoardCounts)
+            {
+                var boardCounts = _dbContext.WorkspaceMembers
+                    .Include(wm => wm.AppUser)
+                    .ThenInclude(u => u.BoardMembers)
+                    .Where(wm => wm.WorkspaceId == id)
+                    .Select(wm => new BoardCountDto
+                    {
+                        IdMember = wm.AppUserId,
+                        BoardCount = wm.AppUser.BoardMembers.Count
+                    })
+                    .ToList();
+
+                response.BoardCounts = boardCounts;
             }
 
             return response;

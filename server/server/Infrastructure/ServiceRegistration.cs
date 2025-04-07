@@ -35,6 +35,7 @@ namespace server.Infrastructure
             services.AddScoped<IDataStore, EFGoogleDataStore>();
             services.AddScoped<IFileUploadService, FileUploadService>();
             services.AddScoped<IWorkspaceService, WorkspaceService>();
+            services.AddScoped<IUserService, UserService>();
             #region Repositories
             services.AddTransient<IWorkspaceRepository, WorkspaceRepository>();
             #endregion

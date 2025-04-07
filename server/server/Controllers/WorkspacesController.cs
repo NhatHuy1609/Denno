@@ -7,6 +7,7 @@ using server.Constants;
 using server.Dtos.Requests.Workspace;
 using server.Dtos.Response;
 using server.Dtos.Response.Workspace;
+using server.Dtos.Response.Workspace.WorkspaceResponseDto2;
 using server.Entities;
 using server.Interfaces;
 using server.Models;
@@ -51,41 +52,6 @@ namespace server.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]
-        [Route("users/me/workspaces")]
-        [ProducesResponseType(typeof(IEnumerable<Workspace>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> GetCurrentUserWorkspaces()
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (userId == null)
-            {
-                return Unauthorized(new ApiErrorResponse()
-                {
-                    StatusCode = Enums.ApiStatusCode.Unauthorized,
-                    StatusMessage = "User needs login"
-                });
-            }
-
-            var user = await _userManager.Users
-                .Include(u => u.OwnedWorkspaces)
-                .FirstOrDefaultAsync(u => u.Id == userId);
-
-            if (user == null)
-            {
-                return Unauthorized(new ApiErrorResponse()
-                {
-                    StatusCode = Enums.ApiStatusCode.Unauthorized,
-                    StatusMessage = "Can not find user"
-                });
-            }
-
-            var workspacesDto = _mapper.Map<IEnumerable<WorkspaceResponseDto>>(user.OwnedWorkspaces);
-
-            return Ok(workspacesDto);
-        }
-
         //[HttpGet("[controller]/{id}")]
         //[ProducesResponseType(StatusCodes.Status404NotFound)]
         //[ProducesResponseType(typeof(Workspace), StatusCodes.Status200OK)]
@@ -112,7 +78,7 @@ namespace server.Controllers
         [ProducesResponseType(typeof(Workspace), StatusCodes.Status200OK)]
         public async Task<IActionResult> Get(Guid id, [FromQuery] WorkspaceQuery query)
         {
-            var workspace = await _workspaceService.GetWorkspaceByIdAsync(id, query);
+            var workspace = await _workspaceService.GetWorkspaceResponseAsync(id, query);
 
             if (workspace == null)
             {

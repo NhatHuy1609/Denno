@@ -8,7 +8,7 @@ namespace server.Dtos.Response.Workspace.WorkspaceResponseDto2
         public string Name { get; set; }
         public string Description { get; set; }
         public string IdOwner { get; set; }
-        public string Logo { get; set; }
+        public string? Logo { get; set; }
         public WorkspaceVisibility Visibility { get; set; }
 
         public List<BoardCountDto> BoardCounts { get; set; } = new List<BoardCountDto>();
