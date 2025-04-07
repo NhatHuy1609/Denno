@@ -1,6 +1,14 @@
 import { httpPost, httpGet, httpPut } from '../_req'
 import { AxiosContracts } from '@/lib/axios/AxiosContracts'
-import { AddWorkspaceMemberDto, AddWorkspaceMemberResponseDto, CreateWorkspaceDto, UpdateWorkspaceDto, UpdateWorkspaceLogoDto, WorkspaceResponseDto } from './workspace.types'
+import { 
+  AddWorkspaceMemberDto, 
+  AddWorkspaceMemberResponseDto, 
+  CreateWorkspaceDto, 
+  UpdateWorkspaceDto, 
+  UpdateWorkspaceLogoDto, 
+  WorkspaceResponseDto 
+} from './workspace.types'
+
 import { 
   AddWorkspaceMemberDtoSchema,
   CreateWorkspaceDtoSchema,
@@ -10,15 +18,13 @@ import {
   WorkspacesResponseDtoSchema 
 } from './workspace.contracts'
 
-export class WorkspaceService {
-  static currentUserWorkspacesQuery(config: { signal?: AbortSignal }) {
-    return httpGet('/users/me/workspaces')
-            .then(AxiosContracts.responseContract(WorkspacesResponseDtoSchema))
-  }
+import { WorkspaceQueryParamsDto } from '../_models/query-models/workspace/workspace.types'
 
-  static workspaceQuery(workspaceId: string) {
-    return httpGet(`/workspaces/${workspaceId}`)
-            .then(AxiosContracts.responseContract(WorkspaceResponseDtoSchema))
+export class WorkspaceService {
+  private static readonly basePath = '/workspaces'
+
+  static workspaceQuery(workspaceId: string, config?: { signal?: AbortSignal, params?: WorkspaceQueryParamsDto }) {
+    return httpGet<WorkspaceResponseDto>(`${this.basePath}/${workspaceId}`, config)
   }
 
   static CreateWorkspaceMutation(data: { createWorkspaceDto: CreateWorkspaceDto }) {
@@ -26,7 +32,7 @@ export class WorkspaceService {
       CreateWorkspaceDtoSchema,
       data.createWorkspaceDto)
 
-    return httpPost<WorkspaceResponseDto>('/workspaces', data.createWorkspaceDto)
+    return httpPost<WorkspaceResponseDto>(this.basePath, createWorkspaceDto)
   }
 
   static updateWorkspaceMutation(data: { workspaceId: string, updateWorkspaceDto: UpdateWorkspaceDto }) {
@@ -35,7 +41,7 @@ export class WorkspaceService {
       data.updateWorkspaceDto
     )
 
-    return httpPut(`/workspaces/${data.workspaceId}`, updateWorkspaceDto)
+    return httpPut(`${this.basePath}/${data.workspaceId}`, updateWorkspaceDto)
   }
 
   static updateWorkspaceLogoMutation(data: { workspaceId: string, updateWorkspaceLogoDto: UpdateWorkspaceLogoDto }) {
@@ -44,7 +50,7 @@ export class WorkspaceService {
       data.updateWorkspaceLogoDto
     )
 
-    return httpPut(`/workspaces/${data.workspaceId}/logo`, updateWorkspaceLogoDto, {
+    return httpPut(`${this.basePath}/${data.workspaceId}/logo`, updateWorkspaceLogoDto, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -57,6 +63,6 @@ export class WorkspaceService {
       data.addWorkspaceMemberDto
     )
 
-    return httpPost<AddWorkspaceMemberResponseDto>(`/workspaces/${data.workspaceId}/members`, addWorkspaceMemberDto)
+    return httpPost<AddWorkspaceMemberResponseDto>(`${this.basePath}/${data.workspaceId}/members`, addWorkspaceMemberDto)
   }
 }

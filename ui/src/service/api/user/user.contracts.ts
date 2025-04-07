@@ -28,3 +28,9 @@ export const GetUserResponseDtoSchema = z.object({
 export const UsersResponseDtoSchema = 
   createPaginatedResultSchema(GetUserResponseDtoSchema)
   .describe("UsersResponseDtoSchema")
+
+export const UserWorkspacesResponseDtoSchema = z.array(z.object({
+  id: z.string(),
+  name: z.string(),
+  logo: z.string().nullable()
+})).describe('UserWorkspacesResponseDtoSchema')

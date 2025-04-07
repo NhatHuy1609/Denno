@@ -40,7 +40,7 @@ function WorkspaceInfoCard({
   const { workspaceId } = useParams()
   const { data } = useWorkspaceQuery(workspaceId as string)
 
-  const { logoUrl = '', name, description, visibility } = data || {}
+  const { logo = '', name, description, visibility } = data || {}
 
   const handleShowUpdateWorkspaceForm = () => {
     setShowWorkspaceUpdateForm(true)
@@ -49,7 +49,7 @@ function WorkspaceInfoCard({
   return (
     <div className='w-full'>
       <div className='flex items-center gap-3'>
-        <WorkspaceInfoLogo logoUrl={logoUrl} name={name} />
+        <WorkspaceInfoLogo logoUrl={logo} name={name} />
         <WorkspaceInfoDetail
           name={name}
           visibility={visibility}

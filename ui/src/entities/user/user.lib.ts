@@ -1,5 +1,5 @@
 import type { userTypesDto } from "@/service/api/user";
-import { User, Users } from "./user.types";
+import { User, Users, UserWorkspaces } from "./user.types";
 
 export function transformUserDtoToUser(
   userDto: userTypesDto.GetUserResponseDto
@@ -18,4 +18,12 @@ export function transformUsersDtoToUsers(
     ...usersDto,
     users: items
   }
+}
+
+export function transformUserWorkspacesDtoToUserWorkspaces(
+  userWorkspacesDto: userTypesDto.UserWorkspacesResponseDto
+): UserWorkspaces {
+  return userWorkspacesDto.map((userWorkspace) => ({
+    ...userWorkspace,
+  }))
 }
