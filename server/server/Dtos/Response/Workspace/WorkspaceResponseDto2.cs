@@ -1,4 +1,5 @@
-﻿using server.Enums;
+﻿using Newtonsoft.Json;
+using server.Enums;
 
 namespace server.Dtos.Response.Workspace.WorkspaceResponseDto2
 {
@@ -11,8 +12,11 @@ namespace server.Dtos.Response.Workspace.WorkspaceResponseDto2
         public string? Logo { get; set; }
         public WorkspaceVisibility Visibility { get; set; }
 
-        public List<BoardCountDto> BoardCounts { get; set; } = new List<BoardCountDto>();
-        public List<MemberDto> Members { get; set; } = new List<MemberDto>();
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public List<BoardCountDto>? BoardCounts { get; set; } = null;
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public List<MemberDto>? Members { get; set; } = null;
     }
 
     public class BoardCountDto

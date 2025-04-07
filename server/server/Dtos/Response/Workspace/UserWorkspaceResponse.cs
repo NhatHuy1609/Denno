@@ -1,9 +1,14 @@
-﻿namespace server.Dtos.Response.Workspace
+﻿
+using Newtonsoft.Json;
+
+namespace server.Dtos.Response.Workspace
 {
     public class UserWorkspaceResponse
     {
         public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string? Logo { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public string? Name { get; set; } = null;
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public string? Logo { get; set; } = null;
     }
 }

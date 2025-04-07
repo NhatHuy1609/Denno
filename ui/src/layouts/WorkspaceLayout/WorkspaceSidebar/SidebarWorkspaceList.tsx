@@ -2,8 +2,6 @@ import React, { ReactNode } from 'react'
 import Link from 'next/link'
 import { setLocalStorageItem } from '@/utils/local-storage'
 import { PersistedStateKey } from '@/data/persisted-keys'
-import { useQuery } from '@tanstack/react-query'
-import { WorkspaceQueries } from '@/entities/workspace/workspace.queries'
 import { LiaAngleDownSolid } from 'react-icons/lia'
 import { HiViewBoards } from 'react-icons/hi'
 import { FaRegHeart } from 'react-icons/fa6'
@@ -12,8 +10,8 @@ import { MdOutlineGridView } from 'react-icons/md'
 import { IoIosSettings } from 'react-icons/io'
 import { Collapsible } from '@/ui'
 import WorkspaceLogo from '@/app/_components/WorkspaceLogo'
-import { workspaceTypes } from '@/entities/workspace'
 import { useWorkspaceQuery } from '@/app/_hooks/query'
+import useCurrentUserWorkspacesQuery from '@/app/_hooks/query/useCurrentUserWorkspacesQuery'
 
 interface IWorkspaceSubItem {
   title: string
@@ -78,14 +76,14 @@ function SidebarWorkspaceSubContent({ workspaceId }: { workspaceId: string }) {
 function SidebarWorkspaceItem({ workspaceId }: { workspaceId: string }) {
   const { data: workspace } = useWorkspaceQuery(workspaceId)
 
-  const { id = '', name = '', logoUrl = '' } = workspace || {}
+  const { id = '', name = '', logo = '' } = workspace || {}
 
   return (
     <Collapsible.Collapsible>
       <Collapsible.Trigger className='w-full'>
         <div className='flex cursor-pointer items-center justify-between rounded-md p-2 pr-4 hover:bg-gray-200'>
           <div className='flex items-center gap-2'>
-            <WorkspaceLogo name={name} imageUrl={logoUrl} size='sm' />
+            <WorkspaceLogo name={name} imageUrl={logo} size='sm' />
             <span className='text-sm font-semibold text-slate-700'>{name}</span>
           </div>
           <LiaAngleDownSolid className='-translate-y-px text-sm' />
@@ -99,7 +97,7 @@ function SidebarWorkspaceItem({ workspaceId }: { workspaceId: string }) {
 }
 
 function SidebarWorkspaceList() {
-  const { data: workspaces } = useQuery(WorkspaceQueries.currentUserWorkspacesQuery())
+  const { data: workspaces } = useCurrentUserWorkspacesQuery({})
 
   return (
     <div className='mt-3 flex w-full flex-col'>

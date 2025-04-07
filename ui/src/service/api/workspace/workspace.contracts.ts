@@ -32,8 +32,6 @@ export const AddWorkspaceMemberDtoSchema = z.object({
 }).describe("AddWorkspaceMemberDtoSchema")
 
 // Response
-// export const WorkspaceResponseDtoSchema = WorkspaceDto.describe("WorkspaceResponseDtoSchema")
-
 export const WorkspaceResponseDtoSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
@@ -44,22 +42,17 @@ export const WorkspaceResponseDtoSchema = z.object({
   boardCounts: z.array(z.object({
     idMember: z.string(),
     boardCount: z.number(),
-  })),
+  })).optional(),
   members: z.array(z.object({
     Id: z.string(),
     Avatar: z.string(),
     FullName: z.string(),
     MemberType: z.enum(['Normal', 'Admin']),
-  })),
-});
+  })).optional(),
+}).describe('WorkspaceResponseDtoSchema')
 
-export const UserWorkspacesResponseDtoSchema = z.array(z.object({
-  id: z.string(),
-  name: z.string(),
-  logo: z.string().nullable()
-})).describe('UserWorkspacesResponseDtoSchema')
-
-export const WorkspacesResponseDtoSchema = z.array(WorkspaceDto).describe('WorkspacesResponseDtoSchema')
+export const WorkspacesResponseDtoSchema = z.array(WorkspaceResponseDtoSchema)
+.describe('WorkspacesResponseDtoSchema')
 
 export const AddWorkspaceMemberResponseDtoSchema = z.object({
   actionId: z.string().uuid(),

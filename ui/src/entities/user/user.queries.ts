@@ -1,7 +1,8 @@
 import { queryOptions } from "@tanstack/react-query"
 import { UserService } from "@/service/api/user/user.service"
-import { UsersFilterQuery } from "./user.types"
-import { transformUserDtoToUser, transformUsersDtoToUsers } from "./user.lib"
+import { UsersFilterQuery, UserWorkspacesFilterQuery } from "./user.types"
+import { transformUserDtoToUser, transformUsersDtoToUsers, transformUserWorkspacesDtoToUserWorkspaces } from "./user.lib"
+import { UserWorkspacesQueryParamsDto } from "@/service/api/_models/query-models/user/user.types"
 
 export class UserQueries {
   static readonly keys = {
@@ -30,6 +31,20 @@ export class UserQueries {
       queryFn: async ({ signal }) => {
         const response = await UserService.loggedInUserQuery()
         return transformUserDtoToUser(response.data)
+      }
+    })
+  }
+
+  static userWorkspacesQuery(userId: string, filter?: UserWorkspacesFilterQuery) {
+    const params = {
+      ...filter
+    } as UserWorkspacesQueryParamsDto
+
+    return queryOptions({
+      queryKey: [...this.keys.root, userId, 'workspaces'],
+      queryFn: async ({ signal }) => {
+        const response = await UserService.userWorkspacesQuery(userId, { signal, params })
+        return transformUserWorkspacesDtoToUserWorkspaces(response.data)
       }
     })
   }

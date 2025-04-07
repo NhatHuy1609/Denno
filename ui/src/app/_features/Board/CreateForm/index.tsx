@@ -20,7 +20,7 @@ import BoardBackgroundSelectionDisplay from './BoardBackgroundSelectionDisplay'
 type FormValues = boardTypesDto.CreateBoardDto
 
 function BoardCreateForm() {
-  const { data: userWorkspaces = [] } = useCurrentUserWorkspacesQuery()
+  const { data: userWorkspaces = [] } = useCurrentUserWorkspacesQuery({})
 
   const {
     reset,

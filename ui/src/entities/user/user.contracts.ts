@@ -31,9 +31,20 @@ export const UsersSchema = z.object({
   totalPages: z.number().int().nonnegative()
 })
 
+export const UserWorkspacesSchema = z.array(z.object({
+  id: z.string(),
+  name: z.string(),
+  logo: z.string().nullable(),
+}))
+
 export const UsersFilterQuerySchema = z.object({
   name: z.string(),
   email: z.string(),
   pageSize: z.number().int().positive(),
   pageNumber: z.number().int().positive()
 }).partial().describe("UsersFilterQuerySchema")
+
+export const UserWorkspacesFilterQuerySchema = z.object({
+  filter: z.enum(["none", "members", "public", "all"]),
+  fields: z.array(z.enum(["id", "name", "logo"])).default(["id", "name", "logo"])
+}).describe("UserWorkspacesFilterQuerySchema")
