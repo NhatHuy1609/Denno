@@ -5,9 +5,6 @@ import DefaultAvatarUser from 'public/default-avatar-user.png'
 
 function HeaderUserInfo() {
   const { data: loggedInUserData } = useMe()
-
-  console.log('USER: ', loggedInUserData)
-
   const { avatar = '' } = loggedInUserData || {}
 
   return (

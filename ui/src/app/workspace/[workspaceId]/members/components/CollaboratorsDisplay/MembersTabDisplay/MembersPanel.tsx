@@ -1,8 +1,15 @@
 import React, { useRef } from 'react'
 import NameFilterInput from '../NameFilterInput'
+import { Workspace } from '@/entities/workspace/workspace.types'
 
-function MembersPanel() {
+type MembersPanelProps = {
+  workspace: Workspace
+}
+
+function MembersPanel({ workspace }: MembersPanelProps) {
   const inputRef = useRef<HTMLInputElement>(null)
+
+  console.log('WORKSPACE', workspace)
 
   return (
     <div className='w-full'>

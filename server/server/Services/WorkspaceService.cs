@@ -51,15 +51,34 @@ namespace server.Services
             // Handle Members field
             if (query.Members)
             {
+                // Load workspacemembers
+                await _dbContext.Entry(workspace)
+                        .Collection(w => w.WorkspaceMembers)
+                        .LoadAsync();
+
                 var members = workspace.WorkspaceMembers
-                    .Select(wm => new MemberDto
+                    .Select(workspaceMember =>
                     {
-                        Id = wm.AppUserId,
-                        Avatar = wm.AppUser.Avatar,
-                        FullName = wm.AppUser.FullName,
-                        MemberType = wm.Role
+                         _dbContext.Entry(workspaceMember)
+                            .Reference(wm => wm.AppUser)
+                            .Load();
+
+                        return new MemberDto
+                        {
+                            Id = workspaceMember.AppUserId,
+                            Avatar = workspaceMember.AppUser.Avatar,
+                            FullName = workspaceMember.AppUser.FullName,
+                            MemberType = workspaceMember.Role
+                        };
                     })
                     .ToList();
+
+                foreach (var member in workspace.WorkspaceMembers)
+                {
+                    await _dbContext.Entry(member)
+                        .Reference(m => m.AppUser)
+                        .LoadAsync();
+                }
 
                 response.Members = members;
             }
