@@ -4,14 +4,21 @@ import TabButton from './TabButton'
 
 type Props = {
   setTabFn: (val: Tabs) => void
+  memberCount?: number
+  guestCount?: number
+  requestCount?: number
 }
 
-function CollaboratorsTabs({ setTabFn }: Props) {
+function CollaboratorsTabs({ setTabFn, memberCount = 0, guestCount = 0, requestCount = 0 }: Props) {
   return (
     <div className='flex min-w-[250px] flex-col gap-2'>
-      <TabButton text='Workspace members (2)' tabName='members' setTabFn={setTabFn} />
-      <TabButton text='Guests (1)' tabName='guests' setTabFn={setTabFn} />
-      <TabButton text='Requests (0)' tabName='requests' setTabFn={setTabFn} />
+      <TabButton
+        tabName='members'
+        setTabFn={setTabFn}
+        text={`Workspace members (${memberCount})`}
+      />
+      <TabButton text={`Guests (${guestCount})`} tabName='guests' setTabFn={setTabFn} />
+      <TabButton text={`Requests (${requestCount})`} tabName='requests' setTabFn={setTabFn} />
     </div>
   )
 }

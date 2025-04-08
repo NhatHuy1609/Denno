@@ -12,18 +12,18 @@ export const WorkspaceSchema = z.object({
     boardCount: z.number(),
   })).optional(),
   members: z.array(z.object({
-    Id: z.string(),
-    Avatar: z.string(),
-    FullName: z.string(),
-    MemberType: z.enum(['Normal', 'Admin']),
+    id: z.string(),
+    avatar: z.string(),
+    fullName: z.string(),
+    memberType: z.enum(['Normal', 'Admin']),
   })).optional(),
 }).describe('WorkspaceResponseDtoSchema')
 
 export const WorkspacesSchema = z.array(WorkspaceSchema)
 
 export const WorkspaceFilterQuerySchema = z.object({
-  fields: z.string().default(""),
-  boardCounts: z.coerce.boolean().default(false),
-  members: z.coerce.boolean().default(false),
+  fields: z.string().default("").optional(),
+  boardCounts: z.coerce.boolean().default(false).optional(),
+  members: z.coerce.boolean().default(false).optional(),
   memberFields: z.string().optional()
-});
+}).optional().describe('WorkspaceFilterQuerySchema');

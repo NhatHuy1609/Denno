@@ -1,15 +1,6 @@
 import { z } from 'zod'
 import { MemberRoleEnumSchema } from '../_enums/enums.contracts'
 
-const WorkspaceDto = z.object({
-  id: z.string(),
-  name: z.string (),
-  description: z.string(),
-  visibility: z.string(),
-  logoUrl: z.string().nullable(),
-  ownerId: z.string(),
-})
-
 // Request
 export const CreateWorkspaceDtoSchema = z.object({
   name: z.string(),
@@ -44,10 +35,10 @@ export const WorkspaceResponseDtoSchema = z.object({
     boardCount: z.number(),
   })).optional(),
   members: z.array(z.object({
-    Id: z.string(),
-    Avatar: z.string(),
-    FullName: z.string(),
-    MemberType: z.enum(['Normal', 'Admin']),
+    id: z.string(),
+    avatar: z.string(),
+    fullName: z.string(),
+    memberType: z.enum(['Normal', 'Admin']),
   })).optional(),
 }).describe('WorkspaceResponseDtoSchema')
 
