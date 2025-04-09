@@ -18,7 +18,12 @@ export default function BoardAdjustButton({
   return (
     <PopoverAction
       renderTrigger={() => (
-        <CustomizableButton intent='secondary' size='small' value={`${boardCount} boards`} />
+        <CustomizableButton
+          intent='secondary'
+          size='small'
+          className='px-4'
+          value={`${boardCount} boards`}
+        />
       )}
       renderContent={(closePopoverFn) => (
         <BoardAdjustPanel userId={userId} userName={userName} closePopoverFn={closePopoverFn} />

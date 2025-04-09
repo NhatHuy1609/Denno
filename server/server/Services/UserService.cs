@@ -1,4 +1,5 @@
-﻿using server.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using server.Data;
 using server.Dtos.Response.Workspace;
 using server.Entities;
 using server.Interfaces;
@@ -27,18 +28,15 @@ namespace server.Services
             switch (query.Filter)
             {
                 case FilterType.All:
-                    // Loaded user's owned workspaces
-                    await _dbContext.Entry(user)
-                            .Collection(u => u.OwnedWorkspaces)
-                            .LoadAsync();
+                    var invitedWorkspaces = await _dbContext.WorkspaceMembers
+                        .Include(wm => wm.Workspace)
+                        .Where(wm => wm.AppUserId == userId)
+                        .Select(wm => wm.Workspace)
+                        .ToListAsync();
 
-                    // Loaded user's invited workspaces
-                    await _dbContext.Entry(user)
-                            .Collection(u => u.WorkspaceMembers)
-                            .LoadAsync();
-
-                    var invitedWorkspaces = user.WorkspaceMembers.Select(wm => wm.Workspace);
-                    var ownedWorkspaces = user.OwnedWorkspaces;
+                    var ownedWorkspaces = await _dbContext.Workspaces
+                        .Where(w => w.OwnerId == userId)
+                        .ToListAsync();
 
                     workspaces.AddRange(invitedWorkspaces);
                     workspaces.AddRange(ownedWorkspaces);
@@ -49,18 +47,23 @@ namespace server.Services
             }
 
             // Handle Fields query field
-            List<UserWorkspaceResponse> responses = workspaces.Select(w =>
+            var responses = new List<UserWorkspaceResponse>();
+            if (workspaces.Count > 0)
             {
-                var response = new UserWorkspaceResponse();
-                if (query.Fields.HasFlag(FieldsType.Id) || query.Fields.HasFlag(FieldsType.All))
-                    response.Id = w.Id;
-                if (query.Fields.HasFlag(FieldsType.Name) || query.Fields.HasFlag(FieldsType.All))
-                    response.Name = w.Name;
-                if (query.Fields.HasFlag(FieldsType.Logo) || query.Fields.HasFlag(FieldsType.All))
-                    response.Logo = w.Logo?.Url;
+                foreach (var workspace in workspaces)
+                {
+                    var response = new UserWorkspaceResponse();
 
-                return response;
-            }).ToList();
+                    if (query.Fields.HasFlag(FieldsType.Id) || query.Fields.HasFlag(FieldsType.All))
+                        response.Id = workspace.Id;
+                    if (query.Fields.HasFlag(FieldsType.Name) || query.Fields.HasFlag(FieldsType.All))
+                        response.Name = workspace.Name;
+                    if (query.Fields.HasFlag(FieldsType.Logo) || query.Fields.HasFlag(FieldsType.All))
+                        response.Logo = workspace.Logo?.Url;
+
+                    responses.Add(response);
+                }
+            }
 
             return responses;
         }
