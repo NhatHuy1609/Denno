@@ -28,6 +28,7 @@ namespace server.Dtos.Response.Workspace.WorkspaceResponseDto2
     public class MemberDto
     {
         public string Id { get; set; }
+        public string Email { get; set; }
         public string Avatar { get; set; }
         public string FullName { get; set; }
         public MemberRole MemberType { get; set; }

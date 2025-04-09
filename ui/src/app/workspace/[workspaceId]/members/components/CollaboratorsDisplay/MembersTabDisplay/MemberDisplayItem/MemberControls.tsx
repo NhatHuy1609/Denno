@@ -14,7 +14,7 @@ export default function MemberControls({
   const { id, fullName } = member
 
   return (
-    <div className='flex h-8 w-full gap-4'>
+    <div className='flex h-8 w-full justify-end gap-4'>
       <BoardAdjustButton userId={id} userName={fullName} boardCount={boardCount} />
       <RoleAdjustButton />
       <UserRemoveButton />

@@ -99,6 +99,13 @@ namespace server.Controllers
             return Ok(responses);
         }
 
+        [HttpGet("[controller]/{id}/boardsInvited")]
+        public async Task<IActionResult> GetUserBoardsInvitedAsync(string id)
+        {
+            return Ok();
+        }
+
+
         [HttpGet]
         [Route("[controller]/{id}/notifications")]
         public async Task<IActionResult> GetUserNotificationsAsync([FromRoute] string id)

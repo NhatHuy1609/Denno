@@ -20,6 +20,7 @@ namespace server.Services
         public async Task<WorkspaceResponseDto2?> GetWorkspaceResponseAsync(Guid id, WorkspaceQuery query)
         {
             var workspace = await _dbContext.Workspaces
+                .Include(w => w.Logo)
                 .FirstOrDefaultAsync(w => w.Id == id);
 
             if (workspace == null) return null;
@@ -66,6 +67,7 @@ namespace server.Services
                         return new MemberDto
                         {
                             Id = workspaceMember.AppUserId,
+                            Email = workspaceMember.AppUser.Email,
                             Avatar = workspaceMember.AppUser.Avatar,
                             FullName = workspaceMember.AppUser.FullName,
                             MemberType = workspaceMember.Role

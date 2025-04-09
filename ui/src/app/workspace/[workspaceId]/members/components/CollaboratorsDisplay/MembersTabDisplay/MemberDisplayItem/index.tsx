@@ -13,7 +13,7 @@ export default function MemberDisplayItem({ member, joinedBoardCount }: MemberDi
   const { boardCount } = joinedBoardCount
 
   return (
-    <div className='flex w-full items-center justify-between gap-6'>
+    <div className='flex w-full flex-1 items-center justify-between gap-6'>
       <MemberInfo name={fullName} avatar={avatar} email={email} />
       <MemberControls member={member} boardCount={boardCount} />
     </div>
