@@ -20,7 +20,10 @@ function TabButton({ setTabFn, tabName, text }: Props) {
   return (
     <button
       type='button'
-      className={cn('rounded-lg bg-gray-300 px-4 py-2', isTabActive && 'bg-blue-100 text-blue-600')}
+      className={cn(
+        'rounded-lg px-4 py-2 font-medium hover:bg-gray-300',
+        isTabActive && 'bg-blue-100 text-blue-600'
+      )}
       onClick={handleClickTab}
     >
       <span className='block text-left text-sm'>{text}</span>

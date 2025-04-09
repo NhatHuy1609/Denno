@@ -13,6 +13,7 @@ export const WorkspaceSchema = z.object({
   })).optional(),
   members: z.array(z.object({
     id: z.string(),
+    email: z.string(),
     avatar: z.string(),
     fullName: z.string(),
     memberType: z.enum(['Normal', 'Admin']),
