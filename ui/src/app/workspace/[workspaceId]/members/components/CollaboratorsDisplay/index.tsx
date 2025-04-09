@@ -10,7 +10,6 @@ import { useWorkspaceQuery } from '@/app/_hooks/query'
 
 function CollaboratorsDisplay() {
   const { workspaceId } = useParams<{ workspaceId: string }>()
-
   const [tab, setTab] = useQueryParamState<Tabs>('tab', 'members')
 
   const { data: detailedWorkspace } = useWorkspaceQuery(workspaceId, {
@@ -19,7 +18,6 @@ function CollaboratorsDisplay() {
   })
 
   const { members } = detailedWorkspace || {}
-
   const collaboratorCount = members?.length || 0
 
   const renderTabDisplay = () => {

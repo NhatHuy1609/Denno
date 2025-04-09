@@ -38,6 +38,7 @@ export const WorkspaceResponseDtoSchema = z.object({
     id: z.string(),
     avatar: z.string(),
     fullName: z.string(),
+    email: z.string(),
     memberType: z.enum(['Normal', 'Admin']),
   })).optional(),
 }).describe('WorkspaceResponseDtoSchema')

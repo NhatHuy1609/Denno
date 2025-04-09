@@ -5,6 +5,8 @@ import { LiaAngleLeftSolid } from 'react-icons/lia'
 import { NavigationMenuProvider } from './context'
 import { useSelectedItemsHistory } from './useSelectedItemsHistory'
 
+// When using this component, remember to use useNaviationMenu hook to get the context
+// and use it to manage the selected items history
 function NavigationMenu({
   title,
   onClosePopover,
