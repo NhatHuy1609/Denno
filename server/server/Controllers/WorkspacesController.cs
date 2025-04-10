@@ -21,7 +21,7 @@ namespace server.Controllers
     [ApiVersion("1.0")]
     [ControllerName("workspaces")]
     [Route("api/v{version:apiVersion}")]
-    public class WorkspacesController: ControllerBase
+    public class WorkspacesController : ControllerBase
     {
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
@@ -51,27 +51,6 @@ namespace server.Controllers
             _workspaceService = workspaceService;
             _mapper = mapper;
         }
-
-        //[HttpGet("[controller]/{id}")]
-        //[ProducesResponseType(StatusCodes.Status404NotFound)]
-        //[ProducesResponseType(typeof(Workspace), StatusCodes.Status200OK)]
-        //public async Task<IActionResult> Get(Guid id)
-        //{
-        //    var workspace = await _unitOfWork.Workspaces.GetByIdAsync(id, w => w.Logo);
-
-        //    if (workspace == null)
-        //    {
-        //        return NotFound(new ApiErrorResponse()
-        //        {
-        //            StatusCode = Enums.ApiStatusCode.NotFound,
-        //            StatusMessage = "Workspace not found"
-        //        });
-        //    }
-
-        //    var workspaceDto = _mapper.Map<WorkspaceResponseDto>(workspace);
-
-        //    return Ok(workspaceDto);
-        //}
 
         [HttpGet("[controller]/{id}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -118,7 +97,18 @@ namespace server.Controllers
                 Id = new Guid(),
                 Name = request.Name,
                 Description = request.Description,
-                OwnerId = ownerId
+                OwnerId = ownerId,
+            };
+
+            // Adding owner to workspace member
+            workspace.WorkspaceMembers = new List<WorkspaceMember>
+            {
+                new WorkspaceMember()
+                {
+                    AppUserId = ownerId,
+                    WorkspaceId = workspace.Id,
+                    Role = Enums.MemberRole.Admin
+                }
             };
 
             _unitOfWork.Workspaces.Add(workspace);

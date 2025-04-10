@@ -21,8 +21,8 @@ export default function BoardAdjustButton({
         <CustomizableButton
           intent='secondary'
           size='small'
-          className='px-4'
-          value={`${boardCount} boards`}
+          className='px-2'
+          value={`View boards (${boardCount})`}
         />
       )}
       renderContent={(closePopoverFn) => (

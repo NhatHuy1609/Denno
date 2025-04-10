@@ -11,7 +11,7 @@ function UserRemoveButton() {
           intent='secondary'
           size='small'
           value={`Remove`}
-          className='px-4'
+          className='px-2'
           startIcon={<FaXmark className='text-base' />}
         />
       )}
