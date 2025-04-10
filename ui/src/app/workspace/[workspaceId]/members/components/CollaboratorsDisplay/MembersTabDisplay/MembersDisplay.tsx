@@ -27,6 +27,31 @@ function MembersDisplay({ members = [], boardCounts }: MembersDisplayProps) {
     setSearchedName(value)
   }
 
+  const renderMemberDisplayItems = () => {
+    if (filteredMembers.length === 0) {
+      return (
+        <p className='text-center text-sm font-medium text-black'>
+          Uh oh, there's no one here by that name.
+          <br /> Should there be? Invite them now!
+        </p>
+      )
+    }
+
+    return (
+      <>
+        {filteredMembers?.map((member) => (
+          <MemberDisplayItem
+            key={member.id}
+            member={member}
+            joinedBoardCount={
+              joinedBoardCountsMap.get(member.id) ?? { idMember: '', boardCount: 0 }
+            }
+          />
+        ))}
+      </>
+    )
+  }
+
   return (
     <div className='w-full'>
       {/* Name filter input */}
@@ -39,15 +64,7 @@ function MembersDisplay({ members = [], boardCounts }: MembersDisplayProps) {
         />
       </div>
       <div className='mt-2 flex w-full flex-col divide-y divide-gray-300 py-2'>
-        {filteredMembers?.map((member) => (
-          <MemberDisplayItem
-            key={member.id}
-            member={member}
-            joinedBoardCount={
-              joinedBoardCountsMap.get(member.id) ?? { idMember: '', boardCount: 0 }
-            }
-          />
-        ))}
+        {renderMemberDisplayItems()}
       </div>
     </div>
   )

@@ -1,16 +1,16 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
-import PrimaryInputText from '@/app/_components/PrimaryInputText'
+import { useParams } from 'next/navigation'
 import { useUsersQuery } from '@/app/_hooks/query/user/useUsersQuery'
 import { userTypes } from '@/entities/user'
 import { useDebounce } from '@/app/_hooks/useDebounce'
-import SearchedUsersResult from './SearchedUsersResult'
-import InviteMemberDescriptionInput from './InviteMemberDescriptionInput'
+import useAddMultipleWorkspaceMemberMutation from '@/app/_hooks/mutation/workspace/useAddMultipleWorkspaceMember'
 import { FaLink } from 'react-icons/fa6'
 import { HiOutlineXMark } from 'react-icons/hi2'
-import CustomizableButton from '@/ui/components/CustomizableButton'
-import useAddMultipleWorkspaceMemberMutation from '@/app/_hooks/mutation/workspace/useAddMultipleWorkspaceMember'
-import { useParams } from 'next/navigation'
 import { toastError, toastSuccess } from '@/ui'
+import SearchedUsersResult from './SearchedUsersResult'
+import PrimaryInputText from '@/app/_components/PrimaryInputText'
+import CustomizableButton from '@/ui/components/CustomizableButton'
+import InviteMemberDescriptionInput from './InviteMemberDescriptionInput'
 
 type SearchedUserFilter = Pick<userTypes.UsersFilterQuery, 'email'>
 
@@ -19,7 +19,7 @@ type Props = {
 }
 
 export default function InviteMemberModalBody({ closeModalFn }: Props) {
-  const { workspaceId } = useParams()
+  const { workspaceId } = useParams<{ workspaceId: string }>()
 
   const inputRef = useRef<HTMLInputElement>(null)
   const descriptionInputRef = useRef<HTMLInputElement>(null)
@@ -44,12 +44,14 @@ export default function InviteMemberModalBody({ closeModalFn }: Props) {
     }
   })
 
+  // Fetch searched users using the debounced search term
+  // This will only trigger when the search term changes
   const searchedUserFilter: SearchedUserFilter = {
     email: debouncedSearchTerm
   }
-
   const { data: searchedUsers } = useUsersQuery(searchedUserFilter)
 
+  // Check if there are any searched users
   useEffect(() => {
     setShowSearchedUsersResult(Boolean(searchTerm))
   }, [searchTerm])
@@ -96,8 +98,9 @@ export default function InviteMemberModalBody({ closeModalFn }: Props) {
   )
 
   const handleAddWorkspaceMember = () => {
+    // Call mutation api to add members
     addWorkspaceMember({
-      workspaceId: workspaceId as string,
+      workspaceId,
       description: descriptionInputRef.current?.value || '',
       memberEmails: selectedUsers.map((user) => user.email)
     })
