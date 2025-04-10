@@ -53,34 +53,24 @@ namespace server.Services
             if (query.Members)
             {
                 // Load workspacemembers
-                await _dbContext.Entry(workspace)
-                        .Collection(w => w.WorkspaceMembers)
-                        .LoadAsync();
+                var workspaceMembers = await _dbContext.WorkspaceMembers
+                    .Include(wm => wm.AppUser)
+                    .Where(wm => wm.WorkspaceId == workspace.Id)
+                    .ToListAsync();
 
-                var members = workspace.WorkspaceMembers
-                    .Select(workspaceMember =>
+                var members = workspaceMembers
+                    .Select(wm =>
                     {
-                         _dbContext.Entry(workspaceMember)
-                            .Reference(wm => wm.AppUser)
-                            .Load();
-
                         return new MemberDto
                         {
-                            Id = workspaceMember.AppUserId,
-                            Email = workspaceMember.AppUser.Email,
-                            Avatar = workspaceMember.AppUser.Avatar,
-                            FullName = workspaceMember.AppUser.FullName,
-                            MemberType = workspaceMember.Role
+                            Id = wm.AppUserId,
+                            Email = wm.AppUser.Email,
+                            Avatar = wm.AppUser.Avatar,
+                            FullName = wm.AppUser.FullName,
+                            MemberType = wm.Role
                         };
                     })
                     .ToList();
-
-                foreach (var member in workspace.WorkspaceMembers)
-                {
-                    await _dbContext.Entry(member)
-                        .Reference(m => m.AppUser)
-                        .LoadAsync();
-                }
 
                 response.Members = members;
             }

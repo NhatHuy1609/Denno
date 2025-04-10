@@ -46,7 +46,10 @@ function NavigationMenu({
           <span className='flex-1 text-center text-sm font-medium text-slate-800'>
             {menuTitle || title}
           </span>
-          <button onClick={handleCloseNavigationMenu} className='rounded-md p-2 hover:bg-gray-200'>
+          <button
+            onClick={handleCloseNavigationMenu}
+            className='absolute right-[8px] top-[8px] rounded-md p-2 hover:bg-gray-200'
+          >
             <HiXMark className='text-sm' />
           </button>
         </div>

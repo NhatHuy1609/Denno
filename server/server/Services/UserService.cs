@@ -28,18 +28,13 @@ namespace server.Services
             switch (query.Filter)
             {
                 case FilterType.All:
-                    var invitedWorkspaces = await _dbContext.WorkspaceMembers
+                    var joinedWorkspaces = await _dbContext.WorkspaceMembers
                         .Include(wm => wm.Workspace)
                         .Where(wm => wm.AppUserId == userId)
                         .Select(wm => wm.Workspace)
                         .ToListAsync();
 
-                    var ownedWorkspaces = await _dbContext.Workspaces
-                        .Where(w => w.OwnerId == userId)
-                        .ToListAsync();
-
-                    workspaces.AddRange(invitedWorkspaces);
-                    workspaces.AddRange(ownedWorkspaces);
+                    workspaces.AddRange(joinedWorkspaces);
 
                     break;
                 default: // case FilterType.None will return an empty list of workspaces

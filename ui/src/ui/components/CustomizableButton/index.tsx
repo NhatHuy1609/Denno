@@ -13,7 +13,7 @@ const buttonVariants = cva(
         icon: ['bg-transparent justify-center']
       },
       size: {
-        small: ['text-sm', 'py-1.5', 'px-2'],
+        small: ['text-[13px]', 'py-1.5', 'px-2'],
         medium: ['text-base', 'py-2', 'px-3'],
         icon: ['aspect-square']
       },
