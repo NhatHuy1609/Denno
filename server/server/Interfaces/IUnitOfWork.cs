@@ -10,6 +10,7 @@
         ICardRepository Cards { get; }
         IWorkspaceMemberRepository WorkspaceMembers { get; }
         INotificationRepository Notifications { get; }
+        IInvitationSecretRepository InvitationSecrets { get; }
         int Complete();
     }
 }

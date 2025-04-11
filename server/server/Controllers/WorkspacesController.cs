@@ -7,10 +7,9 @@ using server.Constants;
 using server.Dtos.Requests.Workspace;
 using server.Dtos.Response;
 using server.Dtos.Response.Workspace;
-using server.Dtos.Response.Workspace.WorkspaceResponseDto2;
 using server.Entities;
+using server.Helpers;
 using server.Interfaces;
-using server.Models;
 using server.Models.Query;
 using server.Strategies.ActionStrategy;
 using System.Security.Claims;
@@ -265,6 +264,96 @@ namespace server.Controllers
 
             if (workspace == null)
                 return NotFound(new ApiErrorResponse() { StatusMessage = "Workspace not found" });
+
+            return Ok();
+        }
+
+        [HttpPost("[controller]/{id}/invitationSecret")]
+        public async Task<IActionResult> CreateInvitationSecretAsync(Guid id)
+        {
+            var invitationSecret = await _unitOfWork.InvitationSecrets.GetWorkspaceInvitationSecretAsync(id);
+
+            if (invitationSecret == null)
+            {
+                var newInvitationSecret = new InvitationSecret()
+                {
+                    SecretCode = SecretCodeGenerator.GenerateHexCode(),
+                    CreatedByUserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
+                    CreatedAt = DateTime.Now,
+                    ExpiresAt = DateTime.Now.AddDays(3),
+                    WorkspaceId = id
+                };
+
+                await _unitOfWork.InvitationSecrets.CreateAsync(newInvitationSecret);
+
+                return CreatedAtAction(
+                    nameof(CreateInvitationSecretAsync), 
+                    _mapper.Map<WorkspaceInvitationSecretResponseDto>(newInvitationSecret));
+            }
+
+            return Ok(_mapper.Map<WorkspaceInvitationSecretResponseDto>(invitationSecret));
+        }
+
+        [HttpGet("[controller]/{id}/invitationSecret")]
+        public async Task<IActionResult> GetWorkspaceInvitationSecretAsync(Guid id)
+        {
+            var invitationSecret = await _unitOfWork.InvitationSecrets.GetWorkspaceInvitationSecretAsync(id);
+
+            if (invitationSecret == null)
+            {
+                return NotFound(new ApiErrorResponse()
+                {
+                    StatusMessage = "InvitationSecret not found"
+                });
+            }
+
+            return Ok(_mapper.Map<WorkspaceInvitationSecretResponseDto>(invitationSecret));
+        }
+
+        [HttpGet("[controller]/{id}/invitationSecret/verification/{secretCode}")]
+        public async Task<IActionResult> VerifyWorkspaceInvitationSecretAsync(Guid id, string secretCode)
+        {
+            var invitationSecret = await _unitOfWork.InvitationSecrets.GetWorkspaceInvitationSecretAsync(id);
+
+            if (invitationSecret == null)
+            {
+                return NotFound(new ApiErrorResponse()
+                {
+                    StatusMessage = "Ivitation secret not found"
+                });
+            }
+
+            if (DateTime.Now > invitationSecret.ExpiresAt)
+            {
+                return BadRequest(new ApiErrorResponse()
+                {
+                    StatusMessage = "Invitation secret has expired"
+                });
+            }
+
+            if (string.IsNullOrEmpty(secretCode))
+            {
+                return BadRequest(new ApiErrorResponse
+                {
+                    StatusMessage = "Secret code is required."
+                });
+            }
+
+            if (invitationSecret.SecretCode != secretCode)
+            {
+                return BadRequest(new ApiErrorResponse
+                {
+                    StatusMessage = "Invalid secret code."
+                });
+            }
+
+            return NoContent();
+        }
+
+        [HttpDelete("[controller]/{workspaceId}/invitationSecret")]
+        public async Task<IActionResult> DisableInvitationSecretAsync(Guid workspaceId)
+        {
+            await _unitOfWork.InvitationSecrets.DeleteWorkspaceInvitationSecretAsync(workspaceId);
 
             return Ok();
         }

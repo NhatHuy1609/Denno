@@ -36,16 +36,13 @@ function SearchedUsersResult({
   // Check if the user is already a member of the workspace before allowing selection
   const handleSelectUser = (user: userTypes.User) => {
     const isAlreadyMember = members.some((member) => member.id === user.id)
-
-    if (isAlreadyMember) {
-      return
+    if (!isAlreadyMember) {
+      selectUserFn && selectUserFn(user)
     }
-
-    selectUserFn && selectUserFn(user)
   }
 
-  const renderSearchedUsersList = () => {
-    return (
+  return (
+    <div ref={containerRef} className='absolute mt-1 w-full rounded-sm bg-white p-2 shadow-md'>
       <SearchedUsersList users={searchedUserData}>
         {users.map((user) => (
           <SearchedUsersList.Item
@@ -58,12 +55,6 @@ function SearchedUsersResult({
           />
         ))}
       </SearchedUsersList>
-    )
-  }
-
-  return (
-    <div ref={containerRef} className='absolute mt-1 w-full rounded-sm bg-white p-2 shadow-md'>
-      {renderSearchedUsersList()}
     </div>
   )
 }
@@ -110,9 +101,13 @@ function SearchedUserItem({
   return (
     <li
       onClick={handleSelectUser}
-      className={cn('flex cursor-pointer items-center gap-2 rounded-sm p-2 hover:bg-gray-300', {
-        'cursor-not-allowed opacity-70': isAlreadyMember
+      className={cn('flex items-center gap-2 rounded-sm p-2 hover:bg-gray-300', {
+        'cursor-not-allowed opacity-70': isAlreadyMember,
+        'cursor-pointer': !isAlreadyMember
       })}
+      role='button'
+      aria-disabled={isAlreadyMember}
+      title={isAlreadyMember ? 'Already a member' : 'Click to add to workspace'}
     >
       <Avatar src={avatar} name='user-avatar' />
       <div className='flex w-full flex-col gap-1'>

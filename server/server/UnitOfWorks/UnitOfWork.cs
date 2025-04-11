@@ -13,8 +13,9 @@ namespace server.UnitOfWorks
         public IFileUploadRepository FileUploads { get; private set; }
         public ICardListRepository CardLists { get; private set; }
         public ICardRepository Cards { get; private set; }
-        public IWorkspaceMemberRepository WorkspaceMembers { get; set; }
-        public INotificationRepository Notifications { get; set; }
+        public IWorkspaceMemberRepository WorkspaceMembers { get; private set; }
+        public INotificationRepository Notifications { get; private set; }
+        public IInvitationSecretRepository InvitationSecrets { get; private set; }
 
         public UnitOfWork(ApplicationDBContext context)
         {
@@ -27,6 +28,7 @@ namespace server.UnitOfWorks
             FileUploads = new FileUploadRepository(context);
             WorkspaceMembers = new WorkspaceMemberRepository(context);
             Notifications = new NotificationRepository(context);
+            InvitationSecrets = new InvitationSecretRepository(context);
         }
 
         public int Complete()
