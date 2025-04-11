@@ -31,6 +31,7 @@ namespace server.Data
         public DbSet<DennoAction> Actions { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<NotificationRecipient> NotificationRecipients { get; set; }
+        public DbSet<InvitationSecret> InvitationSecrets { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
