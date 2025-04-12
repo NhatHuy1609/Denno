@@ -22,6 +22,10 @@ export const AddWorkspaceMemberDtoSchema = z.object({
   role: MemberRoleEnumSchema.optional().default('Normal')
 }).describe("AddWorkspaceMemberDtoSchema")
 
+export const VerifyWorkspaceInvitationSecretRequestDtoSchema = z.object({
+  secretCode: z.string()
+}).describe("VerifyWorkspaceInvitationSecretRequestDtoSchema")
+
 // Response
 export const WorkspaceResponseDtoSchema = z.object({
   id: z.string().uuid(),
@@ -54,3 +58,7 @@ export const AddWorkspaceMemberResponseDtoSchema = z.object({
   memberCreatorId: z.string(),
   targetUserId: z.string()
 }).describe("AddWorkspaceMemberResponseDtoSchema")
+
+export const WorkspaceInvitationSecretResponseDtoSchema = z.object({
+  secretCode: z.string()
+}).describe("WorkspaceInvitationSecretResponseDtoSchema")
