@@ -5,6 +5,8 @@ import {
   CreateWorkspaceDtoSchema,
   UpdateWorkspaceDtoSchema,
   UpdateWorkspaceLogoDtoSchema,
+  VerifyWorkspaceInvitationSecretRequestDtoSchema,
+  WorkspaceInvitationSecretResponseDtoSchema,
   WorkspaceResponseDtoSchema ,
   WorkspacesResponseDtoSchema
 } from './workspace.contracts'
@@ -14,7 +16,9 @@ export type CreateWorkspaceDto = z.infer<typeof CreateWorkspaceDtoSchema>
 export type UpdateWorkspaceDto = z.infer<typeof UpdateWorkspaceDtoSchema>
 export type UpdateWorkspaceLogoDto = z.infer<typeof UpdateWorkspaceLogoDtoSchema>
 export type AddWorkspaceMemberDto = z.infer<typeof AddWorkspaceMemberDtoSchema>
+export type VerifyWorkspaceInvitationSecretRequestDto = z.infer<typeof VerifyWorkspaceInvitationSecretRequestDtoSchema>
 // Response
 export type WorkspaceResponseDto = z.infer<typeof WorkspaceResponseDtoSchema>
 export type WorkspacesResponseDto = z.infer<typeof WorkspacesResponseDtoSchema>
 export type AddWorkspaceMemberResponseDto = z.infer<typeof AddWorkspaceMemberResponseDtoSchema>
+export type WorkspaceInvitationSecretResponseDto = z.infer<typeof WorkspaceInvitationSecretResponseDtoSchema>

@@ -2,6 +2,7 @@ import React from 'react'
 import { useParams } from 'next/navigation'
 import { useWorkspaceQuery } from '@/app/_hooks/query'
 import MembersPanel from './MembersPanel'
+import MembersLinkInvitation from './MembersLinkInvitation'
 
 function MembersTabDisplay() {
   const { workspaceId } = useParams<{ workspaceId: string }>()
@@ -21,6 +22,7 @@ function MembersTabDisplay() {
           the Workspace.
         </p>
       </div>
+      <MembersLinkInvitation />
       {detailedWorkspace && <MembersPanel workspace={detailedWorkspace} />}
     </div>
   )

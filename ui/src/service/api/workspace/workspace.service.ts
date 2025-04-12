@@ -1,4 +1,4 @@
-import { httpPost, httpGet, httpPut } from '../_req'
+import { httpPost, httpGet, httpPut, httpDel } from '../_req'
 import { AxiosContracts } from '@/lib/axios/AxiosContracts'
 import { 
   AddWorkspaceMemberDto, 
@@ -6,6 +6,8 @@ import {
   CreateWorkspaceDto, 
   UpdateWorkspaceDto, 
   UpdateWorkspaceLogoDto, 
+  VerifyWorkspaceInvitationSecretRequestDto, 
+  WorkspaceInvitationSecretResponseDto, 
   WorkspaceResponseDto 
 } from './workspace.types'
 
@@ -14,8 +16,9 @@ import {
   CreateWorkspaceDtoSchema,
   UpdateWorkspaceDtoSchema,
   UpdateWorkspaceLogoDtoSchema,
+  VerifyWorkspaceInvitationSecretRequestDtoSchema,
   WorkspaceResponseDtoSchema,
-  WorkspacesResponseDtoSchema 
+  WorkspacesResponseDtoSchema,
 } from './workspace.contracts'
 
 import { WorkspaceQueryParamsDto } from '../_models/query-models/workspace/workspace.types'
@@ -64,5 +67,29 @@ export class WorkspaceService {
     )
 
     return httpPost<AddWorkspaceMemberResponseDto>(`${this.basePath}/${data.workspaceId}/members`, addWorkspaceMemberDto)
+  }
+
+  static workspaceInvitationSecretQuery(workspaceId: string) {
+    return httpGet<WorkspaceInvitationSecretResponseDto>(`${this.basePath}/${workspaceId}/invitationSecret`)
+  }
+
+  static createWorkspaceInvitationSecretMutation(workspaceId: string) {
+    return httpPost<WorkspaceInvitationSecretResponseDto>(`${this.basePath}/${workspaceId}/invitationSecret`)
+  }
+
+  static disableWorkspaceInvitationSecretMutation(workspaceId: string) {
+    return httpDel(`${this.basePath}/${workspaceId}/invitationSecret`)
+  }
+
+  static verifyInvitationSecretMutation(data: { workspaceId: string, verifyInvitationSecretDto: VerifyWorkspaceInvitationSecretRequestDto }) {
+    const verifyInvitationSecretDto = AxiosContracts.requestContract(
+      VerifyWorkspaceInvitationSecretRequestDtoSchema,
+      data.verifyInvitationSecretDto
+    )
+
+    return httpPost(
+      `${this.basePath}/${data.workspaceId}/invitationSecret/verify`,
+      verifyInvitationSecretDto
+    )
   }
 }

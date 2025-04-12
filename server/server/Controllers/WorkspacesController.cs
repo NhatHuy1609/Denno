@@ -310,8 +310,8 @@ namespace server.Controllers
             return Ok(_mapper.Map<WorkspaceInvitationSecretResponseDto>(invitationSecret));
         }
 
-        [HttpGet("[controller]/{id}/invitationSecret/verification/{secretCode}")]
-        public async Task<IActionResult> VerifyWorkspaceInvitationSecretAsync(Guid id, string secretCode)
+        [HttpPost("[controller]/{id}/invitationSecret/verification/{secretCode}")]
+        public async Task<IActionResult> VerifyInvitationSecretAsync(Guid id, string secretCode)
         {
             var invitationSecret = await _unitOfWork.InvitationSecrets.GetWorkspaceInvitationSecretAsync(id);
 
@@ -347,7 +347,7 @@ namespace server.Controllers
                 });
             }
 
-            return NoContent();
+            return Ok();
         }
 
         [HttpDelete("[controller]/{workspaceId}/invitationSecret")]
