@@ -1,9 +1,14 @@
 import React from 'react'
-import InviteWithLinkButton from './InviteWithLinkButton'
 import { useParams } from 'next/navigation'
+import { useInvitationSecretQuery } from '@/app/_hooks/query/workspace/useWorkspaceInvitationSecretQuery'
+import InviteWithLinkButton from './InviteWithLinkButton'
+import DisableLinkButton from './DisableLinkButton'
 
 export default function MembersLinkInvitation() {
   const { workspaceId } = useParams<{ workspaceId: string }>()
+  const { data: invitationSecret, isError } = useInvitationSecretQuery(workspaceId)
+
+  const showDisableLinkButton = Boolean(invitationSecret?.secretCode) && !isError
 
   return (
     <div className='w-full py-6'>
@@ -15,7 +20,7 @@ export default function MembersLinkInvitation() {
           collaborator limit.
         </p>
         <div className='flex h-fit w-[70%] justify-end gap-4'>
-          {/* <DisableLinkButton /> */}
+          {showDisableLinkButton && <DisableLinkButton workspaceId={workspaceId} />}
           <InviteWithLinkButton workspaceId={workspaceId} />
         </div>
       </div>
