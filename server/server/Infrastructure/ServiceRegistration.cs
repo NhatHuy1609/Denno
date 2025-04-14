@@ -51,6 +51,7 @@ namespace server.Infrastructure
             // Factories
             services.AddScoped<NotificationResponseFactoryResolver>();
             services.AddScoped<AddedMemberWorkspaceNotificationResponseFactory>();
+            services.AddScoped<JoinWorkspaceWithLinkNotificationResponseFactory>();
 
             return services;
         }

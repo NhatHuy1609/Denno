@@ -19,6 +19,7 @@ namespace server.Factories
             return actionType switch
             {
                 ActionTypes.AddMemberToWorkspace => new AddWorkspaceMemberStrategy(_dbContext),
+                ActionTypes.JoinWorkspaceByLink => new JoinWorkspaceByLinkStrategy(_dbContext),
                 _ => throw new ArgumentException($"Unsupported action type: {actionType}")
             };
         }

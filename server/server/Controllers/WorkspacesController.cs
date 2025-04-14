@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using server.Constants;
 using server.Dtos.Requests.Workspace;
 using server.Dtos.Response;
+using server.Dtos.Response.Action;
 using server.Dtos.Response.Workspace;
 using server.Entities;
 using server.Helpers;
@@ -253,7 +254,7 @@ namespace server.Controllers
                 });
             }
 
-            return Ok(_mapper.Map<AddWorkspaceResponseDto>(action));
+            return Ok(_mapper.Map<AddWorkspaceMemberActionResponse>(action));
         }
 
         [HttpGet("[controller]/{id}/members")]
@@ -286,9 +287,7 @@ namespace server.Controllers
 
                 await _unitOfWork.InvitationSecrets.CreateAsync(newInvitationSecret);
 
-                return CreatedAtAction(
-                    nameof(CreateInvitationSecretAsync), 
-                    _mapper.Map<WorkspaceInvitationSecretResponseDto>(newInvitationSecret));
+                return Ok(_mapper.Map<WorkspaceInvitationSecretResponseDto>(newInvitationSecret));
             }
 
             return Ok(_mapper.Map<WorkspaceInvitationSecretResponseDto>(invitationSecret));
@@ -356,6 +355,52 @@ namespace server.Controllers
             await _unitOfWork.InvitationSecrets.DeleteWorkspaceInvitationSecretAsync(workspaceId);
 
             return Ok();
+        }
+
+        [HttpPost("[controller]/{workspaceId}/joinByLink")]
+        public async Task<IActionResult> JoinWorkspaceByLink(Guid workspaceId)
+        {
+            var workspace = await _unitOfWork.Workspaces.GetWorkspaceWithMembersAsync(workspaceId);
+            if (workspace == null)
+                return NotFound(new ApiErrorResponse { StatusMessage = "Workspace not found" });
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Check if user has already existed in workspace
+            var isExisted = workspace.WorkspaceMembers.Any(wm => wm.AppUserId == userId);
+            if (isExisted)
+            {
+                return Conflict(new ApiErrorResponse()
+                {
+                    StatusMessage = "User is already a member of this workspace."
+                });
+            }
+
+            var actionContext = new DennoActionContext()
+            {
+                MemberCreatorId = userId,
+                WorkspaceId = workspaceId
+            };
+
+            var action = await _actionService.CreateActionAsync(ActionTypes.JoinWorkspaceByLink, actionContext);
+
+            if (action != null)
+            {
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await _emailService.SendActionEmailAsync(action);
+                        _logger.LogInformation("Successfully sent email to workspace's memberse to notify about new joined member");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"Failed to send action notification email after retries: {ex.Message}");
+                    }
+                });
+            }
+
+            return Ok(_mapper.Map<JoinWorkspaceByLinkActionResponse>(action));
         }
     }
 }

@@ -4,5 +4,6 @@
     {
         public const string AddMemberToWorkspace = "addMemberToWorkspace";
         public const string AddMemberToBoard = "addMemberToBoard";
+        public const string JoinWorkspaceByLink = "joinWorkspaceByLink";
     }
 }

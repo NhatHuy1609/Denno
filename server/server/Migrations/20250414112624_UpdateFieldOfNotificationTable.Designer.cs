@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using server.Data;
 
@@ -11,9 +12,11 @@ using server.Data;
 namespace server.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250414112624_UpdateFieldOfNotificationTable")]
+    partial class UpdateFieldOfNotificationTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1227,7 +1230,7 @@ namespace server.Migrations
             modelBuilder.Entity("server.Entities.NotificationRecipient", b =>
                 {
                     b.HasOne("server.Entities.Notification", "Notification")
-                        .WithMany("NotificationRecipients")
+                        .WithMany()
                         .HasForeignKey("NotificationId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
@@ -1345,11 +1348,6 @@ namespace server.Migrations
             modelBuilder.Entity("server.Entities.CardList", b =>
                 {
                     b.Navigation("Cards");
-                });
-
-            modelBuilder.Entity("server.Entities.Notification", b =>
-                {
-                    b.Navigation("NotificationRecipients");
                 });
 
             modelBuilder.Entity("server.Entities.Restriction", b =>

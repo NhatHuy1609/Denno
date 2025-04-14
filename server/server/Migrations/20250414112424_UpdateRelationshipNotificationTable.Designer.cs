@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using server.Data;
 
@@ -11,9 +12,11 @@ using server.Data;
 namespace server.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250414112424_UpdateRelationshipNotificationTable")]
+    partial class UpdateRelationshipNotificationTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -775,9 +778,14 @@ namespace server.Migrations
                     b.Property<bool>("IsRead")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("NotificationId1")
+                        .HasColumnType("int");
+
                     b.HasKey("RecipientId", "NotificationId");
 
                     b.HasIndex("NotificationId");
+
+                    b.HasIndex("NotificationId1");
 
                     b.ToTable("NotificationRecipients");
                 });
@@ -1227,10 +1235,14 @@ namespace server.Migrations
             modelBuilder.Entity("server.Entities.NotificationRecipient", b =>
                 {
                     b.HasOne("server.Entities.Notification", "Notification")
-                        .WithMany("NotificationRecipients")
+                        .WithMany()
                         .HasForeignKey("NotificationId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.HasOne("server.Entities.Notification", null)
+                        .WithMany("NotificationRecipients")
+                        .HasForeignKey("NotificationId1");
 
                     b.HasOne("server.Entities.AppUser", "Recipient")
                         .WithMany("NotificationRecipients")
