@@ -19,6 +19,7 @@ namespace server.Factories.NotificationResponseFactory
             return actionType switch
             {
                 ActionTypes.AddMemberToWorkspace => _serviceProvider.GetService<AddedMemberWorkspaceNotificationResponseFactory>(),
+                ActionTypes.JoinWorkspaceByLink => _serviceProvider.GetService<JoinWorkspaceWithLinkNotificationResponseFactory>(),
                 // Add more action types as needed
                 _ => throw new ArgumentException($"No factory found for action type: {actionType}")
             };

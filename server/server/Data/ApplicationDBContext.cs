@@ -237,7 +237,7 @@ namespace server.Data
 
             modelBuilder.Entity<NotificationRecipient>()
                 .HasOne(n => n.Notification)
-                .WithMany()
+                .WithMany(n => n.NotificationRecipients)
                 .HasForeignKey(n => n.NotificationId)
                 .OnDelete(DeleteBehavior.NoAction);
         }

@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using server.Dtos.Response.Workspace;
+using server.Dtos.Response.Action;
 using server.Entities;
 
 namespace server.Models.MapperProfile
@@ -8,7 +8,8 @@ namespace server.Models.MapperProfile
     {
         public DennoActionProfile()
         {
-            CreateMap<DennoAction, AddWorkspaceResponseDto>();
+            CreateMap<DennoAction, AddWorkspaceMemberActionResponse>();
+            CreateMap<DennoAction, JoinWorkspaceByLinkActionResponse>();
         }
     }
 }

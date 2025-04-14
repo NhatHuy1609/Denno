@@ -26,6 +26,10 @@ namespace server.Services
                 { 
                     ActionTypes.AddMemberToWorkspace,
                     action => $"{action.MemberCreator?.FullName} added {action.TargetUser?.FullName} to workspace {action.Workspace?.Name}"
+                },
+                {
+                    ActionTypes.JoinWorkspaceByLink,
+                    action => $"{action.MemberCreator?.FullName} is now a member of the Workspace {action.Workspace?.Name}. Help them get started by adding them to a card in any board."
                 }
             };
         }

@@ -109,22 +109,40 @@ namespace server.Services
             await SendEmailAsync(emailData, true);
         }
 
-        private EmailData BuildNotificationEmailData(DennoAction action)
+        public async Task SendActionEmailAsync(DennoAction action)
         {
-            if (action == null)
-                throw new ArgumentNullException(nameof(action), "Action cannot be null");
+            // Take notification recipients who will receive email about action
+            var notification = await _dbContext.Notifications
+                .FirstOrDefaultAsync(n => n.ActionId == action.Id);
 
-            if (action.TargetUser == null)
-                throw new ArgumentNullException(nameof(action.TargetUser), "Recipient cannot be null");
+            if (notification == null)
+                throw new ArgumentNullException("");
+
+            var recipients = await _dbContext.NotificationRecipients
+                .Include(n => n.Recipient)
+                .Where(n => n.NotificationId == notification.Id)
+                .ToListAsync();
+
+            // Send emails in parallel instead of waiting for each one sequentiall
+            var emailTasks = recipients.Select(recipient =>
+            {
+                var mailData = BuildNotificationEmailData(recipient.Recipient.Email, action);
+                return SendEmailAsync(mailData, true);
+            });
+
+            await Task.WhenAll(emailTasks);
+        }
+
+        private EmailData BuildNotificationEmailData(string recipientEmail, DennoAction action)
+        {
+            if (string.IsNullOrEmpty(recipientEmail))
+                throw new ArgumentNullException("Recipient email cannot be null");
 
             var message = _notificationService?.BuildActionNotificationMessage(action)
                 ?? throw new ArgumentNullException(nameof(_notificationService), "Notification service cannot be null");
 
-            if (string.IsNullOrEmpty(action.TargetUser.Email))
-                throw new ArgumentException("Target user email cannot be null or empty", nameof(action.TargetUser.Email));
-
-            string id = action.TargetUser.Email;
-            string name = action.TargetUser.Email;
+            string id = recipientEmail;
+            string name = recipientEmail;
             string subject = message;
             string body = "";
 
@@ -134,11 +152,17 @@ namespace server.Services
                 SenderName = action.MemberCreator?.FullName ?? "Unknown Sender"
             };
 
+            var templatePath = "";
+
             switch (action.ActionType)
             {
                 case ActionTypes.AddMemberToWorkspace:
-                    var templatePath = File.ReadAllText(GetTemplatePath("NotificationTemplate.cshtml"));
+                    templatePath = File.ReadAllText(GetTemplatePath("NotificationTemplate.cshtml"));
                     body = Engine.Razor.RunCompile(templatePath, "addMemberToWorkspaceTemplate", typeof(NotificationTemplateModel), notificationEmailModel);
+                    break;
+                case ActionTypes.JoinWorkspaceByLink:
+                    templatePath = File.ReadAllText(GetTemplatePath("LatestNewsEmailTemplate.cshtml"));
+                    body = Engine.Razor.RunCompile(templatePath, "joinWorkspaceByLink", typeof(NotificationTemplateModel), notificationEmailModel);
                     break;
                 default:
                     throw new ArgumentException("Failed to build notification email due to action not being found.");
@@ -156,13 +180,6 @@ namespace server.Services
         public static string GetTemplatePath(string templateFileName)
         {
             return Path.Combine(Directory.GetCurrentDirectory(), "Helpers", "HtmlTemplates", templateFileName);
-        }
-
-        public async Task SendActionEmailAsync(DennoAction action)
-        {
-            var emailData = BuildNotificationEmailData(action);
-
-            await SendEmailAsync(emailData, true);
         }
     }
 }
