@@ -1,8 +1,8 @@
 'use client'
 
-import LandingHeader from '../LandingHeader'
 import Link from 'next/link'
 import { FaBolt, FaCheckCircle, FaTh, FaUsers } from 'react-icons/fa'
+import LandingHeader from '@/app/_components/LandingHeader'
 
 export default function General() {
   return (

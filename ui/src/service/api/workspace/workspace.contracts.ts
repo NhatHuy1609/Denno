@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { MemberRoleEnumSchema } from '../_enums/enums.contracts'
+import { GetUserResponseDtoSchema } from '../user/user.contracts'
 
 // Request
 export const CreateWorkspaceDtoSchema = z.object({
@@ -62,3 +63,8 @@ export const AddWorkspaceMemberResponseDtoSchema = z.object({
 export const WorkspaceInvitationSecretResponseDtoSchema = z.object({
   secretCode: z.string()
 }).describe("WorkspaceInvitationSecretResponseDtoSchema")
+
+export const DetailedWorkspaceInvitationResponseDtoSchema= z.object({
+  inviter: GetUserResponseDtoSchema,
+  workspace: WorkspaceResponseDtoSchema
+}).describe('DetailedWorkspaceInvitationResponseDtoSchema')

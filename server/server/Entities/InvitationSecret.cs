@@ -1,12 +1,17 @@
-﻿namespace server.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace server.Entities
 {
     public class InvitationSecret
     {
+        [Key]
         public int Id { get; set; }
         public string SecretCode { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime ExpiresAt { get; set; }
-        public string CreatedByUserId { get; set; }
+
+        public string InviterId { get; set; }
+        public AppUser Inviter { get; set; }
 
         public Guid? BoardId { get; set; }
         public virtual Board? Board { get; set; }

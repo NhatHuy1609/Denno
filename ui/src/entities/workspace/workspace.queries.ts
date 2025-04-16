@@ -1,6 +1,6 @@
 import { WorkspaceService } from '@/service/api/workspace'
 import { queryOptions } from '@tanstack/react-query'
-import { mapToInvitationSecret, transformWorkspaceDtoToWorkspace } from './workspace.lib'
+import { mapToDetailedWorkspaceInvitation, mapToInvitationSecret, transformWorkspaceDtoToWorkspace } from './workspace.lib'
 import { WorkspaceFilterQuery } from './workspace.types'
 import { WorkspaceQueryParamsDto } from '@/service/api/_models/query-models/workspace/workspace.types'
 
@@ -29,6 +29,16 @@ export class WorkspaceQueries {
       queryFn: async ({ signal }) => {
         const response = await WorkspaceService.workspaceInvitationSecretQuery(workspaceId)
         return mapToInvitationSecret(response.data)
+      }
+    })
+  }
+
+  static detailedWorkspaceInvitationQuery(workspaceId: string) {
+    return queryOptions({
+      queryKey: [...this.keys.root, 'invitationSecret', workspaceId, 'detailed'] as unknown[],
+      queryFn: async ({ signal }) => {
+        const response = await WorkspaceService.detailedWorkspaceInvitationSecretQuery(workspaceId)
+        return mapToDetailedWorkspaceInvitation(response.data)
       }
     })
   }

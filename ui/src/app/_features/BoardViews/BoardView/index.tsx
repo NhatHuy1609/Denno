@@ -1,6 +1,6 @@
 import React from 'react'
 import { useParams } from 'next/navigation'
-import { useCardListsByBoards } from '@/app/_hooks/query/useCardListsByBoard'
+import { useCardListsByBoards } from '@/app/_hooks/query/cardList/useCardListsByBoard'
 import SortableCardLists from './components/SortableCardLists'
 
 function BoardView() {

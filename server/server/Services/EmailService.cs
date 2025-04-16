@@ -138,6 +138,7 @@ namespace server.Services
             if (string.IsNullOrEmpty(recipientEmail))
                 throw new ArgumentNullException("Recipient email cannot be null");
 
+            // Creating message for email
             var message = _notificationService?.BuildActionNotificationMessage(action)
                 ?? throw new ArgumentNullException(nameof(_notificationService), "Notification service cannot be null");
 

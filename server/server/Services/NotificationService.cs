@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Serilog.Events;
 using server.Constants;
 using server.Data;
 using server.Dtos.Response.Notification.Interfaces;

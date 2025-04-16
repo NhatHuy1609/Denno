@@ -2,7 +2,7 @@
 {
     public class AddWorkspaceMemberActionResponse
     {
-        public Guid ActionId { get; set; }
+        public Guid Id { get; set; }
         public DateTime Date { get; set; }
         public string ActionType { get; set; }
         public string WorkspaceId { get; set; }

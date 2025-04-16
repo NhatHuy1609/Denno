@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { 
+  DetailedWorkspaceInvitationSchema,
   WorkspaceFilterQuerySchema,
   WorkspaceSchema,
   WorkspacesSchema
@@ -8,3 +9,4 @@ import {
 export type Workspace = z.infer<typeof WorkspaceSchema>
 export type Workspaces = z.infer<typeof WorkspacesSchema>
 export type WorkspaceFilterQuery = z.infer<typeof WorkspaceFilterQuerySchema>
+export type DetailedWorkspaceInvitation = z.infer<typeof DetailedWorkspaceInvitationSchema>

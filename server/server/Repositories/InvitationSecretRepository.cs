@@ -31,9 +31,19 @@ namespace server.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
+        public async Task<InvitationSecret?> GetWorkspaceInvitationBySecretCodeAsync(Guid workspaceId, string secretCode)
+        {
+            return await _dbContext.InvitationSecrets
+                .Include(i => i.Inviter)
+                .Include(i => i.Workspace)
+                .FirstOrDefaultAsync(i => i.WorkspaceId == workspaceId && i.SecretCode == secretCode);
+        }
+
         public async Task<InvitationSecret?> GetWorkspaceInvitationSecretAsync(Guid workspaceId)
         {
             return await _dbContext.InvitationSecrets
+                .Include(i => i.Inviter)
+                .Include(i => i.Workspace)
                 .FirstOrDefaultAsync(i => i.WorkspaceId == workspaceId);  
         }
     }
