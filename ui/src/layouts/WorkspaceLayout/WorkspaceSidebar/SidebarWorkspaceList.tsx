@@ -11,7 +11,7 @@ import { IoIosSettings } from 'react-icons/io'
 import { Collapsible } from '@/ui'
 import WorkspaceLogo from '@/app/_components/WorkspaceLogo'
 import { useWorkspaceQuery } from '@/app/_hooks/query'
-import useCurrentUserWorkspacesQuery from '@/app/_hooks/query/useCurrentUserWorkspacesQuery'
+import useCurrentUserWorkspacesQuery from '@/app/_hooks/query/user/useCurrentUserWorkspacesQuery'
 
 interface IWorkspaceSubItem {
   title: string

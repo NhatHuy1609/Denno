@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using server.Dtos.Response.InvitationSecret;
 using server.Dtos.Response.Workspace;
 using server.Entities;
 
@@ -9,6 +10,7 @@ namespace server.Models.MapperProfile
         public InvitationSecretProfile()
         {
             CreateMap<InvitationSecret, WorkspaceInvitationSecretResponseDto>();
+            CreateMap<InvitationSecret, DetailedWorkspaceInvitationSecretResponse>();
         }
     }
 }

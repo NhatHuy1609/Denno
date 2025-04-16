@@ -11,10 +11,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Helpers\HtmlTemplates\LatestNewsEmailTemplate.cshtml" />
     <Content Remove="Helpers\HtmlTemplates\NotificationTemplate.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Helpers\HtmlTemplates\LatestNewsEmailTemplate.cshtml" />
     <None Include="Helpers\HtmlTemplates\NotificationTemplate.cshtml" />
   </ItemGroup>
 

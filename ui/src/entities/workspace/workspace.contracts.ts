@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { UserSchema } from '../user/user.contracts';
 
 export const WorkspaceSchema = z.object({
   id: z.string().uuid(),
@@ -28,3 +29,15 @@ export const WorkspaceFilterQuerySchema = z.object({
   members: z.coerce.boolean().default(false).optional(),
   memberFields: z.string().optional()
 }).optional().describe('WorkspaceFilterQuerySchema');
+
+export const DetailedWorkspaceInvitationSchema = z.object({
+  inviter: UserSchema.pick({
+    id: true,
+    fullName: true,
+    email: true
+  }),
+  workspace: WorkspaceSchema.pick({
+    id: true,
+    name: true
+  })
+}).describe('DetailedWorkspaceInvitationSchema')

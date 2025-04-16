@@ -18,6 +18,7 @@ export const useQueryParamState = <T extends number | string>(
   const pathname = usePathname();
   const router = useRouter();
 
+  // Set the default value in the URL if it is not already set
   useEffect(() => {
     if (defaultValue) {
       const params = new URLSearchParams(searchParams.toString())
@@ -27,6 +28,7 @@ export const useQueryParamState = <T extends number | string>(
     }
   }, [defaultValue])
 
+  // Update the state when the URL changes
   useEffect(() => {
     const paramValue = searchParams.get(key);
     if (paramValue !== null) {

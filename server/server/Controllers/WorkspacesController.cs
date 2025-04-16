@@ -7,6 +7,7 @@ using server.Constants;
 using server.Dtos.Requests.Workspace;
 using server.Dtos.Response;
 using server.Dtos.Response.Action;
+using server.Dtos.Response.InvitationSecret;
 using server.Dtos.Response.Workspace;
 using server.Entities;
 using server.Helpers;
@@ -279,7 +280,7 @@ namespace server.Controllers
                 var newInvitationSecret = new InvitationSecret()
                 {
                     SecretCode = SecretCodeGenerator.GenerateHexCode(),
-                    CreatedByUserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
+                    InviterId = User.FindFirstValue(ClaimTypes.NameIdentifier),
                     CreatedAt = DateTime.Now,
                     ExpiresAt = DateTime.Now.AddDays(3),
                     WorkspaceId = id
@@ -309,8 +310,21 @@ namespace server.Controllers
             return Ok(_mapper.Map<WorkspaceInvitationSecretResponseDto>(invitationSecret));
         }
 
-        [HttpPost("[controller]/{id}/invitationSecret/verification/{secretCode}")]
-        public async Task<IActionResult> VerifyInvitationSecretAsync(Guid id, string secretCode)
+        [HttpGet("[controller]/{id}/invitationSecret/detailed")]
+        public async Task<IActionResult> GetDetailedInvitationSecretAsync(Guid id)
+        {
+            var detailedInvitation = await _unitOfWork.InvitationSecrets.GetWorkspaceInvitationSecretAsync(id);
+
+            if (detailedInvitation == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(_mapper.Map<DetailedWorkspaceInvitationSecretResponse>(detailedInvitation));
+        }
+
+        [HttpPost("[controller]/{id}/invitationSecret/verification")]
+        public async Task<IActionResult> VerifyInvitationSecretAsync(Guid id, VerifyWorkspaceInvitationSecretRequest request)
         {
             var invitationSecret = await _unitOfWork.InvitationSecrets.GetWorkspaceInvitationSecretAsync(id);
 
@@ -330,7 +344,7 @@ namespace server.Controllers
                 });
             }
 
-            if (string.IsNullOrEmpty(secretCode))
+            if (string.IsNullOrEmpty(request.SecretCode))
             {
                 return BadRequest(new ApiErrorResponse
                 {
@@ -338,7 +352,7 @@ namespace server.Controllers
                 });
             }
 
-            if (invitationSecret.SecretCode != secretCode)
+            if (invitationSecret.SecretCode != request.SecretCode)
             {
                 return BadRequest(new ApiErrorResponse
                 {
@@ -395,7 +409,7 @@ namespace server.Controllers
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"Failed to send action notification email after retries: {ex.Message}");
+                        _logger.LogError($"Failed to send email to workspace's memberse to notify about new joined member after retries: {ex.Message}");
                     }
                 });
             }

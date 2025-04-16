@@ -717,12 +717,12 @@ namespace server.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CreatedByUserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("InviterId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("SecretCode")
                         .IsRequired()
@@ -734,6 +734,8 @@ namespace server.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BoardId");
+
+                    b.HasIndex("InviterId");
 
                     b.HasIndex("WorkspaceId");
 
@@ -1204,11 +1206,19 @@ namespace server.Migrations
                         .WithMany()
                         .HasForeignKey("BoardId");
 
+                    b.HasOne("server.Entities.AppUser", "Inviter")
+                        .WithMany()
+                        .HasForeignKey("InviterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("server.Entities.Workspace", "Workspace")
                         .WithMany()
                         .HasForeignKey("WorkspaceId");
 
                     b.Navigation("Board");
+
+                    b.Navigation("Inviter");
 
                     b.Navigation("Workspace");
                 });

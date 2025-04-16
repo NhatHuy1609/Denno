@@ -3,4 +3,5 @@ export enum PersistedStateKey  {
   Token = 'token',
   RefreshToken = 'refreshToken',
   RecentAccessWorkspace = 'recentAccessWorkspace',
+  Invitation = 'invitation'
 }
