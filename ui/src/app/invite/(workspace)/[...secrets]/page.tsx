@@ -4,7 +4,6 @@ import React, { useEffect } from 'react'
 import { setLocalStorageItem } from '@/utils/local-storage'
 import { PersistedStateKey } from '@/data/persisted-keys'
 import { setFixLoading } from '@/ui'
-import { generateWorkspaceInvitationLink } from '@/utils/invitation-link'
 import { useParams, useRouter } from 'next/navigation'
 import useVerifyWorkspaceInvitationSecret from '@/app/_hooks/mutation/workspace/useVerifyWorkspaceInvitationSecret'
 
