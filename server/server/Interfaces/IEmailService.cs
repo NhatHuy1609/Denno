@@ -1,4 +1,5 @@
-﻿using server.Entities;
+﻿using server.Data;
+using server.Entities;
 using server.Enums;
 using server.Models;
 
@@ -8,6 +9,7 @@ namespace server.Interfaces
     {
         Task<bool> SendEmailAsync(EmailData mailData, bool isHtmlBody);
         Task SendActionEmailAsync(DennoAction action);
+        void SendActionEmailInBackgroundAsync(DennoAction action);
         Task SendConfirmationRegisterAccountEmailAsync(string email, AppUser user);
     }
 }

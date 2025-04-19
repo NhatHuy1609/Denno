@@ -19,6 +19,8 @@ using server.Infrastructure.Providers;
 using server.Interfaces;
 using server.Repositories;
 using server.Services;
+using server.Services.Email;
+using server.Services.QueueHostedService;
 using server.UnitOfWorks;
 
 namespace server.Infrastructure
@@ -30,8 +32,6 @@ namespace server.Infrastructure
             services.AddHttpClient<GoogleService>();
             services.AddScoped<IGoogleService, GoogleService>();
             services.AddScoped<IAuthService, AuthService>();
-            services.AddScoped<IEmailService, EmailService>();
-            services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IDataStore, EFGoogleDataStore>();
             services.AddScoped<IFileUploadService, FileUploadService>();
             services.AddScoped<IWorkspaceService, WorkspaceService>();
@@ -39,6 +39,8 @@ namespace server.Infrastructure
             #region Repositories
             services.AddTransient<IWorkspaceRepository, WorkspaceRepository>();
             #endregion
+            services.AddTransient<INotificationService, NotificationService>();
+            services.AddTransient<IEmailService, EmailService>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddTransient<IActionService, ActionService>();
             services.AddTransient<ActionFactory, ActionFactory>();
@@ -52,6 +54,9 @@ namespace server.Infrastructure
             services.AddScoped<NotificationResponseFactoryResolver>();
             services.AddScoped<AddedMemberWorkspaceNotificationResponseFactory>();
             services.AddScoped<JoinWorkspaceWithLinkNotificationResponseFactory>();
+
+            services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+            services.AddHostedService<QueueHostedService>();
 
             return services;
         }
