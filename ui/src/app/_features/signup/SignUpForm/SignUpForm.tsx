@@ -12,6 +12,8 @@ import { LuMail, LuUser2, LuLock } from 'react-icons/lu'
 import { Button, Form, messageError, setFixLoading } from '@/ui'
 import SignInGoogleButton from '../../Signin/SignInForm/SignInGoogleButton'
 import AvatarInput from '@/app/(auth)/sign-up/complete-signup/AvatarInput'
+import { getLocalStorageItem, setLocalStorageItem } from '@/utils/local-storage'
+import { PersistedStateKey } from '@/data/persisted-keys'
 
 type RegisterUserFormData = authTypesDto.RegisterUserDto
 
@@ -28,13 +30,18 @@ export default function SignUpForm() {
 
   const { mutate: registerUser, isPending } = useRegisterUserMutation({
     onSuccess: async (response) => {
+      const redirectAfterLoginPath = getLocalStorageItem(PersistedStateKey.RedirectAfterLogin)
+      if (redirectAfterLoginPath) {
+        router.push(redirectAfterLoginPath)
+        return
+      }
+
       if (response.status === 200) {
         setFixLoading(true)
         router.push('/sign-up/validate-email')
         setFixLoading(false)
       }
     },
-
     onError(error) {
       const { message, field } = authApiLib.getDetailedError(error)
       if (field) {
@@ -45,6 +52,9 @@ export default function SignUpForm() {
       } else {
         messageError(message)
       }
+    },
+    onSettled: () => {
+      setLocalStorageItem(PersistedStateKey.RedirectAfterLogin, '/')
     }
   })
 
