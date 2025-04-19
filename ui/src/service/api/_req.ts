@@ -29,41 +29,41 @@ instance.interceptors.request.use(
 
 instance.interceptors.response.use(
   (response) => response,
-  (error) => {
-    const originalRequest = error.config;
-    const { statusCode, errorType } = authApiLib.getDetailedError(error)
-    if (statusCode === 401 && errorType === 'ExpiredToken' && !originalRequest._retry) {
-      originalRequest._retry = true;
+  // (error) => {
+  //   const originalRequest = error.config;
+  //   const { statusCode, errorType } = authApiLib.getDetailedError(error)
+  //   if (statusCode === 401 && errorType === 'ExpiredToken' && !originalRequest._retry) {
+  //     originalRequest._retry = true;
 
-      // Taking old session to refresh
-      const token = getLocalStorageItem(PersistedStateKey.Token)
-      const refreshToken = getLocalStorageItem(PersistedStateKey.RefreshToken)
-      const data = {
-        jwtToken: token,
-        refreshToken
-      }
+  //     // Taking old session to refresh
+  //     const token = getLocalStorageItem(PersistedStateKey.Token)
+  //     const refreshToken = getLocalStorageItem(PersistedStateKey.RefreshToken)
+  //     const data = {
+  //       jwtToken: token,
+  //       refreshToken
+  //     }
 
-      req.post('/auth/refresh', data)
-        .then(response => {
-          const { accessToken, refreshToken } = response.data
-          console.log(response)
-          store.dispatch(updateSession({
-            token: accessToken,
-            refreshToken
-          }))
+  //     req.post('/auth/refresh', data)
+  //       .then(response => {
+  //         const { accessToken, refreshToken } = response.data
+  //         console.log(response)
+  //         store.dispatch(updateSession({
+  //           token: accessToken,
+  //           refreshToken
+  //         }))
 
-          return req(originalRequest)
-        })
-        .catch(error => {
-          messageInfo("Your session has expired. Please log in again to continue")
-          setTimeout(() => {
-            window.location.href = '/sign-in'
-          }, 500)
-        })
-    }
+  //         return req(originalRequest)
+  //       })
+  //       .catch(error => {
+  //         messageInfo("Your session has expired. Please log in again to continue")
+  //         setTimeout(() => {
+  //           window.location.href = '/sign-in'
+  //         }, 500)
+  //       })
+  //   }
 
-    return Promise.reject(error)
-  }
+  //   return Promise.reject(error)
+  // }
 )
 
 export const req = instance
