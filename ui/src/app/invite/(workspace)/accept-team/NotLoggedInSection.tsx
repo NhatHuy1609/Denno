@@ -1,6 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
-import { getLocalStorageItem } from '@/utils/local-storage'
+import { getLocalStorageItem, setLocalStorageItem } from '@/utils/local-storage'
 import { PersistedStateKey } from '@/data/persisted-keys'
 import { useDetailedWorkspaceInvitationQuery } from '@/app/_hooks/query/workspace/useDetailedWorkspaceInvitationQuery'
 
@@ -15,6 +15,13 @@ function NotLoggedInSection() {
     enabled: Boolean(workspaceId && secretCode),
     retry: 1
   })
+
+  const handleClickLink = () => {
+    setLocalStorageItem(
+      PersistedStateKey.RedirectAfterLogin,
+      `/invite/${workspaceId}/${secretCode}`
+    )
+  }
 
   return (
     <div className='mt-10 flex w-[600px] flex-col items-center'>
@@ -31,12 +38,14 @@ function NotLoggedInSection() {
       <div className='mt-4 flex w-full justify-center gap-6'>
         <Link
           href='/sign-up'
+          onClick={handleClickLink}
           className='min-w-[200px] rounded-md bg-gray-200 p-2 text-center text-lg font-semibold text-black hover:opacity-80'
         >
           Sign up
         </Link>
         <Link
           href='/sign-in'
+          onClick={handleClickLink}
           className='min-w-[200px] rounded-md bg-blue-500 p-2 text-center text-lg font-semibold text-white hover:opacity-80'
         >
           Login
