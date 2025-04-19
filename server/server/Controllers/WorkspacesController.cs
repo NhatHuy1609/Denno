@@ -400,18 +400,7 @@ namespace server.Controllers
 
             if (action != null)
             {
-                _ = Task.Run(async () =>
-                {
-                    try
-                    {
-                        await _emailService.SendActionEmailAsync(action);
-                        _logger.LogInformation("Successfully sent email to workspace's memberse to notify about new joined member");
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError($"Failed to send email to workspace's memberse to notify about new joined member after retries: {ex.Message}");
-                    }
-                });
+                _emailService.SendActionEmailInBackgroundAsync(action);
             }
 
             return Ok(_mapper.Map<JoinWorkspaceByLinkActionResponse>(action));

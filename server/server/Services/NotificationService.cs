@@ -11,7 +11,6 @@ namespace server.Services
     public class NotificationService : INotificationService
     {
         private readonly ApplicationDBContext _dbContext;
-        private readonly Dictionary<string, Func<DennoAction, string>> _messageTemplates;
         private readonly NotificationResponseFactoryResolver _notificationResponseFactoryResolver;
 
         public NotificationService(
@@ -20,27 +19,6 @@ namespace server.Services
         {
             _dbContext = dbContext;
             _notificationResponseFactoryResolver = notificationResponseFactoryResolver;
-            _messageTemplates = new Dictionary<string, Func<DennoAction, string>>()
-            {
-                { 
-                    ActionTypes.AddMemberToWorkspace,
-                    action => $"{action.MemberCreator?.FullName} added {action.TargetUser?.FullName} to workspace {action.Workspace?.Name}"
-                },
-                {
-                    ActionTypes.JoinWorkspaceByLink,
-                    action => $"{action.MemberCreator?.FullName} is now a member of the Workspace {action.Workspace?.Name}. Help them get started by adding them to a card in any board."
-                }
-            };
-        }
-
-        public string? BuildActionNotificationMessage(DennoAction action)
-        {
-            if (_messageTemplates.TryGetValue(action.ActionType, out var template))
-            {
-                return template(action);
-            }
-
-            return null;
         }
 
         public async Task<List<INotificationResponseDto>> GetUserNotificationResponseDtos(string userId)

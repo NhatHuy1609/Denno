@@ -13,32 +13,49 @@ using server.Enums;
 using server.Infrastructure.Configurations;
 using server.Interfaces;
 using server.Models;
+using server.Services.QueueHostedService;
 
-namespace server.Services
+namespace server.Services.Email
 {
     public class EmailService : IEmailService
     {
         private readonly ILogger<EmailService> _logger;
         private readonly MailSettings _mailSettings;
         private readonly UserManager<AppUser> _userManager;
-        private readonly INotificationService _notificationService;
         private readonly ApplicationDBContext _dbContext;
+        private readonly IServiceScopeFactory _scopeFactory;
+        private readonly IBackgroundTaskQueue _taskQueue;
         private readonly FrontendUrlsConfiguration _frontendUrlsConfig;
+        private readonly Dictionary<string, Func<DennoAction, string>> _messageTemplates;
 
         public EmailService(
             ILogger<EmailService> logger,
             IOptions<MailSettings> mailSettings,
             UserManager<AppUser> userManager,
             IOptions<FrontendUrlsConfiguration> frontendUrls,
-            INotificationService notificationService,
-            ApplicationDBContext dbContext)
+            ApplicationDBContext dbContext,
+            IServiceScopeFactory scopeFactory,
+            IBackgroundTaskQueue taskQueue)
         {
             _mailSettings = mailSettings.Value;
             _logger = logger;
             _userManager = userManager;
-            _notificationService = notificationService;
             _dbContext = dbContext;
+            _scopeFactory = scopeFactory;
+            _taskQueue = taskQueue;
             _frontendUrlsConfig = frontendUrls.Value;
+
+            _messageTemplates = new Dictionary<string, Func<DennoAction, string>>()
+            {
+                {
+                    ActionTypes.AddMemberToWorkspace,
+                    action => $"{action.MemberCreator?.FullName} added {action.TargetUser?.FullName} to workspace {action.Workspace?.Name}"
+                },
+                {
+                    ActionTypes.JoinWorkspaceByLink,
+                    action => $"{action.MemberCreator?.FullName} is now a member of the Workspace {action.Workspace?.Name}. Help them get started by adding them to a card in any board."
+                }
+            };
         }
 
         public async Task<bool> SendEmailAsync(EmailData emailData, bool isHtmlBody)
@@ -111,36 +128,55 @@ namespace server.Services
 
         public async Task SendActionEmailAsync(DennoAction action)
         {
+            await SendActionEmailInternalAsync(action, _dbContext);
+        }
+
+        public void SendActionEmailInBackgroundAsync(DennoAction action)
+        {
+            if (action != null)
+            {
+                _taskQueue.QueueBackgroundWorkItem(async (cancellationToken, serviceProvider) =>
+                {
+                    var dbContext = serviceProvider.GetRequiredService<ApplicationDBContext>();
+
+                    await SendActionEmailInternalAsync(action, _dbContext);
+                });
+            }
+        }
+
+        private async Task SendActionEmailInternalAsync(DennoAction action, ApplicationDBContext dbContext)
+        {
             // Take notification recipients who will receive email about action
-            var notification = await _dbContext.Notifications
+            var notification = await dbContext.Notifications
                 .FirstOrDefaultAsync(n => n.ActionId == action.Id);
 
             if (notification == null)
-                throw new ArgumentNullException("");
+                throw new ArgumentNullException("Notification Object can not be null");
 
-            var recipients = await _dbContext.NotificationRecipients
+            var recipients = await dbContext.NotificationRecipients
+                .AsNoTracking()
                 .Include(n => n.Recipient)
                 .Where(n => n.NotificationId == notification.Id)
+                .Select(n => n.Recipient.Email)
                 .ToListAsync();
 
             // Send emails in parallel instead of waiting for each one sequentiall
-            var emailTasks = recipients.Select(recipient =>
+            var emailTasks = recipients.Select(email =>
             {
-                var mailData = BuildNotificationEmailData(recipient.Recipient.Email, action);
+                var mailData = BuildActionEmailData(email, action);
                 return SendEmailAsync(mailData, true);
             });
 
             await Task.WhenAll(emailTasks);
         }
 
-        private EmailData BuildNotificationEmailData(string recipientEmail, DennoAction action)
+        private EmailData BuildActionEmailData(string recipientEmail, DennoAction action)
         {
             if (string.IsNullOrEmpty(recipientEmail))
                 throw new ArgumentNullException("Recipient email cannot be null");
 
             // Creating message for email
-            var message = _notificationService?.BuildActionNotificationMessage(action)
-                ?? throw new ArgumentNullException(nameof(_notificationService), "Notification service cannot be null");
+            var message = this.BuildActionEmailMessage(action);
 
             string id = recipientEmail;
             string name = recipientEmail;
@@ -181,6 +217,16 @@ namespace server.Services
         public static string GetTemplatePath(string templateFileName)
         {
             return Path.Combine(Directory.GetCurrentDirectory(), "Helpers", "HtmlTemplates", templateFileName);
+        }
+
+        private string? BuildActionEmailMessage(DennoAction action)
+        {
+            if (_messageTemplates.TryGetValue(action.ActionType, out var template))
+            {
+                return template(action);
+            }
+
+            return null;
         }
     }
 }
