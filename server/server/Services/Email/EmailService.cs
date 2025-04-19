@@ -139,7 +139,7 @@ namespace server.Services.Email
                 {
                     var dbContext = serviceProvider.GetRequiredService<ApplicationDBContext>();
 
-                    await SendActionEmailInternalAsync(action, _dbContext);
+                    await SendActionEmailInternalAsync(action, dbContext);
                 });
             }
         }
