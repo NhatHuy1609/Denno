@@ -110,20 +110,24 @@ namespace server.Services.Email
             }
         }
 
-        public async Task SendConfirmationRegisterAccountEmailAsync(string email, AppUser user)
+        public void SendConfirmationRegisterAccountEmail(string email, AppUser user)
         {
-            var templatePath = GetTemplatePath("UserRegisterConfimationEmail.html");
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-
-            var emailData = new EmailData()
+            _taskQueue.QueueBackgroundWorkItem(async (cancellationToken, serviceProvider) =>
             {
-                EmailToId = email,
-                EmailToName = email,
-                EmailSubject = "Denno: Registration Account Verification Code",
-                EmailBody = File.ReadAllText(templatePath).Replace("{VerificationCode}", token)
-            };
+                var templatePath = GetTemplatePath("UserRegisterConfimationEmail.html");
+                var userManager = serviceProvider.GetRequiredService<UserManager<AppUser>>();
+                var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
 
-            await SendEmailAsync(emailData, true);
+                var emailData = new EmailData()
+                {
+                    EmailToId = email,
+                    EmailToName = email,
+                    EmailSubject = "Denno: Registration Account Verification Code",
+                    EmailBody = File.ReadAllText(templatePath).Replace("{VerificationCode}", token)
+                };
+
+                await SendEmailAsync(emailData, true);
+            });
         }
 
         public async Task SendActionEmailAsync(DennoAction action)

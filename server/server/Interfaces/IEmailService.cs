@@ -10,6 +10,6 @@ namespace server.Interfaces
         Task<bool> SendEmailAsync(EmailData mailData, bool isHtmlBody);
         Task SendActionEmailAsync(DennoAction action);
         void SendActionEmailInBackgroundAsync(DennoAction action);
-        Task SendConfirmationRegisterAccountEmailAsync(string email, AppUser user);
+        void SendConfirmationRegisterAccountEmail(string email, AppUser user);
     }
 }
