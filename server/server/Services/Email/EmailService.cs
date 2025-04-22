@@ -21,9 +21,7 @@ namespace server.Services.Email
     {
         private readonly ILogger<EmailService> _logger;
         private readonly MailSettings _mailSettings;
-        private readonly UserManager<AppUser> _userManager;
         private readonly ApplicationDBContext _dbContext;
-        private readonly IServiceScopeFactory _scopeFactory;
         private readonly IBackgroundTaskQueue _taskQueue;
         private readonly FrontendUrlsConfiguration _frontendUrlsConfig;
         private readonly Dictionary<string, Func<DennoAction, string>> _messageTemplates;
@@ -31,17 +29,13 @@ namespace server.Services.Email
         public EmailService(
             ILogger<EmailService> logger,
             IOptions<MailSettings> mailSettings,
-            UserManager<AppUser> userManager,
             IOptions<FrontendUrlsConfiguration> frontendUrls,
             ApplicationDBContext dbContext,
-            IServiceScopeFactory scopeFactory,
             IBackgroundTaskQueue taskQueue)
         {
             _mailSettings = mailSettings.Value;
             _logger = logger;
-            _userManager = userManager;
             _dbContext = dbContext;
-            _scopeFactory = scopeFactory;
             _taskQueue = taskQueue;
             _frontendUrlsConfig = frontendUrls.Value;
 

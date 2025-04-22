@@ -405,6 +405,42 @@ namespace server.Controllers
 
             return Ok(_mapper.Map<JoinWorkspaceByLinkActionResponse>(action));
         }
+
+        [HttpPost("/joinRequests")]
+        public async Task<IActionResult> CreateJoinRequestAsync(CreateWorkspaceJoinRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var createdJoinRequest = await _unitOfWork.JoinRequests
+                .CreateWorkspaceJoinRequestAsync(request.RequesterId, request.WorkspaceId);
+
+            return CreatedAtAction(nameof(CreateJoinRequestAsync), createdJoinRequest);
+        }
+
+        [HttpPost("/joinRequets/{requestId}/approval")]
+        public async Task<IActionResult> AppoveJoinRequestAsync(int requestId)
+        {
+            var joinRequest = await _unitOfWork.JoinRequests.GetJoinRequestByIdAsync(requestId);
+
+            if (joinRequest == null)
+            {
+                return NotFound();
+            }
+
+            var actionContext = new DennoActionContext()
+            {
+                MemberCreatorId = User.FindFirstValue(ClaimTypes.NameIdentifier),
+                WorkspaceId = joinRequest.WorkspaceId,
+                TargetUserId = joinRequest.RequesterId
+            };
+
+            var action = await _actionService.CreateActionAsync(ActionTypes.ApproveWorkspaceJoinRequest, actionContext);
+
+            return Ok();
+        }
     }
 }
 
