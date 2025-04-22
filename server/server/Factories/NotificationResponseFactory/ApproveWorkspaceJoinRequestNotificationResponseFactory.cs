@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using server.Constants;
 using server.Data;
 using server.Dtos.Response.Notification;
@@ -11,20 +10,17 @@ using server.Entities;
 
 namespace server.Factories.NotificationResponseFactory
 {
-    public class AddedMemberWorkspaceNotificationResponseFactory : INotificationResponseFactory
+    public class ApproveWorkspaceJoinRequestNotificationResponseFactory : INotificationResponseFactory
     {
         private readonly ApplicationDBContext _dbContext;
         private readonly IMapper _mapper;
-        private readonly ILogger<AddedMemberWorkspaceNotificationResponseFactory> _logger;
 
-        public AddedMemberWorkspaceNotificationResponseFactory(
+        public ApproveWorkspaceJoinRequestNotificationResponseFactory(
             ApplicationDBContext dbContext,
-            IMapper mapper,
-            ILogger<AddedMemberWorkspaceNotificationResponseFactory> logger)
+            IMapper mapper)
         {
             _dbContext = dbContext;
             _mapper = mapper;
-            _logger = logger;
         }
 
         public async Task<INotificationResponseDto> CreateNotificationResponse(NotificationRecipient notification)
@@ -63,7 +59,7 @@ namespace server.Factories.NotificationResponseFactory
                 throw new Exception("TargetUser is null");
             }
 
-            var notificationResponse = new AddedToWorkspaceNotificationResponseDto()
+            var notificationResponse = new ApproveWorkspaceJoinRequestNotificationResponse()
             {
                 Id = notiDetails.Id,
                 IsRead = notification.IsRead,
@@ -73,16 +69,16 @@ namespace server.Factories.NotificationResponseFactory
                 ActionId = notiDetails.ActionId,
                 MemberCreator = _mapper.Map<GetUserResponseDto>(notiDetails.Action.MemberCreator),
 
-                Data = new AddedToWorkspaceData
+                Data = new ApproveWorkspaceJoinRequestData
                 {
                     WorkspaceId = notiDetails.Action.WorkspaceId.Value,
-                    AddedMemberId = notiDetails.Action.TargetUserId,
+                    RequesterId = notiDetails.Action.TargetUserId,
                     MemberCreatorId = notiDetails.Action.MemberCreatorId
                 },
 
                 Display = new NotificationDisplay
                 {
-                    TranslationKey = TranslationKeys.AddMemberToWorkspace,
+                    TranslationKey = TranslationKeys.ApproveWorkspaceJoinRequest,
                     Entities = new Dictionary<string, EntityTypeDisplay>
                     {
                         { EntityTypes.Workspace, new EntityTypeDisplay
@@ -99,10 +95,10 @@ namespace server.Factories.NotificationResponseFactory
                                 Text = notiDetails.Action.MemberCreator.FullName
                             }
                         },
-                        { EntityTypes.AddedMember, new EntityTypeDisplay
+                        { EntityTypes.Requester, new EntityTypeDisplay
                             {
-                                Type = EntityTypes.User,
-                                Id = notiDetails.Action.TargetUser.Id,
+                                Type = EntityTypes.Requester,
+                                Id = notiDetails.Action.TargetUserId,
                                 Text = notiDetails.Action.TargetUser.FullName
                             }
                         }

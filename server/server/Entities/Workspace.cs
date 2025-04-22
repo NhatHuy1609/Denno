@@ -18,5 +18,6 @@ namespace server.Entities
         public virtual ICollection<WorkspaceMember> WorkspaceMembers { get; set; } = new List<WorkspaceMember>();
 
         public virtual ICollection<DennoAction> Actions { get; set; } = new List<DennoAction>();
+        public virtual ICollection<JoinRequest> JoinRequests { get; set; } = new List<JoinRequest>();
     }
 }

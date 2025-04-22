@@ -11,5 +11,6 @@
         public const string MemberCreator = "memberCreator";
         public const string AddedMember = "addedMember";
         public const string JoinedMember = "joinedMember";
+        public const string Requester = "requester";
     }
 }

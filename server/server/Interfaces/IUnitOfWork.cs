@@ -11,6 +11,7 @@
         IWorkspaceMemberRepository WorkspaceMembers { get; }
         INotificationRepository Notifications { get; }
         IInvitationSecretRepository InvitationSecrets { get; }
+        IJoinRequestRepository JoinRequests { get; }
         int Complete();
     }
 }

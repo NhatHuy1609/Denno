@@ -32,6 +32,7 @@ namespace server.Data
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<NotificationRecipient> NotificationRecipients { get; set; }
         public DbSet<InvitationSecret> InvitationSecrets { get; set; }
+        public DbSet<JoinRequest> JoinRequests { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -240,6 +241,19 @@ namespace server.Data
                 .WithMany(n => n.NotificationRecipients)
                 .HasForeignKey(n => n.NotificationId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            // Configure JoinRequest's Relationships
+            modelBuilder.Entity<JoinRequest>()
+                .HasOne(j => j.Workspace)
+                .WithMany(w => w.JoinRequests)
+                .HasForeignKey(j => j.WorkspaceId)
+                .OnDelete(DeleteBehavior.ClientCascade);
+
+            modelBuilder.Entity<JoinRequest>()
+                .HasOne(j => j.Board)
+                .WithMany(b => b.JoinRequests)
+                .HasForeignKey(j => j.BoardId)
+                .OnDelete(DeleteBehavior.ClientCascade);
         }
     }
 }
