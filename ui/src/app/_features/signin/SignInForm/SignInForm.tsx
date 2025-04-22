@@ -62,7 +62,7 @@ function SignInForm() {
       }
     },
     onSettled: () => {
-      setLocalStorageItem(PersistedStateKey.RedirectAfterLogin, '/')
+      setLocalStorageItem(PersistedStateKey.RedirectAfterLogin, '')
     }
   })
 
