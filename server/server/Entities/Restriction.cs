@@ -11,4 +11,10 @@ namespace server.Entities
 
         public virtual ICollection<BoardRestriction> BoardRestrictions { get; set; } = new List<BoardRestriction>();
     }
+
+    public enum WorkStructure
+    {
+        Workspace = 0,
+        Board = 1
+    }
 }

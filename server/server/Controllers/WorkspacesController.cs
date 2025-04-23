@@ -407,6 +407,14 @@ namespace server.Controllers
             return Ok(_mapper.Map<JoinWorkspaceByLinkActionResponse>(action));
         }
 
+        [HttpGet("[controller]/{workspaceId}/joinRequests")]
+        public async Task<IActionResult> GetWorkspaceJoinRequests(Guid workspaceId)
+        {
+            var workspaces = await _unitOfWork.JoinRequests.GetJoinRequestsByWorkspaceId(workspaceId);
+
+            return Ok(_mapper.Map<List<WorkspaceJoinRequestResponse>>(workspaces));
+        }
+
         [HttpPost("[controller]/joinRequests")]
         public async Task<IActionResult> CreateJoinRequestAsync(CreateWorkspaceJoinRequest request)
         {
