@@ -20,6 +20,8 @@ namespace server.Factories
             {
                 ActionTypes.AddMemberToWorkspace => new AddWorkspaceMemberStrategy(_dbContext),
                 ActionTypes.JoinWorkspaceByLink => new JoinWorkspaceByLinkStrategy(_dbContext),
+                ActionTypes.ApproveWorkspaceJoinRequest => new ApproveWorkspaceJoinRequestStrategy(_dbContext),
+                ActionTypes.RejectWorkspaceJoinRequest => new RejectWorkspaceJoinRequestStrategy(_dbContext),
                 _ => throw new ArgumentException($"Unsupported action type: {actionType}")
             };
         }

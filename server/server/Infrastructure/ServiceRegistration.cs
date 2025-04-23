@@ -55,6 +55,7 @@ namespace server.Infrastructure
             services.AddScoped<AddedMemberWorkspaceNotificationResponseFactory>();
             services.AddScoped<JoinWorkspaceWithLinkNotificationResponseFactory>();
             services.AddScoped<ApproveWorkspaceJoinRequestNotificationResponseFactory>();
+            services.AddScoped<RejectWorkspaceJoinRequestNotificationResponseFactory>();
 
             // Background services
             services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();

@@ -48,6 +48,14 @@ namespace server.Services.Email
                 {
                     ActionTypes.JoinWorkspaceByLink,
                     action => $"{action.MemberCreator?.FullName} is now a member of the Workspace {action.Workspace?.Name}. Help them get started by adding them to a card in any board."
+                },
+                {
+                    ActionTypes.ApproveWorkspaceJoinRequest,
+                     action => $"{action.MemberCreator?.FullName} approved your request to join the workspace {action.Workspace?.Name}"
+                },
+                {
+                    ActionTypes.RejectWorkspaceJoinRequest,
+                     action => $"{action.MemberCreator?.FullName} rejected your request to join the workspace {action.Workspace?.Name}"
                 }
             };
         }
@@ -198,6 +206,14 @@ namespace server.Services.Email
                 case ActionTypes.JoinWorkspaceByLink:
                     templatePath = File.ReadAllText(GetTemplatePath("LatestNewsEmailTemplate.cshtml"));
                     body = Engine.Razor.RunCompile(templatePath, "joinWorkspaceByLink", typeof(NotificationTemplateModel), notificationEmailModel);
+                    break;
+                case ActionTypes.ApproveWorkspaceJoinRequest:
+                    templatePath = File.ReadAllText(GetTemplatePath("NotificationTemplate.cshtml"));
+                    body = Engine.Razor.RunCompile(templatePath, "approveWorkspaceJoinRequestTemplate", typeof(NotificationTemplateModel), notificationEmailModel);
+                    break;
+                case ActionTypes.RejectWorkspaceJoinRequest:
+                    templatePath = File.ReadAllText(GetTemplatePath("NotificationTemplate.cshtml"));
+                    body = Engine.Razor.RunCompile(templatePath, "rejectWorkspaceJoinRequestTemplate", typeof(NotificationTemplateModel), notificationEmailModel);
                     break;
                 default:
                     throw new ArgumentException("Failed to build notification email due to action not being found.");

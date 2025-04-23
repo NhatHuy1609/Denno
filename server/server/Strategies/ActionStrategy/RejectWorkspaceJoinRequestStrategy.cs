@@ -5,11 +5,11 @@ using server.Entities;
 
 namespace server.Strategies.ActionStrategy
 {
-    public class ApproveWorkspaceJoinRequestStrategy : IDennoActionStrategy
+    public class RejectWorkspaceJoinRequestStrategy : IDennoActionStrategy
     {
         private readonly ApplicationDBContext _dbContext;
 
-        public ApproveWorkspaceJoinRequestStrategy(
+        public RejectWorkspaceJoinRequestStrategy(
             ApplicationDBContext dContext)
         {
             _dbContext = dContext;
@@ -26,19 +26,10 @@ namespace server.Strategies.ActionStrategy
             if (string.IsNullOrEmpty(context.MemberCreatorId))
                 throw new ArgumentNullException(nameof(context.MemberCreatorId), "MemberCreatorId is required");
 
-            if (_dbContext.WorkspaceMembers.Any(m => m.WorkspaceId == context.WorkspaceId && m.AppUserId == context.TargetUserId))
-                throw new InvalidOperationException("User is already a member of this workspace");
-
-            var newMember = new WorkspaceMember()
-            {
-                WorkspaceId = context.WorkspaceId.Value,
-                AppUserId = context.TargetUserId
-            };
-
             var action = new DennoAction()
             {
                 MemberCreatorId = context.MemberCreatorId,
-                ActionType = ActionTypes.ApproveWorkspaceJoinRequest,
+                ActionType = ActionTypes.RejectWorkspaceJoinRequest,
                 WorkspaceId = context.WorkspaceId,
                 TargetUserId = context.TargetUserId,
                 Date = DateTime.Now
@@ -68,10 +59,13 @@ namespace server.Strategies.ActionStrategy
             _dbContext.Actions.Add(action);
             _dbContext.Notifications.Add(notification);
             _dbContext.NotificationRecipients.Add(recipient);
-            _dbContext.WorkspaceMembers.Add(newMember);
 
             // Load needed navigation properties
-            action.MemberCreator = await _dbContext.Users.FindAsync(context.MemberCreatorId);
+            await _dbContext.Entry(action)
+                .Reference(a => a.MemberCreator)
+                .LoadAsync();
+                
+            //action.MemberCreator = await _dbContext.Users.FindAsync(context.MemberCreatorId);
 
             return action;
         }
