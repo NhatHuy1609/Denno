@@ -35,5 +35,14 @@ namespace server.Repositories
                 .Include(j => j.Workspace)
                 .FirstOrDefaultAsync(j => j.Id == id);
         }
+
+        public async Task<IEnumerable<JoinRequest>> GetJoinRequestsByWorkspaceId(Guid workspaceId)
+        {
+            return await _dbContext.JoinRequests
+                .Include(j => j.Workspace)
+                .Include(j => j.Requester)
+                .Where(j => j.WorkspaceId == workspaceId)
+                .ToListAsync();
+        }
     }
 }
