@@ -18,8 +18,10 @@ namespace server.Factories.NotificationResponseFactory
             // Assuming DennoAction has an ActionType property
             return actionType switch
             {
-                ActionTypes.AddMemberToWorkspace => _serviceProvider.GetService<AddedMemberWorkspaceNotificationResponseFactory>(),
-                ActionTypes.JoinWorkspaceByLink => _serviceProvider.GetService<JoinWorkspaceWithLinkNotificationResponseFactory>(),
+                ActionTypes.AddMemberToWorkspace => _serviceProvider.GetRequiredService<AddedMemberWorkspaceNotificationResponseFactory>(),
+                ActionTypes.JoinWorkspaceByLink => _serviceProvider.GetRequiredService<JoinWorkspaceWithLinkNotificationResponseFactory>(),
+                ActionTypes.ApproveWorkspaceJoinRequest => _serviceProvider.GetRequiredService<ApproveWorkspaceJoinRequestNotificationResponseFactory>(),
+                ActionTypes.RejectWorkspaceJoinRequest => _serviceProvider.GetRequiredService<RejectWorkspaceJoinRequestNotificationResponseFactory>(),
                 // Add more action types as needed
                 _ => throw new ArgumentException($"No factory found for action type: {actionType}")
             };

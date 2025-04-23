@@ -59,6 +59,15 @@ namespace server.Strategies.ActionStrategy
                 RecipientId = context.TargetUserId
             };
 
+            // Delete workspace join requests related to user was added
+            var existedJoinRequest = await _dbContext.JoinRequests
+                .FirstOrDefaultAsync(j => j.WorkspaceId == context.WorkspaceId && j.RequesterId == context.TargetUserId);
+
+            if (existedJoinRequest != null)
+            {
+                _dbContext.JoinRequests.Remove(existedJoinRequest);
+            }
+
             _dbContext.Actions.Add(action);
             _dbContext.Notifications.Add(notification);
             _dbContext.NotificationRecipients.Add(recipient);
