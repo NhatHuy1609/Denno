@@ -3,17 +3,21 @@ import { AxiosContracts } from '@/lib/axios/AxiosContracts'
 import { 
   AddWorkspaceMemberDto, 
   CreateWorkspaceDto, 
+  CreateWorkspaceJoinRequestDto, 
   DetailedWorkspaceInvitationSecretResponseDto, 
   UpdateWorkspaceDto, 
   UpdateWorkspaceLogoDto, 
   VerifyWorkspaceInvitationSecretRequestDto, 
   WorkspaceInvitationSecretResponseDto, 
+  WorkspaceJoinRequestResponseDto, 
+  WorkspaceJoinRequestsResponseDto, 
   WorkspaceResponseDto 
 } from './workspace.types'
 
 import { 
   AddWorkspaceMemberDtoSchema,
   CreateWorkspaceDtoSchema,
+  CreateWorkspaceJoinRequestDtoSchema,
   UpdateWorkspaceDtoSchema,
   UpdateWorkspaceLogoDtoSchema,
   VerifyWorkspaceInvitationSecretRequestDtoSchema,
@@ -99,6 +103,22 @@ export class WorkspaceService {
   static joinWorkspaceByLinkMutation(workspaceId: string) {
     return httpPost<JoinWorkspaceByLinkActionResponseDto>(
       `${this.basePath}/${workspaceId}/joinByLink`
+    )
+  }
+
+  static workspaceJoinRequestsQuery(workspaceId: string) {
+    return httpGet<WorkspaceJoinRequestsResponseDto>(`${this.basePath}/${workspaceId}/joinRequests`)
+  }
+
+  static createWorkspaceJoinRequestMutation(workspaceId: string, data: { createWorkspaceJoinRequestDto: CreateWorkspaceJoinRequestDto }) {
+    const createWorkspaceJoinRequestDto = AxiosContracts.requestContract(
+      CreateWorkspaceJoinRequestDtoSchema,
+      data.createWorkspaceJoinRequestDto
+    )
+
+    return httpPost<WorkspaceJoinRequestResponseDto>(
+      `${this.basePath}/${workspaceId}/joinRequests`,
+      createWorkspaceJoinRequestDto
     )
   }
 }

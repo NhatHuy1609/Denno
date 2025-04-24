@@ -27,6 +27,10 @@ export const VerifyWorkspaceInvitationSecretRequestDtoSchema = z.object({
   secretCode: z.string()
 }).describe("VerifyWorkspaceInvitationSecretRequestDtoSchema")
 
+export const CreateWorkspaceJoinRequestDtoSchema = z.object({
+  requesterId: z.string()
+}).describe("CreateWorkspaceJoinRequestDtoSchema")
+
 // Response
 export const WorkspaceResponseDtoSchema = z.object({
   id: z.string().uuid(),
@@ -68,3 +72,19 @@ export const DetailedWorkspaceInvitationResponseDtoSchema= z.object({
   inviter: GetUserResponseDtoSchema,
   workspace: WorkspaceResponseDtoSchema
 }).describe('DetailedWorkspaceInvitationResponseDtoSchema')
+
+export const WorkspaceJoinRequestResponseDtoSchema = z.object({
+  id: z.number(),
+  workspaceId: z.string(),
+  requestedAt: z.string().datetime(),
+  requester: z.object({
+    id: z.string(),
+    name: z.string(),
+    email: z.string(),
+    avatar: z.string()
+  })
+}).describe('WorkspaceJoinRequestResponseDtoSchema')
+
+export const WorkspaceJoinRequestsResponseDtoSchema = 
+  z.array(WorkspaceJoinRequestResponseDtoSchema)
+  .describe('WorkspaceJoinRequestsResponseDtoSchema')

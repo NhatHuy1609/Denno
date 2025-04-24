@@ -13,7 +13,8 @@ namespace server.Models.MapperProfile
                 {
                     Id = src.Requester.Id,
                     Name = src.Requester.FullName,
-                    Email = src.Requester.Email
+                    Email = src.Requester.Email,
+                    Avatar = src.Requester.Avatar
                 }))
                 .ForMember(dest => dest.RequestedAt, opt => opt.MapFrom(src => src.CreatedAt));
         }

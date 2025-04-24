@@ -2,7 +2,6 @@
 {
     public class CreateWorkspaceJoinRequest
     {
-        public Guid WorkspaceId { get; set; }
         public string RequesterId { get; set; }
     }
 }
