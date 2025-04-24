@@ -4,7 +4,7 @@ import { useQueryParamState } from '@/app/_hooks/next-ui/useQueryParamState'
 import CollaboratorTabs from './CollaboratorsTabs'
 import MembersTabDisplay from './MembersTabDisplay'
 import RequestsTabDisplay from './RequestsTabDisplay'
-import GuestsTabDisplay from './GuestsTabDisplay'
+import GuestsTabDisplay from './RequestsTabDisplay'
 import { useParams } from 'next/navigation'
 import { useWorkspaceQuery } from '@/app/_hooks/query'
 
