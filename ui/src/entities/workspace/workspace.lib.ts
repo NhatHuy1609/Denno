@@ -1,5 +1,5 @@
 import { workspaceTypesDto } from '@/service/api/workspace'
-import { DetailedWorkspaceInvitation, Workspace, Workspaces } from './workspace.types'
+import { DetailedWorkspaceInvitation, Workspace, WorkspaceJoinRequest, WorkspaceJoinRequests, Workspaces } from './workspace.types'
 import { InvitationSecret } from '../invitationSecret/invitationSecret.types'
 
 export function transformWorkspaceDtoToWorkspace(
@@ -38,4 +38,22 @@ export function mapToDetailedWorkspaceInvitation(
       name: dto.workspace.name
     }
   }
+}
+
+export function transformWorkspaceJoinRequestDtoToWorkspaceJoinRequest(
+  dto: workspaceTypesDto.WorkspaceJoinRequestResponseDto
+): WorkspaceJoinRequest {
+  return {
+    ...dto,
+    requester: {
+      ...dto.requester,
+      fullName: dto.requester.name
+    }
+  }
+}
+
+export function transformWorkspaceJoinRequestsDtoToWorkspaceJoinRequests(
+  dto: workspaceTypesDto.WorkspaceJoinRequestsResponseDto
+): WorkspaceJoinRequests {
+  return dto.map(workspaceJoinRequest => transformWorkspaceJoinRequestDtoToWorkspaceJoinRequest(workspaceJoinRequest))
 }

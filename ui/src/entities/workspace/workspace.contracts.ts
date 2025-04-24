@@ -41,3 +41,17 @@ export const DetailedWorkspaceInvitationSchema = z.object({
     name: true
   })
 }).describe('DetailedWorkspaceInvitationSchema')
+
+export const WorkspaceJoinRequestSchema = z.object({
+  id: z.number(),
+  requestedAt: z.string().datetime(),
+  workspaceId: z.string(),
+  requester: UserSchema.pick({
+    id: true,
+    fullName: true,
+    email: true,
+    avatar: true
+  })
+}).describe('WorkspaceJoinRequestSchema')
+
+export const WorkspaceJoinRequestsSchema = z.array(WorkspaceJoinRequestSchema).describe('WorkspaceJoinRequestsSchema')

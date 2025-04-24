@@ -415,8 +415,8 @@ namespace server.Controllers
             return Ok(_mapper.Map<List<WorkspaceJoinRequestResponse>>(workspaces));
         }
 
-        [HttpPost("[controller]/joinRequests")]
-        public async Task<IActionResult> CreateJoinRequestAsync(CreateWorkspaceJoinRequest request)
+        [HttpPost("[controller]/{workspaceId}/joinRequests")]
+        public async Task<IActionResult> CreateJoinRequestAsync([FromRoute] Guid workspaceId, CreateWorkspaceJoinRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -424,67 +424,9 @@ namespace server.Controllers
             }
 
             var createdJoinRequest = await _unitOfWork.JoinRequests
-                .CreateWorkspaceJoinRequestAsync(request.RequesterId, request.WorkspaceId);
+                .CreateWorkspaceJoinRequestAsync(request.RequesterId, workspaceId);
 
-            return Created(nameof(CreateJoinRequestAsync), createdJoinRequest);
-        }
-
-        [HttpPost("[controller]/joinRequests/{requestId}/approval")]
-        public async Task<IActionResult> AppoveJoinRequestAsync(int requestId)
-        {
-            var joinRequest = await _unitOfWork.JoinRequests.GetJoinRequestByIdAsync(requestId);
-
-            if (joinRequest == null)
-            {
-                return NotFound();
-            }
-
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            var actionContext = new DennoActionContext()
-            {
-                MemberCreatorId = userId,
-                WorkspaceId = joinRequest.WorkspaceId,
-                TargetUserId = joinRequest.RequesterId
-            };
-
-            var action = await _actionService.CreateActionAsync(ActionTypes.ApproveWorkspaceJoinRequest, actionContext);
-
-            if (action != null)
-            {
-               await _emailService.SendActionEmailAsync(action);
-            }
-
-            return Ok();
-        }
-
-        [HttpDelete("[controller]/joinRequests/{requestId}/rejection")]
-        public async Task<IActionResult> RejectJoinWorkspaceAsync(int requestId)
-        {
-            var joinRequest = await _unitOfWork.JoinRequests.GetJoinRequestByIdAsync(requestId);
-
-            if (joinRequest == null)
-            {
-                return NotFound();
-            }
-
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            var actionContext = new DennoActionContext()
-            {
-                MemberCreatorId = userId,
-                WorkspaceId = joinRequest.WorkspaceId,
-                TargetUserId = joinRequest.RequesterId
-            };
-
-            var action = await _actionService.CreateActionAsync(ActionTypes.RejectWorkspaceJoinRequest, actionContext);
-
-            if (action != null)
-            {
-                await _emailService.SendActionEmailAsync(action);
-            }
-
-            return Ok();
+            return Created(nameof(CreateJoinRequestAsync), _mapper.Map<WorkspaceJoinRequestResponse>(createdJoinRequest));
         }
     }
 }
