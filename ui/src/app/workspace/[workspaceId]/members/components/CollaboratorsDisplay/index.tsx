@@ -14,11 +14,12 @@ function CollaboratorsDisplay() {
 
   const { data: detailedWorkspace } = useWorkspaceQuery(workspaceId, {
     members: true,
-    boardCounts: true
+    boardCounts: true,
+    joinRequests: true
   })
 
-  const { members } = detailedWorkspace || {}
-  const collaboratorCount = members?.length || 0
+  const { members = [], joinRequests = [] } = detailedWorkspace || {}
+  const collaboratorCount = members?.length + joinRequests?.length || 0
 
   const renderTabDisplay = () => {
     if (tab === 'members') {
@@ -39,7 +40,11 @@ function CollaboratorsDisplay() {
         </span>
       </h3>
       <div className='mt-4 flex w-full gap-6'>
-        <CollaboratorTabs memberCount={members?.length} setTabFn={setTab} />
+        <CollaboratorTabs
+          memberCount={members?.length}
+          requestCount={joinRequests?.length}
+          setTabFn={setTab}
+        />
         <div className='flex-1'>{renderTabDisplay()}</div>
       </div>
     </div>

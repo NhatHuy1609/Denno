@@ -2,13 +2,13 @@ import React from 'react'
 import ApproveRequestButton from './ApproveRequestButton'
 import RejectRequestButton from './RejectRequestButton'
 
-function RequestsAction() {
+function RequestActions() {
   return (
-    <div className='flex gap-2'>
+    <div className='flex items-center gap-2'>
       <ApproveRequestButton />
       <RejectRequestButton />
     </div>
   )
 }
 
-export default RequestsAction
+export default RequestActions

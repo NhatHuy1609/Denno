@@ -17,6 +17,9 @@ namespace server.Dtos.Response.Workspace.WorkspaceResponseDto2
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public List<MemberDto>? Members { get; set; } = null;
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public List<WorkspaceJoinRequestResponse> JoinRequests { get; set; }
     }
 
     public class BoardCountDto

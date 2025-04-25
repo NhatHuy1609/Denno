@@ -3,7 +3,7 @@ import { cn } from '@/lib/styles/utils'
 import { useParams } from 'next/navigation'
 import { useJoinRequestsQuery } from '@/app/_hooks/query/workspace/useJoinRequestsQuery'
 import { RequestsManagerProvider } from './context'
-import RequestsManager from '../RequestsManager'
+import RequestsManager from './RequestsManager'
 import PrimaryInputText from '@/app/_components/PrimaryInputText'
 
 function RequestsPanel() {
