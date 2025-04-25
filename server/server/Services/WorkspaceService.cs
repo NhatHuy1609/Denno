@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using server.Data;
+using server.Dtos.Response.Workspace;
 using server.Dtos.Response.Workspace.WorkspaceResponseDto2;
 using server.Entities;
 using server.Extensions;
@@ -10,10 +12,14 @@ namespace server.Services
 {
     public class WorkspaceService : IWorkspaceService
     {
+        private readonly IMapper _mapper;
         private readonly ApplicationDBContext _dbContext;
 
-        public WorkspaceService(ApplicationDBContext dbContext)
+        public WorkspaceService(
+            IMapper mapper,
+            ApplicationDBContext dbContext)
         {
+            _mapper = mapper;
             _dbContext = dbContext;
         }
 
@@ -75,7 +81,7 @@ namespace server.Services
                 response.Members = members;
             }
 
-            // Handle BoardCounts field
+            // Handle BoardCounts field in response
             if (query.BoardCounts)
             {
                 var boardCounts = _dbContext.WorkspaceMembers
@@ -90,6 +96,16 @@ namespace server.Services
                     .ToList();
 
                 response.BoardCounts = boardCounts;
+            }
+
+            // Handle JoinRequests field in response
+            if (query.JoinRequests)
+            {
+                var joinRequests = await _dbContext.JoinRequests
+                    .Where(j => j.WorkspaceId == id)
+                    .ToListAsync();
+
+                response.JoinRequests = _mapper.Map<List<WorkspaceJoinRequestResponse>>(joinRequests);
             }
 
             return response;

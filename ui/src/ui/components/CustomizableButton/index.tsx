@@ -19,7 +19,7 @@ const buttonVariants = cva(
       },
       disabled: {
         false: null,
-        true: ['opacity-50', 'cursor-not-allowed']
+        true: ['opacity-50', 'cursor-not-allowed', 'bg-gray-200', 'text-black']
       }
     },
     compoundVariants: [

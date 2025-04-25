@@ -50,6 +50,16 @@ export const WorkspaceResponseDtoSchema = z.object({
     email: z.string(),
     memberType: z.enum(['Normal', 'Admin']),
   })).optional(),
+  joinRequests: z.array(z.object({
+    id: z.string(),
+    requester: z.object({
+      id: z.string(),
+      avatar: z.string(),
+      name: z.string(),
+      email: z.string(),
+    }),
+    requestedAt: z.string().datetime(),
+  })).optional()
 }).describe('WorkspaceResponseDtoSchema')
 
 export const WorkspacesResponseDtoSchema = z.array(WorkspaceResponseDtoSchema)
