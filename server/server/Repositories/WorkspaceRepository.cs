@@ -1,6 +1,7 @@
-﻿using server.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using server.Data;
+using server.Entities;
 using server.Interfaces;
-using server.Models;
 
 namespace server.Repositories
 {
@@ -8,6 +9,16 @@ namespace server.Repositories
     {
         public WorkspaceRepository(ApplicationDBContext context) : base(context)
         {
+        }
+
+        public async Task<Workspace?> GetWorkspaceWithMembersAsync(Guid workspaceId)
+        {
+            var workspace = await _context.Workspaces
+                .Include(w => w.WorkspaceMembers)
+                .ThenInclude(wm => wm.AppUser)
+                .FirstOrDefaultAsync(w => w.Id == workspaceId);
+
+            return workspace;
         }
     }
 }

@@ -1,11 +1,10 @@
 ﻿using Asp.Versioning;
 using AutoMapper;
-using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Client;
 using server.Dtos.Requests.CardList;
 using server.Dtos.Response;
 using server.Dtos.Response.CardList;
+using server.Entities;
 using server.Helpers.LexoRank;
 using server.Interfaces;
 using server.Models;

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using server.Dtos.Requests.Card;
 using server.Dtos.Response;
 using server.Dtos.Response.Card;
+using server.Entities;
 using server.Helpers.LexoRank;
 using server.Interfaces;
 using server.Models;

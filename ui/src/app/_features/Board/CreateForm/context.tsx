@@ -1,14 +1,14 @@
 import { boardTypesDto } from '@/service/api/board'
 import { createContext, useContext } from 'react'
 import { UseFormSetValue } from 'react-hook-form'
-import { workspaceTypes } from '@/entities/workspace'
+import { userTypes } from '@/entities/user'
 
 type CreateFormContextProps = {
   setFormValue: UseFormSetValue<boardTypesDto.CreateBoardDto>
   backgroundSource: string
   visibility: string
   workspaceId: string
-  selectedWorkspace?: workspaceTypes.Workspace
+  selectedWorkspace?: userTypes.UserWorkspace
 }
 
 const CreateFormContext = createContext<CreateFormContextProps>({

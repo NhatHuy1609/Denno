@@ -13,7 +13,7 @@ function UserBoardItem({ boardItem }: { boardItem: boardTypes.Board }) {
   const { name, background, id } = boardItem
 
   return (
-    <Link href={`/b/${id}`} className='block px-3 py-[6px] hover:bg-white/30'>
+    <Link href={`/board/${id}`} className='block px-3 py-[6px] hover:bg-white/30'>
       <div className='flex items-center gap-2'>
         <Image
           src={background}

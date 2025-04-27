@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import type { MenuItem } from "./types"
 
 export const useSelectedItemsHistory = () => {

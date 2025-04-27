@@ -2,6 +2,7 @@
 using Google.Apis.Util.Store;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using server.Entities;
 using server.Models;
 
 namespace server.Data

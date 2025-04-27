@@ -1,4 +1,5 @@
 import { z } from 'zod'
-import { BoardVisibilityEnumSchema } from './enums.contracts'
+import { BoardVisibilityEnumSchema, MemberRoleEnumSchema } from './enums.contracts'
 
 export type BoardVisibilityEnum = z.infer<typeof BoardVisibilityEnumSchema>
+export type MemberRoleEnum = z.infer<typeof MemberRoleEnumSchema>

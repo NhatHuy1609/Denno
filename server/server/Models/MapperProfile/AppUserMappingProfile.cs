@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using server.Dtos.Response.Users;
+using server.Entities;
 
 namespace server.Models.MapperProfile
 {
