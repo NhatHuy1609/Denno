@@ -28,7 +28,7 @@ function useUpdateCardRankMutation(
   return useMutation({
     mutationKey: ['card', 'update', 'rank',  ...mutationKey],
     onMutate,
-    mutationFn: async ({id, updateCardRankDto}) => {
+    mutationFn: async ({ id, updateCardRankDto }) => {
       const response = await CardService.updateCardRankMutation({id, updateCardRankDto})
       return response.data
     },

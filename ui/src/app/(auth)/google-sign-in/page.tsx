@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { useAppDispatch } from '@/store/hooks'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useLoginGoogleMutation } from '@/app/_features/Signin/SignInForm'
-import { updateCurrentUser, updateEntireSession } from '@/store/features/session'
+import { updateCurrentUser } from '@/store/features/session'
 import { getErrorMessage } from '@/service/api/_getErrorMessage'
 import { messageError, messageInfo, setFixLoading } from '@/ui'
 
@@ -53,6 +53,8 @@ const Home = () => {
     }
   })
 
+  // This effect handles the Google sign-in process.
+  // It checks if the authorization code is present in the URL and calls the loginGoogle mutation with it.
   useEffect(() => {
     const handleGetGoogleAccessToken = async (authorizationCode: string) => {
       await loginGoogle({ authorizationCode })

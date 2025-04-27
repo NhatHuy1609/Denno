@@ -1,6 +1,6 @@
 ﻿using server.Enums;
 
-namespace server.Models
+namespace server.Entities
 {
     public class Board
     {
@@ -20,5 +20,7 @@ namespace server.Models
         public virtual ICollection<CardList> CardLists { get; set; } = new List<CardList>();
 
         public virtual ICollection<BoardLabel> BoardLabels { get; set; } = new List<BoardLabel>();
+        public virtual ICollection<DennoAction> Actions { get; set; } = new List<DennoAction>();
+        public virtual ICollection<JoinRequest> JoinRequests { get; set; } = new List<JoinRequest>();
     }
 }

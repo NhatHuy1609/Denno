@@ -30,7 +30,7 @@ function WorkspaceInfoLogoUpdatePanel({
 
       <div className='mt-4 flex w-full flex-col gap-3'>
         <UploadLogoButton />
-        {workspace?.logoUrl && <RemoveLogoButton />}
+        {workspace?.logo && <RemoveLogoButton />}
       </div>
     </div>
   )

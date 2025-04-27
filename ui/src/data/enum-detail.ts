@@ -1,4 +1,4 @@
-import type { BoardVisibilityEnum } from "@/service/api/_enums";
+import { BoardVisibilityEnum } from "@/service/api/_enums/enums.types";
 
 const boardVisibilityDescriptions: { [key in BoardVisibilityEnum]: string } = {
   Private : "Only board members can see this board. Workspace admins can close the board or remove members.",

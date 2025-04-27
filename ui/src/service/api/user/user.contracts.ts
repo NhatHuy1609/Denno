@@ -1,7 +1,9 @@
 import { z } from 'zod'
+import { createPaginatedResultSchema } from '../_models/pagination'
 
+// Response Schemas
 export const GetUserResponseDtoSchema = z.object({
-  id: z.string().nullable(),
+  id: z.string(),
   email: z.string(),
   avatar: z.string(),
   fullName: z.string(),
@@ -22,3 +24,13 @@ export const GetUserResponseDtoSchema = z.object({
     avatarVisibility: z.string(),
   }).nullable()
 }).describe("GetUserResponseDtoSchema")
+
+export const UsersResponseDtoSchema = 
+  createPaginatedResultSchema(GetUserResponseDtoSchema)
+  .describe("UsersResponseDtoSchema")
+
+export const UserWorkspacesResponseDtoSchema = z.array(z.object({
+  id: z.string(),
+  name: z.string(),
+  logo: z.string().nullable()
+})).describe('UserWorkspacesResponseDtoSchema')

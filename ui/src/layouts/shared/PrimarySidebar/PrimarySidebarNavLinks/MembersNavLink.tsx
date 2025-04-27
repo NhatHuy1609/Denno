@@ -1,3 +1,5 @@
+import { PersistedStateKey } from '@/data/persisted-keys'
+import { getLocalStorageItem } from '@/utils/local-storage'
 import Link from 'next/link'
 import React from 'react'
 import { FaRegUser, FaPlus } from 'react-icons/fa6'
@@ -14,8 +16,10 @@ function AddMemberButton() {
 }
 
 function MembersNavLink() {
+  const workspaceId = getLocalStorageItem(PersistedStateKey.RecentAccessWorkspace)
+
   return (
-    <Link href='' className='relative flex items-center gap-2'>
+    <Link href={`/workspace/${workspaceId}/members`} className='relative flex items-center gap-2'>
       <span className='block flex aspect-[1/1] w-6 items-center justify-center'>
         <FaRegUser className='-translate-y-[1px] text-sm text-white' />
       </span>

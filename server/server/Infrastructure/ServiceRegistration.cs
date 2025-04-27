@@ -10,13 +10,17 @@ using Polly;
 using Polly.Retry;
 using server.Data;
 using server.Dtos.Response;
+using server.Entities;
 using server.Enums;
+using server.Factories;
+using server.Factories.NotificationResponseFactory;
 using server.Infrastructure.Configurations;
 using server.Infrastructure.Providers;
 using server.Interfaces;
-using server.Models;
 using server.Repositories;
 using server.Services;
+using server.Services.Email;
+using server.Services.QueueHostedService;
 using server.UnitOfWorks;
 
 namespace server.Infrastructure
@@ -28,18 +32,34 @@ namespace server.Infrastructure
             services.AddHttpClient<GoogleService>();
             services.AddScoped<IGoogleService, GoogleService>();
             services.AddScoped<IAuthService, AuthService>();
-            services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IDataStore, EFGoogleDataStore>();
             services.AddScoped<IFileUploadService, FileUploadService>();
+            services.AddScoped<IWorkspaceService, WorkspaceService>();
+            services.AddScoped<IUserService, UserService>();
             #region Repositories
             services.AddTransient<IWorkspaceRepository, WorkspaceRepository>();
             #endregion
+            services.AddTransient<INotificationService, NotificationService>();
+            services.AddTransient<IEmailService, EmailService>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
+            services.AddTransient<IActionService, ActionService>();
+            services.AddTransient<ActionFactory, ActionFactory>();
 
             services.AddDbContext<ApplicationDBContext>(options =>
             {
                 options.UseSqlServer(connectionStringConfigName);
             });
+
+            // Factories
+            services.AddScoped<NotificationResponseFactoryResolver>();
+            services.AddScoped<AddedMemberWorkspaceNotificationResponseFactory>();
+            services.AddScoped<JoinWorkspaceWithLinkNotificationResponseFactory>();
+            services.AddScoped<ApproveWorkspaceJoinRequestNotificationResponseFactory>();
+            services.AddScoped<RejectWorkspaceJoinRequestNotificationResponseFactory>();
+
+            // Background services
+            services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+            services.AddHostedService<QueueHostedService>();
 
             return services;
         }

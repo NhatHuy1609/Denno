@@ -14,10 +14,10 @@ const UpdateFormSchema = workspaceContractsDto.UpdateWorkspaceDtoSchema
 type UpdateFormValues = workspaceTypesDto.UpdateWorkspaceDto
 
 interface IWorkspaceUpdateFormProps {
-  hideForm?: () => void
+  hideFormFn: () => void
 }
 
-function WorkspaceUpdateForm({ hideForm }: IWorkspaceUpdateFormProps) {
+function WorkspaceUpdateForm({ hideFormFn }: IWorkspaceUpdateFormProps) {
   const workspaceId = getLocalStorageItem(PersistedStateKey.RecentAccessWorkspace)
   const { data: workspace } = useWorkspaceQuery(workspaceId)
 
@@ -55,11 +55,11 @@ function WorkspaceUpdateForm({ hideForm }: IWorkspaceUpdateFormProps) {
       workspaceId,
       data
     })
-    hideForm && hideForm()
+    hideFormFn && hideFormFn()
   }
 
   const handleHideForm = () => {
-    hideForm && hideForm()
+    hideFormFn && hideFormFn()
   }
 
   return (
