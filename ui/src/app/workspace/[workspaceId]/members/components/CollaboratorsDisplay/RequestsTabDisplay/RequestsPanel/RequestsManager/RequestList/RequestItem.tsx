@@ -14,14 +14,12 @@ type Props = {
 export default function RequestItem({ joinRequest, selectRequestFn, isSelected }: Props) {
   const { id, requester, requestedAt } = joinRequest
 
-  // console.log('REQUEST ITEM RE-RENDER')
-
   return (
     <div className='flex w-full items-center justify-between p-2'>
       <div className='flex w-fit items-center gap-2'>
         <SelectRequestCheckbox
-          isSelected={isSelected}
           requestId={id}
+          isSelected={isSelected}
           selectRequestFn={selectRequestFn}
         />
         <RequesterInfo requester={requester} />

@@ -6,7 +6,7 @@ function RequestList() {
   const { workspaceJoinRequests, setSelectedRequests, selectedRequests } =
     useRequestsManagerContext()
 
-  console.log('SELECTED REQUESTS: ', selectedRequests)
+  // console.log('SELECTED REQUESTS: ', selectedRequests)
 
   const handleSelectRequest = (requestId: number) => {
     if (selectedRequests.includes(requestId)) {

@@ -1,36 +1,59 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRequestsManagerContext } from '../../context'
+import { GrFormSubtract } from 'react-icons/gr'
+import { IoCheckmark } from 'react-icons/io5'
 
 function SelectAllCheckbox() {
-  const [isChecked, setIsChecked] = useState(false)
-  const { selectAllRequestsFn, selectedRequests, workspaceJoinRequests } =
+  const [checkboxState, setCheckboxState] = useState({
+    isAllChecked: false,
+    isIndeterminate: false
+  })
+  const { toggleSelectAllRequestsFn, selectedRequests, workspaceJoinRequests } =
     useRequestsManagerContext()
 
   const handleToggleSelectAllRequests = () => {
-    // If all requests are not selected and checkbox is checked then will not trigger selectAllRequestsFn again
-    if (isChecked && selectedRequests.length === 0) {
-      setIsChecked(false)
-      return
-    }
-
-    if (!isChecked && selectedRequests.length === workspaceJoinRequests.length) {
-      setIsChecked(true)
-      return
-    }
-
-    selectAllRequestsFn && selectAllRequestsFn()
-    setIsChecked(!isChecked)
+    toggleSelectAllRequestsFn(checkboxState.isAllChecked, checkboxState.isIndeterminate)
   }
+
+  // Update checkbox state based on selectedRequests and workspaceJoinRequests
+  useEffect(() => {
+    if (selectedRequests.length === workspaceJoinRequests.length) {
+      setCheckboxState({
+        isAllChecked: true,
+        isIndeterminate: false
+      })
+    } else if (selectedRequests.length === 0) {
+      setCheckboxState({
+        isAllChecked: false,
+        isIndeterminate: false
+      })
+    } else {
+      setCheckboxState({
+        isAllChecked: false,
+        isIndeterminate: true
+      })
+    }
+  }, [selectedRequests, workspaceJoinRequests])
 
   return (
     <div className='flex items-center gap-2'>
-      <input
-        checked={isChecked}
-        type='checkbox'
-        className='size-4'
-        onChange={handleToggleSelectAllRequests}
-      />
-      <label className='text-sm'>{`Select all (0)`}</label>
+      <div
+        onClick={handleToggleSelectAllRequests}
+        className='flex size-[18px] items-center justify-center overflow-hidden rounded-sm border-[1.5px] border-gray-500 bg-[#0076ff]'
+      >
+        {checkboxState.isAllChecked ? (
+          <IoCheckmark className='text-lg font-bold text-white' />
+        ) : checkboxState.isIndeterminate ? (
+          <GrFormSubtract className='text-lg font-bold text-white' />
+        ) : (
+          <div className='size-full bg-white' />
+        )}
+      </div>
+      <label className='text-sm'>
+        {selectedRequests.length > 0
+          ? `${selectedRequests.length} selected `
+          : `Select all (${workspaceJoinRequests.length})`}
+      </label>
     </div>
   )
 }
