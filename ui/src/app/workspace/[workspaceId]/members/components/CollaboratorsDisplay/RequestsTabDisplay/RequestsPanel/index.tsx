@@ -30,11 +30,13 @@ function RequestsPanel() {
     setJoinRequestsDisplay(filteredJoinRequests)
   }
 
-  const handleSelectAllRequests = () => {
-    if (selectedRequests.length === joinRequestsDisplay.length) {
+  const handleToggleSelectAllRequests = (isAllChecked: boolean, isIndeterminate: boolean) => {
+    if (isAllChecked) {
+      setSelectedRequests([])
+    } else if (isIndeterminate) {
       setSelectedRequests([])
     } else {
-      setSelectedRequests(joinRequestsDisplay.map((request) => request.id))
+      setSelectedRequests(workspaceJoinRequests.map((request) => request.id))
     }
   }
 
@@ -51,10 +53,11 @@ function RequestsPanel() {
       />
       <RequestsManagerProvider
         value={{
-          workspaceJoinRequests: joinRequestsDisplay,
+          workspaceJoinRequestDisplay: joinRequestsDisplay,
+          workspaceJoinRequests,
           selectedRequests,
           setSelectedRequests,
-          selectAllRequestsFn: handleSelectAllRequests
+          toggleSelectAllRequestsFn: handleToggleSelectAllRequests
         }}
       >
         <RequestsManager />
