@@ -1,45 +1,14 @@
 import React from 'react'
 import { cn } from '@/lib/styles/utils'
+import { userTypes } from '@/entities/user'
+import { useBoardCreateForm } from './context'
+import useCurrentUserWorkspacesQuery from '@/app/_hooks/query/user/useCurrentUserWorkspacesQuery'
 import { FaAngleDown } from 'react-icons/fa'
 import { DropdownMenu } from '@/ui'
-import { workspaceTypes } from '@/entities/workspace'
-import { useBoardCreateForm } from './context'
-import useCurrentUserWorkspacesQuery from '@/app/_hooks/query/useCurrentUserWorkspacesQuery'
 
-function WorkspaceDropdownItem({
-  workspace
-}: {
-  workspace: workspaceTypes.Workspace
-}) {
-  const { setFormValue, workspaceId } = useBoardCreateForm()
-  const { name, id } = workspace
-
-  const isSelected = workspaceId === id
-
-  const handleSelectWorkspace = () => {
-    setFormValue('workspaceId', id)
-  }
-
-  return (
-    <div
-      onClick={handleSelectWorkspace}
-      className={cn(
-        'flex cursor-pointer items-center gap-4 px-2 py-2 hover:bg-gray-100',
-        isSelected && 'bg-blue-100 hover:bg-blue-200'
-      )}
-    >
-      <span
-        className={cn('tex-gray-700 text-sm', isSelected && 'text-blue-600')}
-      >
-        {name}
-      </span>
-    </div>
-  )
-}
-
-function WorkspaceDropdown() {
+export default function WorkspaceDropdown() {
   const { selectedWorkspace } = useBoardCreateForm()
-  const { data: userWorkspaces = [] } = useCurrentUserWorkspacesQuery()
+  const { data: userWorkspaces = [] } = useCurrentUserWorkspacesQuery({})
 
   return (
     <DropdownMenu>
@@ -60,4 +29,25 @@ function WorkspaceDropdown() {
   )
 }
 
-export default WorkspaceDropdown
+function WorkspaceDropdownItem({ workspace }: { workspace: userTypes.UserWorkspace }) {
+  const { setFormValue, workspaceId } = useBoardCreateForm()
+  const { name, id } = workspace
+
+  const isSelected = workspaceId === id
+
+  const handleSelectWorkspace = () => {
+    setFormValue('workspaceId', id)
+  }
+
+  return (
+    <div
+      onClick={handleSelectWorkspace}
+      className={cn(
+        'flex cursor-pointer items-center gap-4 px-2 py-2 hover:bg-gray-100',
+        isSelected && 'bg-blue-100 hover:bg-blue-200'
+      )}
+    >
+      <span className={cn('tex-gray-700 text-sm', isSelected && 'text-blue-600')}>{name}</span>
+    </div>
+  )
+}

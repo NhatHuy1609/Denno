@@ -12,6 +12,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using AutoMapper;
+using server.Entities;
 
 namespace server.Services
 {
@@ -21,17 +22,20 @@ namespace server.Services
         private readonly IConfiguration _config;
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IFileUploadService _fileUploadService;
 
         public AuthService(
             IMapper mapper,
             IConfiguration config,
             UserManager<AppUser> userManager,
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<IdentityRole> roleManager,
+            IFileUploadService fileUploadService)
         {
             _mapper = mapper;
             _config = config;
             _userManager = userManager;
             _roleManager = roleManager;
+            _fileUploadService = fileUploadService;
         }
 
         public async Task<GoogleSignInResponseDto> RegisterUserWithGoogleAccount(Userinfo userinfo)
@@ -92,9 +96,20 @@ namespace server.Services
                 return response;
             }
 
+            // Store avatar with cloudinary
+            var uploadAvatarResult = await _fileUploadService.UploadPhotoAsync(registerRequest.Avatar);
+
+            if (!uploadAvatarResult.Success)
+            {
+                response.Message = uploadAvatarResult.ErrorMessage;
+                return response;
+            }
+
+            // Initialize new created user response
             var userInfo = new GetUserResponseDto()
             {
                 Email = registerRequest.Email,
+                Avatar = uploadAvatarResult.Url
             };
 
             response.User = newUser;
@@ -104,6 +119,8 @@ namespace server.Services
             response.RefreshToken = GenerateRefreshTokenString();
 
             newUser.RefreshTokenExpiry = DateTime.Now.AddDays(JwtTokenProvider.RefreshTokenExpiration);
+            newUser.Avatar = uploadAvatarResult.Url;
+
             await _userManager.UpdateAsync(newUser);
 
             return response;

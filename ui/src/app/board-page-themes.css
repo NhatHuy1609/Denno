@@ -16,5 +16,8 @@
     --ds-button-pressed-hovered: var(--ds-button-pressed);
     --ds-button-hovered: rgba(255, 255, 255, 0.2);
     --ds-header-background: rgba(0, 0, 0, 0.6);
+
+    --ds-accent-text: #172b4d;
+    --ds-accent-background-hovered: #3c4a6324;
   }
 }

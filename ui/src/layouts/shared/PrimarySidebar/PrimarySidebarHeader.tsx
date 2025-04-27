@@ -13,7 +13,7 @@ function PrimarySidebarHeader({ hideSideboard }: IProps) {
   const workspaceId = getLocalStorageItem(PersistedStateKey.RecentAccessWorkspace)
   const { data: workspace } = useWorkspaceQuery(workspaceId as string)
 
-  const { name = '', logoUrl } = workspace || {}
+  const { name = '', logo } = workspace || {}
 
   const handleClickToHideSideboard = () => {
     hideSideboard()
@@ -22,7 +22,7 @@ function PrimarySidebarHeader({ hideSideboard }: IProps) {
   return (
     <div className='flex h-[var(--primary-sidebar-header-height)] items-center justify-between border-b border-[var(--ds-border-light-transparent)] p-3'>
       <div className='flex items-center gap-2'>
-        <WorkspaceLogo name={name} imageUrl={logoUrl} size='base' />
+        <WorkspaceLogo name={name} imageUrl={logo} size='base' />
         <div className='flex flex-col'>
           <span className='text-sm font-semibold text-white'>{name}</span>
           <span className='text-xs font-light text-white'>Free</span>

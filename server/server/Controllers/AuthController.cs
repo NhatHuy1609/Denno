@@ -8,6 +8,7 @@ using server.Dtos.Requests.Auth;
 using server.Dtos.Requests.Users;
 using server.Dtos.Response;
 using server.Dtos.Response.Users;
+using server.Entities;
 using server.Infrastructure.Providers;
 using server.Interfaces;
 using server.Models;
@@ -97,7 +98,7 @@ namespace server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> Register([FromBody] RegisterRequestDto registerDto)
+        public async Task<IActionResult> Register([FromForm] RegisterRequestDto registerDto)
         {
             if (!ModelState.IsValid)
             {
@@ -117,17 +118,7 @@ namespace server.Controllers
 
             registerResult.Message = "Registration successful, please check your email to confirm your account";
 
-            _ = Task.Run(async () =>
-            {
-                try
-                {
-                    await _emailService.SendConfirmationRegisterAccountEmailAsync(registerDto.Email, registerResult.User);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError("Failed to send email after retries: {ex.Message}", ex);
-                }
-            });
+            _emailService.SendConfirmationRegisterAccountEmail(registerDto.Email, registerResult.User);
 
             return Ok(registerResult);
         }
@@ -251,17 +242,14 @@ namespace server.Controllers
                 });
             }
 
-            _ = Task.Run(async () =>
+            try
             {
-                try
-                {
-                    await _emailService.SendConfirmationRegisterAccountEmailAsync(requestDto.Email, user);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError("Failed to send email after retries: {ex.Message}", ex);
-                }
-            });
+                _emailService.SendConfirmationRegisterAccountEmail(requestDto.Email, user);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Failed to send email after retries: {ex.Message}", ex);
+            }
 
             return Ok();
         }

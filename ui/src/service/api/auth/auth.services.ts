@@ -15,7 +15,6 @@ export class AuthService {
     )
 
     return httpPost('/auth/google-sign-in', loginGoogleDto)
-            .then(AxiosContracts.responseContract(LoginGoogleResponseDtoSchema))
   }
 
   static registerUserMutation(data: { registerUserDto: RegisterUserDto }) {
@@ -23,8 +22,16 @@ export class AuthService {
       RegisterUserDtoSchema,
       data.registerUserDto
     )
-    return httpPost('/auth/register', registerUserDto)
-            .then(AxiosContracts.responseContract(RegisterResponseDtoSchema))
+    const formData = new FormData();
+    Object.entries(registerUserDto).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+    
+    return httpPost('/auth/register', formData, {
+      headers: {
+      'Content-Type': 'multipart/form-data'
+      }
+    });
   }
 
   static validateRegisterUserMutation(data: { validateRegisterUserDto: ValidateRegisterUserDto }) {
@@ -33,7 +40,6 @@ export class AuthService {
       data.validateRegisterUserDto
     )
     return httpPost('/auth/validate-email', validateRegisterUserDto)
-            .then(AxiosContracts.responseContract(LoginResponseDtoSchema))
   }
 
   static loginUserMutation(data: { loginUserDto: LoginUserDto }) {
@@ -42,7 +48,6 @@ export class AuthService {
       data.loginUserDto
     )
     return httpPost('/auth/login', loginUserDto)
-            .then(AxiosContracts.responseContract(LoginResponseDtoSchema))
   }
 
   static resendRegisterCodeMutation(data: { resendRegisterCodeDto: ResendRegisterCodeDto }) {

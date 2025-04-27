@@ -6,6 +6,12 @@
         IBoardRepository Boards { get; }
         IWorkspaceRepository Workspaces { get; }
         IFileUploadRepository FileUploads { get; }
+        ICardListRepository CardLists { get; }
+        ICardRepository Cards { get; }
+        IWorkspaceMemberRepository WorkspaceMembers { get; }
+        INotificationRepository Notifications { get; }
+        IInvitationSecretRepository InvitationSecrets { get; }
+        IJoinRequestRepository JoinRequests { get; }
         int Complete();
     }
 }

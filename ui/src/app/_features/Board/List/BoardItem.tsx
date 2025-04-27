@@ -13,7 +13,7 @@ function BoardItem({ item }: Props) {
 
   return (
     <Link
-      href={`/b/${id}`}
+      href={`/board/${id}`}
       className='group relative block min-h-24 w-full overflow-hidden rounded-md'
     >
       <div className='absolute inset-0 group-hover:brightness-90'>

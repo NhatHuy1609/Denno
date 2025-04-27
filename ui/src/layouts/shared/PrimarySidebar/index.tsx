@@ -99,7 +99,7 @@ function PrimarySidebar() {
         backdropFilter: 'blur(10px)',
         boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)'
       }}
-      className='relative z-[100] h-[calc(100vh-var(--header-height))] w-[var(--primary-sidebar-width)] border-r border-[var(--ds-border-light-transparent)] text-white'
+      className='relative z-[100] h-[calc(100vh-var(--header-height))] w-[var(--primary-sidebar-width)] shrink-0 border-r border-[var(--ds-border-light-transparent)] text-white'
     >
       {!isSidebarOpen && <ShowPrimarySidebarButton showSidebar={handleShowSidebar} />}
       <div ref={containerRef} className='size-full'>

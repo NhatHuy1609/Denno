@@ -1,17 +1,13 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Asp.Versioning;
+﻿using Asp.Versioning;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using server.Interfaces;
-using server.Models;
-using Amazon.S3;
-using Amazon.S3.Model;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using server.Dtos.Requests.Board;
 using server.Dtos.Response;
 using server.Dtos.Response.Board;
 using server.Enums;
+using server.Entities;
 
 namespace server.Controllers
 {

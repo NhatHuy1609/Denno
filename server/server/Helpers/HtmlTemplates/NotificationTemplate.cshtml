@@ -1,0 +1,135 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Denno Invitation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #f9f9fb;
+            color: #172B4D;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 600px;
+            padding: 40px 20px;
+            background-color: #f9f9fb;
+        }
+
+        .logo {
+            margin-bottom: 20px;
+        }
+
+            .logo img {
+                height: 30px;
+            }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #172B4D;
+        }
+
+        p {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .button {
+            display: inline-block;
+            background-color: #0052CC;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 3px;
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+
+            .button:hover {
+                background-color: #0047B3;
+            }
+
+        .description-title {
+            font-weight: 600;
+            font-size: 16px;
+            display: inline;
+        }
+
+        .learn-more {
+            color: #0052CC;
+            text-decoration: none;
+        }
+
+        .learn-more:hover {
+            text-decoration: underline;
+        }
+
+        .note-container {
+            display: flex;
+            align-items: center;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .note-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+
+        .note-content {
+            flex: 1;
+        }
+
+        .note-content h3 {
+            margin: 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .note-content p {
+            margin: 5px 0 0;
+            font-size: 14px;
+            color: #0052cc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>@Model.Message</h1>
+
+        <p>Join them on Denno to collaborate, manage projects, and reach new productivity peaks.</p>
+
+        <a href="#" class="button">Go to Workspace</a>
+
+        @if (!string.IsNullOrEmpty(Model.Description)) 
+        {
+            <div class="note-container">
+                <img src="@(Model.SenderAvatar ?? "")" alt="Avatar" class="note-avatar">
+                <div class="note-content">
+                    <h3>A note from @Model.SenderName</h3>
+                    <p>Hey, join us</p>
+                </div>
+            </div>
+        }
+
+        <p><span class="description-title">What is Denno?</span> Imagine a white board, filled with lists of sticky notes, with each note as a task. Now imagine that each of those sticky notes has photos, attachments from other data sources like Jira or Salesforce, documents, due dates, and more.</p>
+
+        <p>Now imagine that you can take that whiteboard anywhere you go on your smartphone, and can access it from any computer through the web. That's Denno! <a href="#" class="learn-more">Learn more</a></p>
+    </div>
+</body>
+</html>
