@@ -23,9 +23,10 @@ function RequestsPanel() {
     setJoinRequestsDisplay(workspaceJoinRequests)
   }, [workspaceJoinRequests])
 
+  // Handle filter join requests based on name input
   const handleChangeFilterInput = () => {
     const searchedName = inputRef.current?.value ?? ''
-    const filteredJoinRequests = joinRequestsDisplay.filter((request) => {
+    const filteredJoinRequests = workspaceJoinRequests.filter((request) => {
       return request.requester.fullName.toLowerCase().includes(searchedName.toLowerCase())
     })
     setJoinRequestsDisplay(filteredJoinRequests)

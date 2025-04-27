@@ -26,7 +26,7 @@ export default function RequestItem({ joinRequest, selectRequestFn, isSelected }
       </div>
       <div className='flex w-fit items-center gap-6'>
         <RequestedDateDisplay requestedAt={requestedAt} />
-        <RequestActions />
+        <RequestActions requestId={id} />
       </div>
     </div>
   )
