@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react'
 import { useCopyToClipboard } from '@/app/_hooks/useCopyToClipboard'
-import { useCreateInvitationLink } from './useCreateInvitationLink'
+import { useCreateInvitationLink } from '../../../../../../../_hooks/useCreateInvitationLink'
 import { IoIosLink } from 'react-icons/io'
 import { FaRegCircleCheck } from 'react-icons/fa6'
 import CustomizableButton from '@/ui/components/CustomizableButton'

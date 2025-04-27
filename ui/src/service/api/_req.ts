@@ -29,6 +29,9 @@ instance.interceptors.request.use(
 
 instance.interceptors.response.use(
   (response) => response,
+  (error) => {
+    return Promise.reject(error)
+  }
   // (error) => {
   //   const originalRequest = error.config;
   //   const { statusCode, errorType } = authApiLib.getDetailedError(error)
