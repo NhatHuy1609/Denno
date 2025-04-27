@@ -3,10 +3,8 @@ import { useRequestsManagerContext } from '../../context'
 import RequestItem from './RequestItem'
 
 function RequestList() {
-  const { workspaceJoinRequests, setSelectedRequests, selectedRequests } =
+  const { workspaceJoinRequestDisplay, setSelectedRequests, selectedRequests } =
     useRequestsManagerContext()
-
-  // console.log('SELECTED REQUESTS: ', selectedRequests)
 
   const handleSelectRequest = (requestId: number) => {
     if (selectedRequests.includes(requestId)) {
@@ -20,7 +18,7 @@ function RequestList() {
 
   return (
     <div className='flex w-full flex-col gap-2'>
-      {workspaceJoinRequests.map((joinRequest) => (
+      {workspaceJoinRequestDisplay.map((joinRequest) => (
         <RequestItem
           key={joinRequest.id}
           joinRequest={joinRequest}
