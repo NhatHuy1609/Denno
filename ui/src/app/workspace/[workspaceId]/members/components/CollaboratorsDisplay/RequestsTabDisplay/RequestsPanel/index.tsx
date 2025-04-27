@@ -15,6 +15,7 @@ function RequestsPanel() {
 
   // State for managing selected requests
   const [selectedRequests, setSelectedRequests] = useState<number[]>([])
+  // State for managing joinRequestsDisplay to display join requests
   const [joinRequestsDisplay, setJoinRequestsDisplay] = useState(workspaceJoinRequests)
 
   // Synchronize joinRequestsDisplay with workspaceJoinRequests
@@ -24,7 +25,7 @@ function RequestsPanel() {
 
   const handleChangeFilterInput = () => {
     const searchedName = inputRef.current?.value ?? ''
-    const filteredJoinRequests = workspaceJoinRequests.filter((request) => {
+    const filteredJoinRequests = joinRequestsDisplay.filter((request) => {
       return request.requester.fullName.toLowerCase().includes(searchedName.toLowerCase())
     })
     setJoinRequestsDisplay(filteredJoinRequests)
