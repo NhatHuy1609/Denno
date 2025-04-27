@@ -13,7 +13,7 @@ namespace server.Controllers
     [ApiController]
     [ApiVersion("1.0")]
     [ControllerName("joinRequests")]
-    [Route("api/v{version:apiVersion}/[controller]")]
+    [Route("api/v{version:apiVersion}/")]
     public class JoinRequestController: ControllerBase
     {
         private readonly IMapper _mapper;
