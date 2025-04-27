@@ -19,7 +19,7 @@ function CollaboratorsDisplay() {
   })
 
   const { members = [], joinRequests = [] } = detailedWorkspace || {}
-  const collaboratorCount = members?.length + joinRequests?.length || 0
+  const collaboratorCount = members?.length || 0
 
   const renderTabDisplay = () => {
     if (tab === 'members') {

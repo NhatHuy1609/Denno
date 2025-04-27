@@ -1,16 +1,23 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'next/navigation'
 import { useUsersQuery } from '@/app/_hooks/query/user/useUsersQuery'
 import { userTypes } from '@/entities/user'
 import { useDebounce } from '@/app/_hooks/useDebounce'
+import { useCreateInvitationLink } from '@/app/_hooks/useCreateInvitationLink'
+import { useCopyToClipboard } from '@/app/_hooks/useCopyToClipboard'
+import { useInvitationSecretQuery } from '@/app/_hooks/query/workspace/useWorkspaceInvitationSecretQuery'
 import useAddMultipleWorkspaceMemberMutation from '@/app/_hooks/mutation/workspace/useAddMultipleWorkspaceMember'
-import { FaLink } from 'react-icons/fa6'
+import useDisableInvitationSecretMutation from '@/app/_hooks/mutation/workspace/useDisableInvitationSecretMutation'
+import { WorkspaceQueries } from '@/entities/workspace'
+import { FaLink, FaRegCircleCheck } from 'react-icons/fa6'
 import { HiOutlineXMark } from 'react-icons/hi2'
 import { toastError, toastSuccess } from '@/ui'
 import SearchedUsersResult from './SearchedUsersResult'
 import PrimaryInputText from '@/app/_components/PrimaryInputText'
 import CustomizableButton from '@/ui/components/CustomizableButton'
 import InviteMemberDescriptionInput from './InviteMemberDescriptionInput'
+import { generateWorkspaceInvitationLink } from '@/utils/invitation-link'
 
 type SearchedUserFilter = Pick<userTypes.UsersFilterQuery, 'email'>
 
@@ -19,16 +26,29 @@ type Props = {
 }
 
 export default function InviteMemberModalBody({ closeModalFn }: Props) {
+  const queryClient = useQueryClient()
   const { workspaceId } = useParams<{ workspaceId: string }>()
-
   const inputRef = useRef<HTMLInputElement>(null)
   const descriptionInputRef = useRef<HTMLInputElement>(null)
 
   const [selectedUsers, setSelectedUsers] = useState<Array<userTypes.User>>([])
 
-  const [showSearchedUsersResult, setShowSearchedUsersResult] = useState(false)
-  const [searchTerm, setSearchTerm] = useState<string>('')
-  const debouncedSearchTerm = useDebounce(searchTerm, 650)
+  const {
+    data: invitationSecret,
+    isError,
+    refetch
+  } = useInvitationSecretQuery(workspaceId, {
+    retry: 1
+  })
+
+  const { mutateAsync: disableLinkAsync, isPending: isDisablingLink } =
+    useDisableInvitationSecretMutation({
+      onSuccess: async () => {
+        queryClient.invalidateQueries({
+          queryKey: WorkspaceQueries.workspaceInvitationSecretQuery(workspaceId).queryKey
+        })
+      }
+    })
 
   const { mutate: addWorkspaceMember } = useAddMultipleWorkspaceMemberMutation({
     mutationKey: [workspaceId],
@@ -43,6 +63,18 @@ export default function InviteMemberModalBody({ closeModalFn }: Props) {
       closeModalFn && closeModalFn()
     }
   })
+
+  // These states are used to control the behavior of the search results
+  const [showSearchedUsersResult, setShowSearchedUsersResult] = useState(false)
+  const [searchTerm, setSearchTerm] = useState<string>('')
+  const debouncedSearchTerm = useDebounce(searchTerm, 650)
+
+  // Handle create invitation link and copy to clipboard
+  const [_, copy] = useCopyToClipboard()
+  const [isCopiedSuccess, setIsCopiedSuccess] = useState(false)
+  const { createInvitationLink: createInvitationLink, isCreatingLink } =
+    useCreateInvitationLink(workspaceId)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Fetch searched users using the debounced search term
   // This will only trigger when the search term changes
@@ -106,6 +138,62 @@ export default function InviteMemberModalBody({ closeModalFn }: Props) {
     })
   }
 
+  const handleDisableLink = async () => {
+    await disableLinkAsync(workspaceId)
+  }
+
+  const showDisableLinkButton = Boolean(invitationSecret?.secretCode)
+  console.log('Invitation secret: ', invitationSecret)
+  // console.log('IS show disable link button', showDisableLinkButton)
+
+  // Handle create invitation link and copy to clipboard
+  const handleClickCreateLinkButton = async () => {
+    var link = await createInvitationLink()
+    if (link) {
+      await copy(link)
+      setIsCopiedSuccess(true)
+
+      // Invalidate the query to refresh the invitation secret
+      queryClient.invalidateQueries({
+        queryKey: WorkspaceQueries.workspaceInvitationSecretQuery(workspaceId).queryKey
+      })
+
+      // Clear the timeout if it exists before setting a new one
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+
+      // This ensures that the copied state is reset after 2 seconds
+      timeoutRef.current = setTimeout(() => {
+        setIsCopiedSuccess(false)
+      }, 2000)
+    }
+  }
+
+  const handleCopyExistingLink = () => {
+    if (!invitationSecret?.secretCode) return
+
+    const invitationLink = generateWorkspaceInvitationLink(
+      workspaceId,
+      invitationSecret?.secretCode
+    )
+
+    if (invitationLink) {
+      copy(invitationLink)
+      setIsCopiedSuccess(true)
+
+      // Clear the timeout if it exists before setting a new one
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+
+      // This ensures that the copied state is reset after 2 seconds
+      timeoutRef.current = setTimeout(() => {
+        setIsCopiedSuccess(false)
+      }, 2000)
+    }
+  }
+
   return (
     <div className='relative w-full'>
       {/* Selected users */}
@@ -145,15 +233,45 @@ export default function InviteMemberModalBody({ closeModalFn }: Props) {
       <div className='mt-6 flex w-full justify-between'>
         <div className='flex flex-col gap-1'>
           <p className='text-sm'>Invite someone to this Workspace with a link: </p>
-          <span className='text-xs font-medium text-blue-600'>Disable link</span>
+          {showDisableLinkButton && (
+            <button
+              type='button'
+              className='w-fit cursor-pointer text-xs font-medium text-blue-600 underline decoration-transparent underline-offset-1 hover:decoration-inherit'
+              disabled={isDisablingLink}
+              onClick={handleDisableLink}
+            >
+              Disable link
+            </button>
+          )}
         </div>
 
-        <CustomizableButton
-          value='Copy link'
-          size='small'
-          startIcon={<FaLink className='text-base' />}
-          className='min-w-24 bg-gray-200 text-sm font-medium text-black'
-        />
+        <div className='flex flex-col gap-2'>
+          {invitationSecret?.secretCode ? (
+            <CustomizableButton
+              size='small'
+              disabled={isCreatingLink}
+              startIcon={<FaLink className='text-base' />}
+              className='min-w-24 bg-gray-200 text-sm font-medium text-black'
+              value={'Copy link'}
+              onClick={handleCopyExistingLink}
+            />
+          ) : (
+            <CustomizableButton
+              size='small'
+              disabled={isCreatingLink}
+              startIcon={<FaLink className='text-base' />}
+              className='min-w-24 bg-gray-200 text-sm font-medium text-black'
+              value={'Create link'}
+              onClick={handleClickCreateLinkButton}
+            />
+          )}
+
+          {!isCreatingLink && isCopiedSuccess && (
+            <div className='flex w-[200px] items-center gap-2 rounded-full bg-green-100 px-2 py-1 text-sm text-green-800'>
+              <FaRegCircleCheck className='text-green-800' /> Link copied to clipboard
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

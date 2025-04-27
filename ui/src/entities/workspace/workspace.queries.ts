@@ -25,7 +25,7 @@ export class WorkspaceQueries {
 
   static workspaceInvitationSecretQuery(workspaceId: string) {
     return queryOptions({
-      queryKey: [...this.keys.root, 'invitationSecret', workspaceId],
+      queryKey: [...this.keys.root, 'invitationSecret', workspaceId] as unknown[],
       queryFn: async ({ signal }) => {
         const response = await WorkspaceService.workspaceInvitationSecretQuery(workspaceId)
         return mapToInvitationSecret(response.data)

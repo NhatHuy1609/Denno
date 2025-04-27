@@ -18,8 +18,6 @@ namespace server.Controllers
     {
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly UserManager<AppUser> _userManager;
-        private readonly IFileUploadService _uploadService;
         private readonly IActionService _actionService;
         private readonly ILogger<JoinRequestController> _logger;
         private readonly IEmailService _emailService;
@@ -27,16 +25,11 @@ namespace server.Controllers
         public JoinRequestController(
             IMapper mapper,
             IUnitOfWork unitOfWork,
-            UserManager<AppUser> userManager,
-            IFileUploadService uploadService,
             IActionService actionService,
             ILogger<JoinRequestController> logger,
-            IEmailService emailService,
-            IWorkspaceService workspaceService)
+            IEmailService emailService)
         {
             _unitOfWork = unitOfWork;
-            _userManager = userManager;
-            _uploadService = uploadService;
             _actionService = actionService;
             _logger = logger;
             _emailService = emailService;
