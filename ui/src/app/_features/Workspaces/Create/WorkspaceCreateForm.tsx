@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import React from 'react'
 import Image from 'next/image'
 import WorkspaceImage from 'public/workspace_create_image.svg'
@@ -10,7 +11,16 @@ import useCreateWorkspaceMutation from './create.mutation'
 import { getErrorMessage } from '@/service/api/_getErrorMessage'
 import { ScrollArea, Form, Button, toastSuccess, toastError } from '@/ui'
 
-type FormValues = workspaceTypesDto.CreateWorkspaceDto
+const FormSchema = z
+  .object({
+    name: z.string({ required_error: 'Name required!' }).min(1, { message: 'Name required!' }),
+    description: z
+      .string({ required_error: 'Description required!' })
+      .min(1, { message: 'Description required!' })
+  })
+  .describe('CreateWorkspaceDtoSchema')
+
+type FormValues = z.infer<typeof FormSchema>
 
 function WorkspaceCreateForm() {
   const {
@@ -19,7 +29,7 @@ function WorkspaceCreateForm() {
     handleSubmit,
     formState: { errors }
   } = useForm<FormValues>({
-    resolver: zodResolver(workspaceContractsDto.CreateWorkspaceDtoSchema),
+    resolver: zodResolver(FormSchema),
     defaultValues: {
       name: '',
       description: ''
@@ -38,7 +48,6 @@ function WorkspaceCreateForm() {
       })
     },
     onSettled: () => {
-      console.log('reset workspace create form')
       reset()
     }
   })

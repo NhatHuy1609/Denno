@@ -2,7 +2,7 @@ import React from 'react'
 import { FaRegUser } from 'react-icons/fa6'
 import BoardList from './BoardList'
 import { useParams } from 'next/navigation'
-import { useBoardsByWorkspace } from '@/app/_hooks/query/useBoardsByWorkspace'
+import { useBoardsByWorkspace } from '@/app/_hooks/query/board/useBoardsByWorkspace'
 
 function WorkspaceBoardList() {
   const { workspaceId } = useParams()

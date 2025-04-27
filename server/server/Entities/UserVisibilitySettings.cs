@@ -1,5 +1,4 @@
 ﻿using server.Data.Enums;
-using server.Models;
 
 namespace server.Entities
 {

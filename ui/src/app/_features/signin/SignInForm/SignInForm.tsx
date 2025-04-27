@@ -12,6 +12,8 @@ import { authTypesDto, authContractsDto, authApiLib } from '@/service/api/auth'
 import { LuMail, LuLock } from 'react-icons/lu'
 import { Form, Button, messageError, messageInfo } from '@/ui'
 import SignInGoogleButton from './SignInGoogleButton'
+import { getLocalStorageItem, setLocalStorageItem } from '@/utils/local-storage'
+import { PersistedStateKey } from '@/data/persisted-keys'
 
 type SignInFormValues = authTypesDto.LoginUserDto
 
@@ -35,6 +37,12 @@ function SignInForm() {
       const data = response?.data
       const userName = data?.user?.userName
 
+      const redirectAfterLoginPath = getLocalStorageItem(PersistedStateKey.RedirectAfterLogin)
+      if (redirectAfterLoginPath) {
+        router.push(redirectAfterLoginPath)
+        return
+      }
+
       if (status === 200) {
         router.push(`/u/${userName}/boards`)
       }
@@ -52,6 +60,9 @@ function SignInForm() {
       } else {
         messageError(message)
       }
+    },
+    onSettled: () => {
+      setLocalStorageItem(PersistedStateKey.RedirectAfterLogin, '')
     }
   })
 

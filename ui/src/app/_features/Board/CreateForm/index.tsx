@@ -6,7 +6,7 @@ import { BoardQueries } from '@/entities/board'
 import { PHOTOS_BACKGROUND } from '@/data/board-photo-backgrounds'
 import { useForm, Controller } from 'react-hook-form'
 import { useCreateBoardMutation } from './boardCreate.mutation'
-import useCurrentUserWorkspacesQuery from '@/app/_hooks/query/useCurrentUserWorkspacesQuery'
+import useCurrentUserWorkspacesQuery from '@/app/_hooks/query/user/useCurrentUserWorkspacesQuery'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { boardTypesDto } from '@/service/api/board'
 import { boardContractsDto } from '@/service/api/board'
@@ -20,7 +20,7 @@ import BoardBackgroundSelectionDisplay from './BoardBackgroundSelectionDisplay'
 type FormValues = boardTypesDto.CreateBoardDto
 
 function BoardCreateForm() {
-  const { data: userWorkspaces = [] } = useCurrentUserWorkspacesQuery()
+  const { data: userWorkspaces = [] } = useCurrentUserWorkspacesQuery({})
 
   const {
     reset,

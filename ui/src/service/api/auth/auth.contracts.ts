@@ -1,6 +1,5 @@
 import { z } from 'zod'
 import { GetUserResponseDtoSchema } from '../user/user.contracts'
-import { userContracts } from '@/entities/user'
 import { userContractsDto } from '../user'
 
 // RequestsDto ============================================================================
@@ -30,7 +29,8 @@ export const RegisterUserDtoSchema = z.object({
     .max(50, "Your name is too long"),
   password: z
     .string({ required_error: 'Password required!' })
-    .min(8, {message: 'Password must contain at least 8 character(s)'})
+    .min(8, { message: 'Password must contain at least 8 character(s)' }),
+  avatar: z.instanceof(File, { message: 'Avatar must be a file' }),
 }).required()
 
 export const ValidateRegisterUserDtoSchema = z.object({

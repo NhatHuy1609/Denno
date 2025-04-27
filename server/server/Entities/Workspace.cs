@@ -1,7 +1,6 @@
-﻿using server.Entities;
-using server.Enums;
+﻿using server.Enums;
 
-namespace server.Models
+namespace server.Entities
 {
     public class Workspace
     {
@@ -17,5 +16,8 @@ namespace server.Models
 
         public ICollection<Board> Boards { get; set; } = new List<Board>();
         public virtual ICollection<WorkspaceMember> WorkspaceMembers { get; set; } = new List<WorkspaceMember>();
+
+        public virtual ICollection<DennoAction> Actions { get; set; } = new List<DennoAction>();
+        public virtual ICollection<JoinRequest> JoinRequests { get; set; } = new List<JoinRequest>();
     }
 }

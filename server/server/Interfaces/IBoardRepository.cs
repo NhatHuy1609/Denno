@@ -1,4 +1,4 @@
-﻿using server.Models;
+﻿using server.Entities;
 
 namespace server.Interfaces;
 

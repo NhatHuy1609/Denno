@@ -155,85 +155,7 @@ namespace server.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("server.Entities.FileUpload", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AssetId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CreatedAt")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Format")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PublicId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ResourceType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SecureUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("WorkspaceId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("WorkspaceId")
-                        .IsUnique();
-
-                    b.ToTable("FileUploads");
-                });
-
-            modelBuilder.Entity("server.Entities.UserVisibilitySettings", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("AvatarVisibility")
-                        .HasColumnType("int");
-
-                    b.Property<int>("BasedInVisibility")
-                        .HasColumnType("int");
-
-                    b.Property<int>("DepartmentVisibility")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EmailVisibility")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FullNameVisibility")
-                        .HasColumnType("int");
-
-                    b.Property<int>("JobTitleVisibility")
-                        .HasColumnType("int");
-
-                    b.Property<int>("OrganizationVisibility")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("UserVisibilitySettings");
-                });
-
-            modelBuilder.Entity("server.Models.AppUser", b =>
+            modelBuilder.Entity("server.Entities.AppUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -325,7 +247,7 @@ namespace server.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("server.Models.Board", b =>
+            modelBuilder.Entity("server.Entities.Board", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -357,7 +279,7 @@ namespace server.Migrations
                     b.ToTable("Boards");
                 });
 
-            modelBuilder.Entity("server.Models.BoardLabel", b =>
+            modelBuilder.Entity("server.Entities.BoardLabel", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -383,7 +305,7 @@ namespace server.Migrations
                     b.ToTable("BoardLabels");
                 });
 
-            modelBuilder.Entity("server.Models.BoardMember", b =>
+            modelBuilder.Entity("server.Entities.BoardMember", b =>
                 {
                     b.Property<Guid>("BoardId")
                         .HasColumnType("uniqueidentifier");
@@ -398,7 +320,7 @@ namespace server.Migrations
                     b.ToTable("BoardMembers");
                 });
 
-            modelBuilder.Entity("server.Models.BoardRestriction", b =>
+            modelBuilder.Entity("server.Entities.BoardRestriction", b =>
                 {
                     b.Property<Guid>("BoardId")
                         .HasColumnType("uniqueidentifier");
@@ -416,7 +338,7 @@ namespace server.Migrations
                     b.ToTable("BoardRestrictions");
                 });
 
-            modelBuilder.Entity("server.Models.Card", b =>
+            modelBuilder.Entity("server.Entities.Card", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -450,6 +372,10 @@ namespace server.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Rank")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("ReminderDate")
                         .HasColumnType("datetime2");
 
@@ -465,41 +391,7 @@ namespace server.Migrations
                     b.ToTable("Cards");
                 });
 
-            modelBuilder.Entity("server.Models.CardActivity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("ActionType")
-                        .HasColumnType("int");
-
-                    b.Property<string>("AppUserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<Guid>("CardId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Id"), false);
-
-                    b.HasIndex("AppUserId");
-
-                    b.HasIndex("CardId");
-
-                    b.ToTable("CardActivites");
-                });
-
-            modelBuilder.Entity("server.Models.CardAttachment", b =>
+            modelBuilder.Entity("server.Entities.CardAttachment", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -528,7 +420,7 @@ namespace server.Migrations
                     b.ToTable("CardAttachments");
                 });
 
-            modelBuilder.Entity("server.Models.CardCheckList", b =>
+            modelBuilder.Entity("server.Entities.CardCheckList", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -550,7 +442,7 @@ namespace server.Migrations
                     b.ToTable("CardCheckLists");
                 });
 
-            modelBuilder.Entity("server.Models.CardCheckListItem", b =>
+            modelBuilder.Entity("server.Entities.CardCheckListItem", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -590,7 +482,7 @@ namespace server.Migrations
                     b.ToTable("CardCheckListItems");
                 });
 
-            modelBuilder.Entity("server.Models.CardComment", b =>
+            modelBuilder.Entity("server.Entities.CardComment", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -621,7 +513,7 @@ namespace server.Migrations
                     b.ToTable("CardComments");
                 });
 
-            modelBuilder.Entity("server.Models.CardLabel", b =>
+            modelBuilder.Entity("server.Entities.CardLabel", b =>
                 {
                     b.Property<Guid>("BoardLabelId")
                         .HasColumnType("uniqueidentifier");
@@ -636,7 +528,7 @@ namespace server.Migrations
                     b.ToTable("CardLabels");
                 });
 
-            modelBuilder.Entity("server.Models.CardList", b =>
+            modelBuilder.Entity("server.Entities.CardList", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -649,6 +541,10 @@ namespace server.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Rank")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("BoardId");
@@ -656,7 +552,7 @@ namespace server.Migrations
                     b.ToTable("CardLists");
                 });
 
-            modelBuilder.Entity("server.Models.CardMember", b =>
+            modelBuilder.Entity("server.Entities.CardMember", b =>
                 {
                     b.Property<string>("AppUserId")
                         .HasColumnType("nvarchar(450)");
@@ -671,7 +567,122 @@ namespace server.Migrations
                     b.ToTable("CardMembers");
                 });
 
-            modelBuilder.Entity("server.Models.GoogleAuthDataStore", b =>
+            modelBuilder.Entity("server.Entities.DennoAction", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ActionType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("BoardId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CardId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CommentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("ListId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("MemberCreatorId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid?>("TargetBoardId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("TargetCardId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("TargetListId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("TargetUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid?>("WorkspaceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BoardId");
+
+                    b.HasIndex("CardId");
+
+                    b.HasIndex("CommentId");
+
+                    b.HasIndex("ListId");
+
+                    b.HasIndex("MemberCreatorId");
+
+                    b.HasIndex("TargetBoardId");
+
+                    b.HasIndex("TargetCardId");
+
+                    b.HasIndex("TargetListId");
+
+                    b.HasIndex("TargetUserId");
+
+                    b.HasIndex("WorkspaceId");
+
+                    b.ToTable("Actions");
+                });
+
+            modelBuilder.Entity("server.Entities.FileUpload", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AssetId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedAt")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Format")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PublicId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ResourceType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SecureUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("WorkspaceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WorkspaceId")
+                        .IsUnique();
+
+                    b.ToTable("FileUploads");
+                });
+
+            modelBuilder.Entity("server.Entities.GoogleAuthDataStore", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -692,7 +703,118 @@ namespace server.Migrations
                     b.ToTable("GoogleAuthDataStores");
                 });
 
-            modelBuilder.Entity("server.Models.Restriction", b =>
+            modelBuilder.Entity("server.Entities.InvitationSecret", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid?>("BoardId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("InviterId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("SecretCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("WorkspaceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BoardId");
+
+                    b.HasIndex("InviterId");
+
+                    b.HasIndex("WorkspaceId");
+
+                    b.ToTable("InvitationSecrets");
+                });
+
+            modelBuilder.Entity("server.Entities.JoinRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid?>("BoardId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RequesterId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("WorkspaceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BoardId");
+
+                    b.HasIndex("WorkspaceId");
+
+                    b.ToTable("JoinRequests");
+                });
+
+            modelBuilder.Entity("server.Entities.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid>("ActionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActionId");
+
+                    b.ToTable("Notifications");
+                });
+
+            modelBuilder.Entity("server.Entities.NotificationRecipient", b =>
+                {
+                    b.Property<string>("RecipientId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("NotificationId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DateRead")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.HasKey("RecipientId", "NotificationId");
+
+                    b.HasIndex("NotificationId");
+
+                    b.ToTable("NotificationRecipients");
+                });
+
+            modelBuilder.Entity("server.Entities.Restriction", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -714,7 +836,38 @@ namespace server.Migrations
                     b.ToTable("Restrictions");
                 });
 
-            modelBuilder.Entity("server.Models.Workspace", b =>
+            modelBuilder.Entity("server.Entities.UserVisibilitySettings", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AvatarVisibility")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BasedInVisibility")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DepartmentVisibility")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EmailVisibility")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FullNameVisibility")
+                        .HasColumnType("int");
+
+                    b.Property<int>("JobTitleVisibility")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrganizationVisibility")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserVisibilitySettings");
+                });
+
+            modelBuilder.Entity("server.Entities.Workspace", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -744,13 +897,16 @@ namespace server.Migrations
                     b.ToTable("Workspaces");
                 });
 
-            modelBuilder.Entity("server.Models.WorkspaceMember", b =>
+            modelBuilder.Entity("server.Entities.WorkspaceMember", b =>
                 {
                     b.Property<Guid>("WorkspaceId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("AppUserId")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
 
                     b.HasKey("WorkspaceId", "AppUserId");
 
@@ -770,7 +926,7 @@ namespace server.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("server.Models.AppUser", null)
+                    b.HasOne("server.Entities.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -779,7 +935,7 @@ namespace server.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("server.Models.AppUser", null)
+                    b.HasOne("server.Entities.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -794,7 +950,7 @@ namespace server.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("server.Models.AppUser", null)
+                    b.HasOne("server.Entities.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -803,36 +959,16 @@ namespace server.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("server.Models.AppUser", null)
+                    b.HasOne("server.Entities.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("server.Entities.FileUpload", b =>
+            modelBuilder.Entity("server.Entities.Board", b =>
                 {
-                    b.HasOne("server.Models.Workspace", "Workspace")
-                        .WithOne("Logo")
-                        .HasForeignKey("server.Entities.FileUpload", "WorkspaceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Workspace");
-                });
-
-            modelBuilder.Entity("server.Entities.UserVisibilitySettings", b =>
-                {
-                    b.HasOne("server.Models.AppUser", null)
-                        .WithOne("UserVisibilitySettings")
-                        .HasForeignKey("server.Entities.UserVisibilitySettings", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("server.Models.Board", b =>
-                {
-                    b.HasOne("server.Models.Workspace", "Workspace")
+                    b.HasOne("server.Entities.Workspace", "Workspace")
                         .WithMany("Boards")
                         .HasForeignKey("WorkspaceId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -841,9 +977,9 @@ namespace server.Migrations
                     b.Navigation("Workspace");
                 });
 
-            modelBuilder.Entity("server.Models.BoardLabel", b =>
+            modelBuilder.Entity("server.Entities.BoardLabel", b =>
                 {
-                    b.HasOne("server.Models.Board", "Board")
+                    b.HasOne("server.Entities.Board", "Board")
                         .WithMany("BoardLabels")
                         .HasForeignKey("BoardId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -852,15 +988,15 @@ namespace server.Migrations
                     b.Navigation("Board");
                 });
 
-            modelBuilder.Entity("server.Models.BoardMember", b =>
+            modelBuilder.Entity("server.Entities.BoardMember", b =>
                 {
-                    b.HasOne("server.Models.AppUser", "AppUser")
+                    b.HasOne("server.Entities.AppUser", "AppUser")
                         .WithMany("BoardMembers")
                         .HasForeignKey("AppUserId")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
-                    b.HasOne("server.Models.Board", "Board")
+                    b.HasOne("server.Entities.Board", "Board")
                         .WithMany("BoardMembers")
                         .HasForeignKey("BoardId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -871,15 +1007,15 @@ namespace server.Migrations
                     b.Navigation("Board");
                 });
 
-            modelBuilder.Entity("server.Models.BoardRestriction", b =>
+            modelBuilder.Entity("server.Entities.BoardRestriction", b =>
                 {
-                    b.HasOne("server.Models.Board", "Board")
+                    b.HasOne("server.Entities.Board", "Board")
                         .WithMany("BoardRestrictions")
                         .HasForeignKey("BoardId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("server.Models.Restriction", "Restriction")
+                    b.HasOne("server.Entities.Restriction", "Restriction")
                         .WithMany("BoardRestrictions")
                         .HasForeignKey("RestrictionId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -890,9 +1026,9 @@ namespace server.Migrations
                     b.Navigation("Restriction");
                 });
 
-            modelBuilder.Entity("server.Models.Card", b =>
+            modelBuilder.Entity("server.Entities.Card", b =>
                 {
-                    b.HasOne("server.Models.CardList", "CardList")
+                    b.HasOne("server.Entities.CardList", "CardList")
                         .WithMany("Cards")
                         .HasForeignKey("CardListId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -901,28 +1037,9 @@ namespace server.Migrations
                     b.Navigation("CardList");
                 });
 
-            modelBuilder.Entity("server.Models.CardActivity", b =>
+            modelBuilder.Entity("server.Entities.CardAttachment", b =>
                 {
-                    b.HasOne("server.Models.AppUser", "AppUser")
-                        .WithMany("CardActivities")
-                        .HasForeignKey("AppUserId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
-                        .IsRequired();
-
-                    b.HasOne("server.Models.Card", "Card")
-                        .WithMany("CardActivities")
-                        .HasForeignKey("CardId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AppUser");
-
-                    b.Navigation("Card");
-                });
-
-            modelBuilder.Entity("server.Models.CardAttachment", b =>
-                {
-                    b.HasOne("server.Models.Card", "Card")
+                    b.HasOne("server.Entities.Card", "Card")
                         .WithMany("CardAttachments")
                         .HasForeignKey("CardId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -931,9 +1048,9 @@ namespace server.Migrations
                     b.Navigation("Card");
                 });
 
-            modelBuilder.Entity("server.Models.CardCheckList", b =>
+            modelBuilder.Entity("server.Entities.CardCheckList", b =>
                 {
-                    b.HasOne("server.Models.Card", "Card")
+                    b.HasOne("server.Entities.Card", "Card")
                         .WithMany("CardCheckLists")
                         .HasForeignKey("CardId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -942,15 +1059,15 @@ namespace server.Migrations
                     b.Navigation("Card");
                 });
 
-            modelBuilder.Entity("server.Models.CardCheckListItem", b =>
+            modelBuilder.Entity("server.Entities.CardCheckListItem", b =>
                 {
-                    b.HasOne("server.Models.AppUser", "Asignee")
+                    b.HasOne("server.Entities.AppUser", "Asignee")
                         .WithMany("CardCheckListItems")
                         .HasForeignKey("AsigneeId")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
-                    b.HasOne("server.Models.CardCheckList", "CardCheckList")
+                    b.HasOne("server.Entities.CardCheckList", "CardCheckList")
                         .WithMany("CardCheckListItems")
                         .HasForeignKey("CardCheckListId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -961,15 +1078,15 @@ namespace server.Migrations
                     b.Navigation("CardCheckList");
                 });
 
-            modelBuilder.Entity("server.Models.CardComment", b =>
+            modelBuilder.Entity("server.Entities.CardComment", b =>
                 {
-                    b.HasOne("server.Models.AppUser", "AppUser")
+                    b.HasOne("server.Entities.AppUser", "AppUser")
                         .WithMany("CardComments")
                         .HasForeignKey("AppUserId")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
-                    b.HasOne("server.Models.Card", "Card")
+                    b.HasOne("server.Entities.Card", "Card")
                         .WithMany("CardComments")
                         .HasForeignKey("CardId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -980,15 +1097,15 @@ namespace server.Migrations
                     b.Navigation("Card");
                 });
 
-            modelBuilder.Entity("server.Models.CardLabel", b =>
+            modelBuilder.Entity("server.Entities.CardLabel", b =>
                 {
-                    b.HasOne("server.Models.BoardLabel", "BoardLabel")
+                    b.HasOne("server.Entities.BoardLabel", "BoardLabel")
                         .WithMany("CardLabels")
                         .HasForeignKey("BoardLabelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("server.Models.Card", "Card")
+                    b.HasOne("server.Entities.Card", "Card")
                         .WithMany("CardLabels")
                         .HasForeignKey("CardId")
                         .OnDelete(DeleteBehavior.ClientCascade)
@@ -999,9 +1116,9 @@ namespace server.Migrations
                     b.Navigation("Card");
                 });
 
-            modelBuilder.Entity("server.Models.CardList", b =>
+            modelBuilder.Entity("server.Entities.CardList", b =>
                 {
-                    b.HasOne("server.Models.Board", "Board")
+                    b.HasOne("server.Entities.Board", "Board")
                         .WithMany("CardLists")
                         .HasForeignKey("BoardId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1010,15 +1127,15 @@ namespace server.Migrations
                     b.Navigation("Board");
                 });
 
-            modelBuilder.Entity("server.Models.CardMember", b =>
+            modelBuilder.Entity("server.Entities.CardMember", b =>
                 {
-                    b.HasOne("server.Models.AppUser", "AppUser")
+                    b.HasOne("server.Entities.AppUser", "AppUser")
                         .WithMany("CardMembers")
                         .HasForeignKey("AppUserId")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
-                    b.HasOne("server.Models.Card", "Card")
+                    b.HasOne("server.Entities.Card", "Card")
                         .WithMany("CardMembers")
                         .HasForeignKey("CardId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1029,9 +1146,172 @@ namespace server.Migrations
                     b.Navigation("Card");
                 });
 
-            modelBuilder.Entity("server.Models.Workspace", b =>
+            modelBuilder.Entity("server.Entities.DennoAction", b =>
                 {
-                    b.HasOne("server.Models.AppUser", "Owner")
+                    b.HasOne("server.Entities.Board", "Board")
+                        .WithMany("Actions")
+                        .HasForeignKey("BoardId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("server.Entities.Card", "Card")
+                        .WithMany("Actions")
+                        .HasForeignKey("CardId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("server.Entities.CardComment", "Comment")
+                        .WithMany()
+                        .HasForeignKey("CommentId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("server.Entities.CardList", "List")
+                        .WithMany()
+                        .HasForeignKey("ListId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("server.Entities.AppUser", "MemberCreator")
+                        .WithMany("Actions")
+                        .HasForeignKey("MemberCreatorId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("server.Entities.Board", "TargetBoard")
+                        .WithMany()
+                        .HasForeignKey("TargetBoardId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("server.Entities.Card", "TargetCard")
+                        .WithMany()
+                        .HasForeignKey("TargetCardId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("server.Entities.CardList", "TargetList")
+                        .WithMany()
+                        .HasForeignKey("TargetListId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("server.Entities.AppUser", "TargetUser")
+                        .WithMany()
+                        .HasForeignKey("TargetUserId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("server.Entities.Workspace", "Workspace")
+                        .WithMany("Actions")
+                        .HasForeignKey("WorkspaceId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("Board");
+
+                    b.Navigation("Card");
+
+                    b.Navigation("Comment");
+
+                    b.Navigation("List");
+
+                    b.Navigation("MemberCreator");
+
+                    b.Navigation("TargetBoard");
+
+                    b.Navigation("TargetCard");
+
+                    b.Navigation("TargetList");
+
+                    b.Navigation("TargetUser");
+
+                    b.Navigation("Workspace");
+                });
+
+            modelBuilder.Entity("server.Entities.FileUpload", b =>
+                {
+                    b.HasOne("server.Entities.Workspace", "Workspace")
+                        .WithOne("Logo")
+                        .HasForeignKey("server.Entities.FileUpload", "WorkspaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Workspace");
+                });
+
+            modelBuilder.Entity("server.Entities.InvitationSecret", b =>
+                {
+                    b.HasOne("server.Entities.Board", "Board")
+                        .WithMany()
+                        .HasForeignKey("BoardId");
+
+                    b.HasOne("server.Entities.AppUser", "Inviter")
+                        .WithMany()
+                        .HasForeignKey("InviterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("server.Entities.Workspace", "Workspace")
+                        .WithMany()
+                        .HasForeignKey("WorkspaceId");
+
+                    b.Navigation("Board");
+
+                    b.Navigation("Inviter");
+
+                    b.Navigation("Workspace");
+                });
+
+            modelBuilder.Entity("server.Entities.JoinRequest", b =>
+                {
+                    b.HasOne("server.Entities.Board", "Board")
+                        .WithMany("JoinRequests")
+                        .HasForeignKey("BoardId")
+                        .OnDelete(DeleteBehavior.ClientCascade);
+
+                    b.HasOne("server.Entities.Workspace", "Workspace")
+                        .WithMany("JoinRequests")
+                        .HasForeignKey("WorkspaceId")
+                        .OnDelete(DeleteBehavior.ClientCascade);
+
+                    b.Navigation("Board");
+
+                    b.Navigation("Workspace");
+                });
+
+            modelBuilder.Entity("server.Entities.Notification", b =>
+                {
+                    b.HasOne("server.Entities.DennoAction", "Action")
+                        .WithMany()
+                        .HasForeignKey("ActionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Action");
+                });
+
+            modelBuilder.Entity("server.Entities.NotificationRecipient", b =>
+                {
+                    b.HasOne("server.Entities.Notification", "Notification")
+                        .WithMany("NotificationRecipients")
+                        .HasForeignKey("NotificationId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("server.Entities.AppUser", "Recipient")
+                        .WithMany("NotificationRecipients")
+                        .HasForeignKey("RecipientId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Notification");
+
+                    b.Navigation("Recipient");
+                });
+
+            modelBuilder.Entity("server.Entities.UserVisibilitySettings", b =>
+                {
+                    b.HasOne("server.Entities.AppUser", null)
+                        .WithOne("UserVisibilitySettings")
+                        .HasForeignKey("server.Entities.UserVisibilitySettings", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("server.Entities.Workspace", b =>
+                {
+                    b.HasOne("server.Entities.AppUser", "Owner")
                         .WithMany("OwnedWorkspaces")
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1040,15 +1320,15 @@ namespace server.Migrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("server.Models.WorkspaceMember", b =>
+            modelBuilder.Entity("server.Entities.WorkspaceMember", b =>
                 {
-                    b.HasOne("server.Models.AppUser", "AppUser")
+                    b.HasOne("server.Entities.AppUser", "AppUser")
                         .WithMany("WorkspaceMembers")
                         .HasForeignKey("AppUserId")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
-                    b.HasOne("server.Models.Workspace", "Workspace")
+                    b.HasOne("server.Entities.Workspace", "Workspace")
                         .WithMany("WorkspaceMembers")
                         .HasForeignKey("WorkspaceId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1059,17 +1339,19 @@ namespace server.Migrations
                     b.Navigation("Workspace");
                 });
 
-            modelBuilder.Entity("server.Models.AppUser", b =>
+            modelBuilder.Entity("server.Entities.AppUser", b =>
                 {
-                    b.Navigation("BoardMembers");
+                    b.Navigation("Actions");
 
-                    b.Navigation("CardActivities");
+                    b.Navigation("BoardMembers");
 
                     b.Navigation("CardCheckListItems");
 
                     b.Navigation("CardComments");
 
                     b.Navigation("CardMembers");
+
+                    b.Navigation("NotificationRecipients");
 
                     b.Navigation("OwnedWorkspaces");
 
@@ -1079,8 +1361,10 @@ namespace server.Migrations
                     b.Navigation("WorkspaceMembers");
                 });
 
-            modelBuilder.Entity("server.Models.Board", b =>
+            modelBuilder.Entity("server.Entities.Board", b =>
                 {
+                    b.Navigation("Actions");
+
                     b.Navigation("BoardLabels");
 
                     b.Navigation("BoardMembers");
@@ -1088,16 +1372,18 @@ namespace server.Migrations
                     b.Navigation("BoardRestrictions");
 
                     b.Navigation("CardLists");
+
+                    b.Navigation("JoinRequests");
                 });
 
-            modelBuilder.Entity("server.Models.BoardLabel", b =>
+            modelBuilder.Entity("server.Entities.BoardLabel", b =>
                 {
                     b.Navigation("CardLabels");
                 });
 
-            modelBuilder.Entity("server.Models.Card", b =>
+            modelBuilder.Entity("server.Entities.Card", b =>
                 {
-                    b.Navigation("CardActivities");
+                    b.Navigation("Actions");
 
                     b.Navigation("CardAttachments");
 
@@ -1110,24 +1396,33 @@ namespace server.Migrations
                     b.Navigation("CardMembers");
                 });
 
-            modelBuilder.Entity("server.Models.CardCheckList", b =>
+            modelBuilder.Entity("server.Entities.CardCheckList", b =>
                 {
                     b.Navigation("CardCheckListItems");
                 });
 
-            modelBuilder.Entity("server.Models.CardList", b =>
+            modelBuilder.Entity("server.Entities.CardList", b =>
                 {
                     b.Navigation("Cards");
                 });
 
-            modelBuilder.Entity("server.Models.Restriction", b =>
+            modelBuilder.Entity("server.Entities.Notification", b =>
+                {
+                    b.Navigation("NotificationRecipients");
+                });
+
+            modelBuilder.Entity("server.Entities.Restriction", b =>
                 {
                     b.Navigation("BoardRestrictions");
                 });
 
-            modelBuilder.Entity("server.Models.Workspace", b =>
+            modelBuilder.Entity("server.Entities.Workspace", b =>
                 {
+                    b.Navigation("Actions");
+
                     b.Navigation("Boards");
+
+                    b.Navigation("JoinRequests");
 
                     b.Navigation("Logo")
                         .IsRequired();

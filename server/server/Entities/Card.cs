@@ -1,9 +1,10 @@
-﻿namespace server.Models
+﻿namespace server.Entities
 {
     public class Card
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
+        public string Rank { get; set; }
         public string ImageCover { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public DateOnly StartDate { get; set; }
@@ -26,6 +27,6 @@
 
         public virtual ICollection<CardComment> CardComments { get; set; } = new List<CardComment>();
 
-        public virtual ICollection<CardActivity> CardActivities { get; set; } = new List<CardActivity>();
+        public virtual ICollection<DennoAction> Actions { get; set; } = new List<DennoAction>();
     }
 }

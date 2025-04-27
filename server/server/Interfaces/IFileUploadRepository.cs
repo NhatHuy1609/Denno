@@ -1,5 +1,4 @@
 ﻿using server.Entities;
-using server.Models;
 
 namespace server.Interfaces
 {
