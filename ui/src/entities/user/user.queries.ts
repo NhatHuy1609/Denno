@@ -3,6 +3,7 @@ import { UserService } from "@/service/api/user/user.service"
 import { UsersFilterQuery, UserWorkspacesFilterQuery } from "./user.types"
 import { transformUserDtoToUser, transformUsersDtoToUsers, transformUserWorkspacesDtoToUserWorkspaces } from "./user.lib"
 import { UserWorkspacesQueryParamsDto } from "@/service/api/_models/query-models/user/user.types"
+import { mapToNotifications } from "../notification/notification.lib"
 
 export class UserQueries {
   static readonly keys = {
@@ -45,6 +46,16 @@ export class UserQueries {
       queryFn: async ({ signal }) => {
         const response = await UserService.userWorkspacesQuery(userId, { signal, params })
         return transformUserWorkspacesDtoToUserWorkspaces(response.data)
+      }
+    })
+  }
+
+  static usersNotificationsQuery(userId: string) {
+    return queryOptions({
+      queryKey: [...this.keys.root, userId, 'notifications'] as unknown[],
+      queryFn: async ({ signal }) => {
+        const response = await UserService.userNotificationsQuery(userId, { signal })
+        return mapToNotifications(response.data)
       }
     })
   }

@@ -21,11 +21,11 @@ import { generateWorkspaceInvitationLink } from '@/utils/invitation-link'
 
 type SearchedUserFilter = Pick<userTypes.UsersFilterQuery, 'email'>
 
-type Props = {
+type InviteMemberModalBodyProps = {
   closeModalFn: () => void
 }
 
-export default function InviteMemberModalBody({ closeModalFn }: Props) {
+export default function InviteMemberModalBody({ closeModalFn }: InviteMemberModalBodyProps) {
   const queryClient = useQueryClient()
   const { workspaceId } = useParams<{ workspaceId: string }>()
   const inputRef = useRef<HTMLInputElement>(null)
