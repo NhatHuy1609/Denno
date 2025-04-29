@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { createPaginatedResultSchema } from '../_models/pagination'
+import { NotificationResponseDtoSchema } from '../notification/notification.contracts'
 
 // Response Schemas
 export const GetUserResponseDtoSchema = z.object({
@@ -34,3 +35,6 @@ export const UserWorkspacesResponseDtoSchema = z.array(z.object({
   name: z.string(),
   logo: z.string().nullable()
 })).describe('UserWorkspacesResponseDtoSchema')
+
+export const UserNotificationsResponseDtoSchema = z.array(NotificationResponseDtoSchema)
+  .describe('UserNotificationsResponseDtoSchema')

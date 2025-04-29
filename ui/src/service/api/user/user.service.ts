@@ -1,5 +1,5 @@
 import { httpGet } from "../_req";
-import { GetUserResponseDto, UsersResponseDto, UserWorkspacesResponseDto } from "./user.types";
+import { GetUserResponseDto, UserNotificationsResponseDto, UsersResponseDto, UserWorkspacesResponseDto } from "./user.types";
 import { UsersQueryParamsDto, UserWorkspacesQueryParamsDto } from "../_models/query-models/user/user.types";
 
 export class UserService {
@@ -15,5 +15,9 @@ export class UserService {
 
   static userWorkspacesQuery(userId: string, config?: { signal?: AbortSignal, params?: UserWorkspacesQueryParamsDto }) {
     return httpGet<UserWorkspacesResponseDto>(`${this.basePath}/${userId}/workspaces`, config)
+  }
+
+  static userNotificationsQuery(userId: string, config?: { signal?: AbortSignal }) {
+    return httpGet<UserNotificationsResponseDto>(`${this.basePath}/${userId}/notifications`, config)
   }
 }
