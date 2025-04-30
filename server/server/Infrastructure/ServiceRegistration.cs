@@ -1,15 +1,11 @@
 ﻿using Asp.Versioning;
 using Google.Apis.Util.Store;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
-using Polly;
-using Polly.Retry;
 using server.Data;
-using server.Dtos.Response;
 using server.Entities;
 using server.Enums;
 using server.Factories;
@@ -56,6 +52,7 @@ namespace server.Infrastructure
             services.AddScoped<JoinWorkspaceWithLinkNotificationResponseFactory>();
             services.AddScoped<ApproveWorkspaceJoinRequestNotificationResponseFactory>();
             services.AddScoped<RejectWorkspaceJoinRequestNotificationResponseFactory>();
+            services.AddScoped<SendWorkspaceJoinRequestNotificationResponseFactory>();
 
             // Background services
             services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();

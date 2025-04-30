@@ -423,10 +423,20 @@ namespace server.Controllers
                 return BadRequest();
             }
 
-            var createdJoinRequest = await _unitOfWork.JoinRequests
-                .CreateWorkspaceJoinRequestAsync(request.RequesterId, workspaceId);
+            var actionContext = new DennoActionContext()
+            {
+                MemberCreatorId = request.RequesterId, // Requester is creator
+                WorkspaceId = workspaceId,
+            };
 
-            return Created(nameof(CreateJoinRequestAsync), _mapper.Map<WorkspaceJoinRequestResponse>(createdJoinRequest));
+            var action = await _actionService.CreateActionAsync(ActionTypes.SendWorkspaceJoinRequest, actionContext);
+
+            if (action != null)
+            {
+                _emailService.SendActionEmailInBackgroundAsync(action);
+            }
+
+            return Ok();
         }
     }
 }
