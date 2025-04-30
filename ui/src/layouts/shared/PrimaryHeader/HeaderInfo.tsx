@@ -1,13 +1,9 @@
 import React from 'react'
 import { Popover } from '@/ui'
+import { HeaderPopupItem } from './types'
 
-interface IHeaderInfo {
-  component: React.ReactNode
-  activeItem?: React.ReactNode
-}
-
-function HeaderInfoItem({ item }: { item: IHeaderInfo }) {
-  const { component: TriggerComp, activeItem: ActiveComp } = item
+function HeaderInfoItem({ item }: { item: HeaderPopupItem }) {
+  const { triggerItem: TriggerComp, activeItem: ActiveComp } = item
   return (
     <Popover.Popover>
       <Popover.Trigger>
@@ -15,12 +11,14 @@ function HeaderInfoItem({ item }: { item: IHeaderInfo }) {
           {TriggerComp}
         </div>
       </Popover.Trigger>
-      <Popover.Content align='end'>{ActiveComp}</Popover.Content>
+      <Popover.Content align='end' className='w-fit'>
+        {ActiveComp}
+      </Popover.Content>
     </Popover.Popover>
   )
 }
 
-function HeaderInfo({ infoList }: { infoList: IHeaderInfo[] }) {
+function HeaderInfo({ infoList }: { infoList: HeaderPopupItem[] }) {
   return (
     <div className='flex items-center gap-1'>
       {infoList.map((item, index) => (

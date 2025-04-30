@@ -12,7 +12,7 @@ export type Notification = {
     name: string
     avatar: string
   }
-  entities: Record<string, {
+  entities: Record<EntityType, {
     id: string
     type: EntityType
     text: string

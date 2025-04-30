@@ -35,6 +35,3 @@ export const UserWorkspacesResponseDtoSchema = z.array(z.object({
   name: z.string(),
   logo: z.string().nullable()
 })).describe('UserWorkspacesResponseDtoSchema')
-
-export const UserNotificationsResponseDtoSchema = z.array(NotificationResponseDtoSchema)
-  .describe('UserNotificationsResponseDtoSchema')

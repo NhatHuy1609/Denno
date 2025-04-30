@@ -1,11 +1,11 @@
 import { z } from 'zod'
-import { GetUserResponseDtoSchema } from '../user/user.contracts';
 import { ActionTypeSchema } from '../_constants/action-types';
 import { AddedToWorkspaceDataSchema } from './models/added-to-workspace-data';
 import { NotificationDisplaySchema } from './models/notification-display';
 import { ApproveWorkspaceJoinRequestDataSchema } from './models/approve-workspace-join-request-data';
 import { JoinWorkspaceByLinkDataSchema } from './models/join-workspace-by-link-data';
 import { RejectWorkspaceJoinRequestDataSchema } from './models/reject-workspace-join-request';
+import { GetUserResponseDtoSchema } from '../user/user.contracts';
 
 const NotificationResponseDtoBaseSchema = z.object({
   id: z.number(),
@@ -37,7 +37,7 @@ export const JoinWorkspaceByLinkNotificationSchema = NotificationResponseDtoBase
 });
 
 export const RejectWorkspaceRequestNotificationSchema = NotificationResponseDtoBaseSchema.extend({
-  type: z.literal("rejectWorkspaceJoinRequest"),
+  type: z.literal(ActionTypeSchema.Enum.rejectWorkspaceJoinRequest),
   data: RejectWorkspaceJoinRequestDataSchema,
   display: NotificationDisplaySchema,
 });

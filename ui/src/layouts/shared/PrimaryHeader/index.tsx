@@ -1,13 +1,15 @@
 import React from 'react'
+import type { HeaderPopupItem } from './types'
 import Image from 'next/image'
 import AppLogo from 'public/favicon.ico'
 import { FiBell } from 'react-icons/fi'
 import { HiOutlinePlus } from 'react-icons/hi'
-import HeaderInfo from './HeaderInfo'
 import HeaderNav from './HeaderNav'
 import HeaderUserInfo from './HeaderUserInfo'
 import { AddingList } from './HeaderNavActiveItems'
 import HeaderInputSearch from './HeaderInputSearch'
+import HeaderUserNotifications from './HeaderUserNotifications'
+import HeaderInfo from './HeaderInfo'
 
 function PrimaryHeader() {
   const navList = [
@@ -26,9 +28,12 @@ function PrimaryHeader() {
     }
   ]
 
-  const infoList = [
-    { component: <FiBell className='text-sm text-[var(--ds-text)]' /> },
-    { component: <HeaderUserInfo /> }
+  const infoList: HeaderPopupItem[] = [
+    {
+      triggerItem: <FiBell className='text-sm text-[var(--ds-text)]' />,
+      activeItem: <HeaderUserNotifications />
+    },
+    { triggerItem: <HeaderUserInfo /> }
   ]
 
   return (
