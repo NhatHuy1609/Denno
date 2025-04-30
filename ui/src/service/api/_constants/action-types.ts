@@ -6,6 +6,7 @@ export const ActionTypeSchema = z.enum([
   "joinWorkspaceByLink",
   "approveWorkspaceJoinRequest",
   "rejectWorkspaceJoinRequest",
+  "sendWorkspaceJoinRequest",
 ]);
 
 export type ActionType = z.infer<typeof ActionTypeSchema>;
