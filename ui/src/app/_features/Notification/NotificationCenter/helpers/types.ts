@@ -25,6 +25,10 @@ export type NotificationContentInfo = {
   }
   date: string
   description: NotificationDescription
+  actionButton?: {
+    text: string
+    onClick: () => void
+  }
 }
 
 // NotificationItemDisplay type
