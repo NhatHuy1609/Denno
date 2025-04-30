@@ -13,7 +13,7 @@ function NotificationItem({ notification }: Props) {
 
   return (
     <div className='w-full rounded-lg shadow-[0_0_4px_rgba(0,0,0,0.25)]'>
-      <NotificationHeader header={header} />
+      {header && <NotificationHeader header={header} />}
       <NotificationContent content={content} />
     </div>
   )

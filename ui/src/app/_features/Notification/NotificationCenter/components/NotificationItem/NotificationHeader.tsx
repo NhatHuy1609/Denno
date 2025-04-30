@@ -1,8 +1,8 @@
 import React from 'react'
-import { NotificationItemDisplay } from '../../helpers/types'
+import { NotificationHeaderInfo } from '../../helpers/types'
 
 type Props = {
-  header: NotificationItemDisplay['header']
+  header: NotificationHeaderInfo
 }
 
 function NotificationHeader({ header }: Props) {
