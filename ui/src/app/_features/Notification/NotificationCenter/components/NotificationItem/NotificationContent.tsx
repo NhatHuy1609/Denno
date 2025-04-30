@@ -2,13 +2,14 @@ import React from 'react'
 import type { NotificationItemDisplay } from '../../helpers/types'
 import { Avatar } from '@/ui'
 import Link from 'next/link'
+import CustomizableButton from '@/ui/components/CustomizableButton'
 
 type Props = {
   content: NotificationItemDisplay['content']
 }
 
 function NotificationContent({ content }: Props) {
-  const { initiator, description, date } = content
+  const { initiator, description, date, actionButton } = content
 
   const renderDescription = () => {
     return description.map((part, index) => {
@@ -44,6 +45,16 @@ function NotificationContent({ content }: Props) {
         {renderDescription()}
         <div className='mt-1 text-xs text-slate-500'>{date}</div>
       </div>
+      {actionButton && (
+        <div className='mt-2 w-fit'>
+          <CustomizableButton
+            intent='secondary'
+            size='medium'
+            value={actionButton.text}
+            onClick={actionButton.onClick}
+          />
+        </div>
+      )}
     </div>
   )
 }

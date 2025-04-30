@@ -22,6 +22,11 @@ export function getNotificationHeaderInfo(
       return null
     case 'rejectWorkspaceJoinRequest':
       return null
+    case 'sendWorkspaceJoinRequest':
+      return {
+        entityIcon: getEntityIcon(entities.workspace.type),
+        entityName: entities.workspace.text
+      }
     default:
       console.error("Invalid notification type")
       return null
