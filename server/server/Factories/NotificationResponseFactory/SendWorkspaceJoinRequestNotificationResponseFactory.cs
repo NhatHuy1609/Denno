@@ -64,7 +64,7 @@ namespace server.Factories.NotificationResponseFactory
                             {
                                 Type = EntityTypes.Requester,
                                 Id = notiDetails.Action.TargetUserId,
-                                Text = notiDetails.Action.TargetUser.FullName
+                                Text = notiDetails.Action.MemberCreator.FullName
                             }
                         }
                     }

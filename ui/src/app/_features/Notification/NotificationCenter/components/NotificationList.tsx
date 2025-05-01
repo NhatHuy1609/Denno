@@ -8,7 +8,7 @@ type Props = {
 
 function NotificationList({ notifications }: Props) {
   return (
-    <div className='mt-6 w-full'>
+    <div className='mt-6 flex w-full flex-col gap-4'>
       {notifications.map((notification) => (
         <NotificationItem key={notification.id} notification={notification} />
       ))}

@@ -61,6 +61,7 @@ export function getContentInfo(
   return {
     initiator,
     description,
+    actionButton,
     date: formatDateTime(createdAt)
   }
 }
