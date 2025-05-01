@@ -32,6 +32,7 @@ namespace server.Services
                 .Include(n => n.Notification)
                 .ThenInclude(n => n.Action)
                 .Where(n => n.RecipientId == userId)
+                .OrderByDescending(n => n.Notification.Date)
                 .ToList();
 
             if (userNotifications == null || !userNotifications.Any())

@@ -8,8 +8,6 @@ function NotificationCenter() {
   const currentUserId = getLocalStorageItem(PersistedStateKey.MeId)
   const { data: notifications = [] } = useUserNotifications(currentUserId)
 
-  // console.log('Notifications: ', notifications)
-
   return (
     <div className='flex w-[440px] flex-col'>
       <div className='w-full border-b border-gray-300 pb-4'>
