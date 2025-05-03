@@ -10,6 +10,7 @@ using server.Entities;
 using server.Enums;
 using server.Factories;
 using server.Factories.NotificationResponseFactory;
+using server.Hubs.NotificationHub;
 using server.Infrastructure.Configurations;
 using server.Infrastructure.Providers;
 using server.Interfaces;
@@ -17,6 +18,7 @@ using server.Repositories;
 using server.Services;
 using server.Services.Email;
 using server.Services.QueueHostedService;
+using server.Services.Realtime;
 using server.UnitOfWorks;
 
 namespace server.Infrastructure
@@ -57,6 +59,9 @@ namespace server.Infrastructure
             // Background services
             services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
             services.AddHostedService<QueueHostedService>();
+
+            // Realtime services
+            services.AddScoped<INotificationRealtimeService, NotificationRealtimeService>();
 
             return services;
         }
@@ -163,6 +168,18 @@ namespace server.Infrastructure
             });
 
             return services;
+        }
+
+        public static IApplicationBuilder UseHubs(this IApplicationBuilder app)
+        {
+            app.UseRouting();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapHub<NotificationHub>("hubs/notification");
+            });
+
+            return app;
         }
     }
 }

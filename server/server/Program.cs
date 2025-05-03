@@ -39,7 +39,13 @@ builder.Services.AddProblemDetails();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Configure SignalR
+builder.Services.AddSignalR();
+
 var app = builder.Build();
+
+// Configure Hubs Endpoints pipeline
+app.UseHubs();
 
 app.UseSwagger();
 app.UseSwaggerUI();
