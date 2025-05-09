@@ -2,6 +2,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using server.Constants;
 using server.Dtos.Requests.Workspace;
@@ -11,8 +12,10 @@ using server.Dtos.Response.InvitationSecret;
 using server.Dtos.Response.Workspace;
 using server.Entities;
 using server.Helpers;
+using server.Hubs.NotificationHub;
 using server.Interfaces;
 using server.Models.Query;
+using server.Services.QueueHostedService;
 using server.Strategies.ActionStrategy;
 using System;
 using System.Security.Claims;
@@ -33,6 +36,9 @@ namespace server.Controllers
         private readonly ILogger<WorkspacesController> _logger;
         private readonly IEmailService _emailService;
         private readonly IWorkspaceService _workspaceService;
+        private readonly INotificationRealtimeService _notificationRealtimeService;
+        private readonly IBackgroundTaskQueue _backgroundTask;
+        private readonly IHubContext<NotificationHub, INotificationHubClient> _hubContext;
 
         public WorkspacesController(
             IMapper mapper,
@@ -42,7 +48,10 @@ namespace server.Controllers
             IActionService actionService,
             ILogger<WorkspacesController> logger,
             IEmailService emailService,
-            IWorkspaceService workspaceService)
+            IWorkspaceService workspaceService,
+            INotificationRealtimeService notificationRealtimeService,
+            IBackgroundTaskQueue backgroundTask,
+            IHubContext<NotificationHub, INotificationHubClient> hubContext)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
@@ -51,7 +60,10 @@ namespace server.Controllers
             _logger = logger;
             _emailService = emailService;
             _workspaceService = workspaceService;
+            _notificationRealtimeService = notificationRealtimeService;
+            _backgroundTask = backgroundTask;
             _mapper = mapper;
+            _hubContext = hubContext;
         }
 
         [HttpGet("[controller]/{id}")]
@@ -423,10 +435,24 @@ namespace server.Controllers
                 return BadRequest();
             }
 
-            var createdJoinRequest = await _unitOfWork.JoinRequests
-                .CreateWorkspaceJoinRequestAsync(request.RequesterId, workspaceId);
+            var actionContext = new DennoActionContext()
+            {
+                MemberCreatorId = request.RequesterId, // Requester is creator
+                WorkspaceId = workspaceId,
+            };
 
-            return Created(nameof(CreateJoinRequestAsync), _mapper.Map<WorkspaceJoinRequestResponse>(createdJoinRequest));
+            var action = await _actionService.CreateActionAsync(ActionTypes.SendWorkspaceJoinRequest, actionContext);
+
+            if (action != null)
+            {
+                _emailService.SendActionEmailInBackgroundAsync(action);
+                _logger.LogInformation("Successfully sent email to notify that user sent a join request to workspace");
+
+                //_notificationRealtimeService.SendActionNotificationToUsersInBackground(action);
+                await _notificationRealtimeService.SendActionNotificationToUsersAsync(action);
+            }
+
+            return Ok();
         }
     }
 }

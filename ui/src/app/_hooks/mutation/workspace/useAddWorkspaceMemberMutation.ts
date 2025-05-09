@@ -1,6 +1,7 @@
 import { DefaultError, useMutation, UseMutationOptions } from "@tanstack/react-query"
 import { WorkspaceService } from "@/service/api/workspace"
 import { workspaceTypesDto } from "@/service/api/workspace"
+import { AddWorkspaceMemberActionResponseDto } from "@/service/api/action/action.types"
 
 type AddWorkspaceMemberParams = {
   workspaceId: string
@@ -10,7 +11,7 @@ type AddWorkspaceMemberParams = {
 function useAddWorkspaceMemberMutation(
   options: Pick<
     UseMutationOptions<
-      Awaited<workspaceTypesDto.AddWorkspaceMemberResponseDto>,
+      Awaited<AddWorkspaceMemberActionResponseDto>,
       DefaultError,
       AddWorkspaceMemberParams,
       any

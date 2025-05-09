@@ -9,7 +9,6 @@ using RazorEngine.Templating;
 using server.Constants;
 using server.Data;
 using server.Entities;
-using server.Enums;
 using server.Infrastructure.Configurations;
 using server.Interfaces;
 using server.Models;
@@ -56,6 +55,10 @@ namespace server.Services.Email
                 {
                     ActionTypes.RejectWorkspaceJoinRequest,
                      action => $"{action.MemberCreator?.FullName} rejected your request to join the workspace {action.Workspace?.Name}"
+                },
+                {
+                    ActionTypes.SendWorkspaceJoinRequest,
+                    action => $"{action.MemberCreator?.FullName} send request to join the workspace {action.Workspace?.Name}"
                 }
             };
         }
@@ -214,6 +217,10 @@ namespace server.Services.Email
                 case ActionTypes.RejectWorkspaceJoinRequest:
                     templatePath = File.ReadAllText(GetTemplatePath("NotificationTemplate.cshtml"));
                     body = Engine.Razor.RunCompile(templatePath, "rejectWorkspaceJoinRequestTemplate", typeof(NotificationTemplateModel), notificationEmailModel);
+                    break;
+                case ActionTypes.SendWorkspaceJoinRequest:
+                    templatePath = File.ReadAllText(GetTemplatePath("NotificationTemplate.cshtml"));
+                    body = Engine.Razor.RunCompile(templatePath, "sendWorkspaceJoinRequestTemplate", typeof(NotificationTemplateModel), notificationEmailModel);
                     break;
                 default:
                     throw new ArgumentException("Failed to build notification email due to action not being found.");

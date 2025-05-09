@@ -1,13 +1,10 @@
 import React from 'react'
 import Image from 'next/image'
 import AppLogo from 'public/favicon.ico'
-import { FiBell } from 'react-icons/fi'
 import { HiOutlinePlus } from 'react-icons/hi'
-import HeaderInfo from './HeaderInfo'
 import HeaderNav from './HeaderNav'
-import HeaderUserInfo from './HeaderUserInfo'
 import { AddingList } from './HeaderNavActiveItems'
-import HeaderInputSearch from './HeaderInputSearch'
+import HeaderUserActions from './HeaderUserActions'
 
 function PrimaryHeader() {
   const navList = [
@@ -26,11 +23,6 @@ function PrimaryHeader() {
     }
   ]
 
-  const infoList = [
-    { component: <FiBell className='text-sm text-[var(--ds-text)]' /> },
-    { component: <HeaderUserInfo /> }
-  ]
-
   return (
     <header
       style={{
@@ -45,10 +37,7 @@ function PrimaryHeader() {
         </div>
         <HeaderNav navList={navList} />
       </div>
-      <div className='flex items-center gap-2'>
-        <HeaderInputSearch />
-        <HeaderInfo infoList={infoList} />
-      </div>
+      <HeaderUserActions />
     </header>
   )
 }

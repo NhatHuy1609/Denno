@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { createPaginatedResultSchema } from '../_models/pagination'
+import { NotificationResponseDtoSchema } from '../notification/notification.contracts'
 
 // Response Schemas
 export const GetUserResponseDtoSchema = z.object({

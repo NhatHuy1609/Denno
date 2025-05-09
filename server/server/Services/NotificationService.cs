@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using server.Constants;
 using server.Data;
 using server.Dtos.Response.Notification.Interfaces;
-using server.Entities;
 using server.Factories.NotificationResponseFactory;
 using server.Interfaces;
 
@@ -32,6 +30,7 @@ namespace server.Services
                 .Include(n => n.Notification)
                 .ThenInclude(n => n.Action)
                 .Where(n => n.RecipientId == userId)
+                .OrderByDescending(n => n.Notification.Date)
                 .ToList();
 
             if (userNotifications == null || !userNotifications.Any())
