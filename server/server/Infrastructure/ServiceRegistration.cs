@@ -140,6 +140,19 @@ namespace server.Infrastructure
 
                             var json = JsonConvert.SerializeObject(response);
                             return context.Response.WriteAsync(json);
+                        },
+
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+                            var path = context.HttpContext.Request.Path;
+                            // TODO just test empty token
+                            if (!string.IsNullOrEmpty(accessToken))
+                            {
+                                context.Token = accessToken;
+                            }
+
+                            return Task.CompletedTask;
                         }
                     };
                 });
@@ -172,8 +185,6 @@ namespace server.Infrastructure
 
         public static IApplicationBuilder UseHubs(this IApplicationBuilder app)
         {
-            app.UseRouting();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapHub<NotificationHub>("hubs/notification");
