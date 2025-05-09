@@ -1,7 +1,8 @@
 import React from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { useUserNotifications } from '@/app/_hooks/query/user/useUserNotifications'
 import { getLocalStorageItem } from '@/utils/local-storage'
 import { PersistedStateKey } from '@/data/persisted-keys'
-import { useUserNotifications } from '@/app/_hooks/query/user/useUserNotifications'
 import NotificationList from './components/NotificationList'
 
 function NotificationCenter() {

@@ -1,8 +1,10 @@
-import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr'
+import { HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/signalr'
 import type { HubConnection } from "@microsoft/signalr"
 import type { HubType } from './types'
 import { HubReceiveEventMap } from './receive-events'
 import { HubInvokeEventMap } from './send-events'
+import { getLocalStorageItem } from '@/utils/local-storage'
+import { PersistedStateKey } from '@/data/persisted-keys'
 
 class SignalRService {
   connections: Partial<Record<HubType, HubConnection>>
@@ -23,12 +25,16 @@ class SignalRService {
     const url = this.urls[hubName]
 
     const connection = new HubConnectionBuilder()
-      .withUrl(url)
+      .withUrl(`${process.env.NEXT_PUBLIC_BE_URL}${url}`, {
+        accessTokenFactory: async () => getLocalStorageItem(PersistedStateKey.Token),
+      })
       .withAutomaticReconnect()
       .configureLogging(LogLevel.Information)
       .build()
 
-    connection.start().catch(err => console.error(`Error starting connection for ${hubName}:`, err))
+    connection.start()
+      .then(() => console.log(`Connected to ${hubName} hub successfully`))
+      .catch(err => console.error(`Error starting connection for ${hubName}:`, err))
 
     this.connections[hubName] = connection
     return connection
