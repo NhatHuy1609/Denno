@@ -4,6 +4,7 @@ import { notificationTypesDto } from "../api/notification"
 
 export type NotificationReceiveEvents = {
   'ReceiveActionNotification': (notificationResponse: notificationTypesDto.NotificationResponseDto) => void
+  'ReceiveTest': (message: string) => void
 }
 
 export type WorkspaceReceiveEvents = {}
