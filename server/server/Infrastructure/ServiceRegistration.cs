@@ -1,19 +1,16 @@
 ﻿using Asp.Versioning;
 using Google.Apis.Util.Store;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
-using Polly;
-using Polly.Retry;
 using server.Data;
-using server.Dtos.Response;
 using server.Entities;
 using server.Enums;
 using server.Factories;
 using server.Factories.NotificationResponseFactory;
+using server.Hubs.NotificationHub;
 using server.Infrastructure.Configurations;
 using server.Infrastructure.Providers;
 using server.Interfaces;
@@ -21,6 +18,7 @@ using server.Repositories;
 using server.Services;
 using server.Services.Email;
 using server.Services.QueueHostedService;
+using server.Services.Realtime;
 using server.UnitOfWorks;
 
 namespace server.Infrastructure
@@ -56,10 +54,14 @@ namespace server.Infrastructure
             services.AddScoped<JoinWorkspaceWithLinkNotificationResponseFactory>();
             services.AddScoped<ApproveWorkspaceJoinRequestNotificationResponseFactory>();
             services.AddScoped<RejectWorkspaceJoinRequestNotificationResponseFactory>();
+            services.AddScoped<SendWorkspaceJoinRequestNotificationResponseFactory>();
 
             // Background services
             services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
             services.AddHostedService<QueueHostedService>();
+
+            // Realtime services
+            services.AddScoped<INotificationRealtimeService, NotificationRealtimeService>();
 
             return services;
         }
@@ -138,6 +140,19 @@ namespace server.Infrastructure
 
                             var json = JsonConvert.SerializeObject(response);
                             return context.Response.WriteAsync(json);
+                        },
+
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+                            var path = context.HttpContext.Request.Path;
+                            // TODO just test empty token
+                            if (!string.IsNullOrEmpty(accessToken))
+                            {
+                                context.Token = accessToken;
+                            }
+
+                            return Task.CompletedTask;
                         }
                     };
                 });
@@ -166,6 +181,16 @@ namespace server.Infrastructure
             });
 
             return services;
+        }
+
+        public static IApplicationBuilder UseHubs(this IApplicationBuilder app)
+        {
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapHub<NotificationHub>("hubs/notification");
+            });
+
+            return app;
         }
     }
 }

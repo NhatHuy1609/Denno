@@ -1,8 +1,10 @@
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using Serilog;
 using server.Exceptions;
 using server.Infrastructure;
 using server.Infrastructure.Configurations;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,7 +41,15 @@ builder.Services.AddProblemDetails();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Configure SignalR
+builder.Services.AddSignalR().AddNewtonsoftJsonProtocol(options =>
+{
+    options.PayloadSerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+});
+
 var app = builder.Build();
+
+app.UseRouting();
 
 app.UseSwagger();
 app.UseSwaggerUI();
@@ -59,6 +69,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseStaticFiles();
+
+app.UseHubs();
 
 app.MapControllers();
 
