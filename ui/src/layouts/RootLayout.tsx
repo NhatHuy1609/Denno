@@ -5,6 +5,7 @@ import ReduxProvider from '@/app/_providers/ReduxProvider'
 import AuthProvider from '@/app/_providers/AuthProvider/AuthProvider'
 import { QueryClientProvider } from '@/app/_providers/QueryClientProvider'
 import { Toaster } from '@/ui'
+import { SignalRProvider } from '@/app/_providers/SignalRProvider/SignalRProvider'
 
 const ThemeProviderComp = dynamic(() => import('@/app/_components/ThemeProviderComp'), {
   ssr: false
@@ -14,12 +15,14 @@ const RootLayoutComp = ({ children }: { children: React.ReactNode }) => {
   return (
     <QueryClientProvider>
       <ReduxProvider>
-        <AuthProvider>
-          <ThemeProviderComp>
-            <div className='size-full'>{children}</div>
-            <Toaster />
-          </ThemeProviderComp>
-        </AuthProvider>
+        <SignalRProvider>
+          <AuthProvider>
+            <ThemeProviderComp>
+              <div className='size-full'>{children}</div>
+              <Toaster />
+            </ThemeProviderComp>
+          </AuthProvider>
+        </SignalRProvider>
       </ReduxProvider>
     </QueryClientProvider>
   )

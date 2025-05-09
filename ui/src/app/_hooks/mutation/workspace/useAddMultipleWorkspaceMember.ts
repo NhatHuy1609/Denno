@@ -1,6 +1,7 @@
 import { DefaultError, useMutation, UseMutationOptions } from "@tanstack/react-query"
 import { WorkspaceService } from "@/service/api/workspace"
 import { workspaceTypesDto } from "@/service/api/workspace"
+import { actionTypesDto } from "@/service/api/action"
 
 type MemberEmail = workspaceTypesDto.AddWorkspaceMemberDto['email']
 
@@ -12,12 +13,12 @@ type AddMultipleWorkspaceMemberParams = {
 
 type AddMultipleWorkspaceMemberData = {
   addedMembers: Array<workspaceTypesDto.AddWorkspaceMemberResponseDto['targetUserId']>
-} & Omit<workspaceTypesDto.AddWorkspaceMemberResponseDto, 'targetUserId'>
+} & Omit<actionTypesDto.AddWorkspaceMemberActionResponseDto, 'targetUserId'>
 
 function useAddMultipleWorkspaceMemberMutation(
   options: Pick<
     UseMutationOptions<
-      AddMultipleWorkspaceMemberData,
+      Awaited<AddMultipleWorkspaceMemberData>,
       DefaultError,
       AddMultipleWorkspaceMemberParams,
       any
@@ -43,8 +44,6 @@ function useAddMultipleWorkspaceMemberMutation(
         role: 'Normal'
       }))
 
-      console.log(addWorkspaceMemberDtos)
-
       // // Send multiple requests in parallel
       const responses = await Promise.all(
         addWorkspaceMemberDtos.map((addWorkspaceMemberDto) =>
@@ -56,20 +55,20 @@ function useAddMultipleWorkspaceMemberMutation(
       const firstResponse = responses[0]
       // Getting data shape from first response
       const { 
-        actionId,
+        id,
         date,
         actionType,
         memberCreatorId,
       } = firstResponse.data
 
       const addedMembersResponseData = {
-        actionId,
+        id,
         date,
         actionType,
         workspaceId,
-        memberCreatorId,
+        memberCreatorId: memberCreatorId ?? '',
         // Map the targetUserId from each response to create an array of added members
-        addedMembers: responses.map((response) => response.data.targetUserId)
+        addedMembers: responses.map((response) => response.data.targetUserId ?? '')
       }
 
       return addedMembersResponseData

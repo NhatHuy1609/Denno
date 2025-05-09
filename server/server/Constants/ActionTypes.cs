@@ -7,5 +7,6 @@
         public const string JoinWorkspaceByLink = "joinWorkspaceByLink";
         public const string ApproveWorkspaceJoinRequest = "approveWorkspaceJoinRequest";
         public const string RejectWorkspaceJoinRequest = "rejectWorkspaceJoinRequest";
+        public const string SendWorkspaceJoinRequest = "sendWorkspaceJoinRequest";
     }
 }

@@ -1,6 +1,4 @@
 ﻿using server.Constants;
-using server.Entities;
-using server.Enums;
 
 namespace server.Factories.NotificationResponseFactory
 {
@@ -22,6 +20,7 @@ namespace server.Factories.NotificationResponseFactory
                 ActionTypes.JoinWorkspaceByLink => _serviceProvider.GetRequiredService<JoinWorkspaceWithLinkNotificationResponseFactory>(),
                 ActionTypes.ApproveWorkspaceJoinRequest => _serviceProvider.GetRequiredService<ApproveWorkspaceJoinRequestNotificationResponseFactory>(),
                 ActionTypes.RejectWorkspaceJoinRequest => _serviceProvider.GetRequiredService<RejectWorkspaceJoinRequestNotificationResponseFactory>(),
+                ActionTypes.SendWorkspaceJoinRequest => _serviceProvider.GetRequiredService<SendWorkspaceJoinRequestNotificationResponseFactory>(),
                 // Add more action types as needed
                 _ => throw new ArgumentException($"No factory found for action type: {actionType}")
             };
