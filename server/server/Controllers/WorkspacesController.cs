@@ -2,6 +2,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using server.Constants;
 using server.Dtos.Requests.Workspace;
@@ -11,6 +12,7 @@ using server.Dtos.Response.InvitationSecret;
 using server.Dtos.Response.Workspace;
 using server.Entities;
 using server.Helpers;
+using server.Hubs.NotificationHub;
 using server.Interfaces;
 using server.Models.Query;
 using server.Services.QueueHostedService;
@@ -36,6 +38,7 @@ namespace server.Controllers
         private readonly IWorkspaceService _workspaceService;
         private readonly INotificationRealtimeService _notificationRealtimeService;
         private readonly IBackgroundTaskQueue _backgroundTask;
+        private readonly IHubContext<NotificationHub, INotificationHubClient> _hubContext;
 
         public WorkspacesController(
             IMapper mapper,
@@ -47,7 +50,8 @@ namespace server.Controllers
             IEmailService emailService,
             IWorkspaceService workspaceService,
             INotificationRealtimeService notificationRealtimeService,
-            IBackgroundTaskQueue backgroundTask)
+            IBackgroundTaskQueue backgroundTask,
+            IHubContext<NotificationHub, INotificationHubClient> hubContext)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
@@ -59,6 +63,7 @@ namespace server.Controllers
             _notificationRealtimeService = notificationRealtimeService;
             _backgroundTask = backgroundTask;
             _mapper = mapper;
+            _hubContext = hubContext;
         }
 
         [HttpGet("[controller]/{id}")]
@@ -443,7 +448,8 @@ namespace server.Controllers
                 _emailService.SendActionEmailInBackgroundAsync(action);
                 _logger.LogInformation("Successfully sent email to notify that user sent a join request to workspace");
 
-                _notificationRealtimeService.SendActionNotificationToUsersInBackground(action);
+                //_notificationRealtimeService.SendActionNotificationToUsersInBackground(action);
+                await _notificationRealtimeService.SendActionNotificationToUsersAsync(action);
             }
 
             return Ok();
