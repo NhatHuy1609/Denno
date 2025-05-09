@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using server.Dtos.Response;
+using server.Dtos.Response.Notification.Interfaces;
 using server.Dtos.Response.Users;
 using server.Dtos.Response.Workspace;
 using server.Entities;
@@ -108,6 +109,8 @@ namespace server.Controllers
 
         [HttpGet]
         [Route("[controller]/{id}/notifications")]
+        [ProducesResponseType(typeof(List<INotificationResponseDto>), StatusCodes.Status200OK)]
+
         public async Task<IActionResult> GetUserNotificationsAsync([FromRoute] string id)
         {
             var notificationResponses = await _notificationService.GetUserNotificationResponseDtos(id);

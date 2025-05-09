@@ -1,5 +1,4 @@
-﻿using server.Dtos.Response.Notification;
-using server.Dtos.Response.Notification.Interfaces;
+﻿using server.Dtos.Response.Notification.Interfaces;
 using server.Entities;
 
 namespace server.Factories.NotificationResponseFactory
