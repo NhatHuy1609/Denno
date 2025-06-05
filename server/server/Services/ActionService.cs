@@ -1,23 +1,23 @@
-﻿using server.Data;
+﻿using server.Constants;
+using server.Data;
 using server.Entities;
 using server.Factories;
 using server.Interfaces;
 using server.Strategies.ActionStrategy;
+using server.Strategies.ActionStrategy.Contexts;
+using server.Strategies.ActionStrategy.Interfaces;
 
 namespace server.Services
 {
     public class ActionService : IActionService
     {
-        private readonly ActionFactory _actionFactory;
         private readonly ApplicationDBContext _dbContext;
         private readonly ILogger<ActionService> _logger;
 
         public ActionService(
-            ActionFactory actionFactory,
             ApplicationDBContext dbContext,
             ILogger<ActionService> logger)
         {
-            _actionFactory = actionFactory;
             _dbContext = dbContext;
             _logger = logger;
         }
@@ -30,7 +30,7 @@ namespace server.Services
             if (context == null)
                 throw new ArgumentNullException(nameof(context), "Action context cannot be null");
 
-            var strategy = _actionFactory.CreateStrategy(actionType);
+            var strategy = GetActionStrategy(actionType);
             if (strategy == null)
                 throw new InvalidOperationException($"No strategy found for action type: {actionType}");
 
@@ -50,6 +50,21 @@ namespace server.Services
                     throw;
                 }
             }
+        }
+
+        private IDennoActionStrategy GetActionStrategy(string actionType)
+        {
+            return actionType switch
+            {
+                ActionTypes.AddMemberToWorkspace => new AddWorkspaceMemberStrategy(_dbContext),
+                ActionTypes.JoinWorkspaceByLink => new JoinWorkspaceByLinkStrategy(_dbContext),
+                ActionTypes.ApproveWorkspaceJoinRequest => new ApproveWorkspaceJoinRequestStrategy(_dbContext),
+                ActionTypes.RejectWorkspaceJoinRequest => new RejectWorkspaceJoinRequestStrategy(_dbContext),
+                ActionTypes.SendWorkspaceJoinRequest => new SendWorkspaceJoinRequestStrategy(_dbContext),
+                ActionTypes.AddMemberToBoard => new AddBoardMemberStrategy(_dbContext),
+                ActionTypes.CreateBoard => new CreateBoardStategy(_dbContext),
+                _ => throw new ArgumentException($"Unsupported action type: {actionType}")
+            };
         }
     }
 }

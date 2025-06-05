@@ -1,5 +1,5 @@
 ﻿using server.Entities;
-using server.Strategies.ActionStrategy;
+using server.Strategies.ActionStrategy.Contexts;
 
 namespace server.Interfaces
 {
