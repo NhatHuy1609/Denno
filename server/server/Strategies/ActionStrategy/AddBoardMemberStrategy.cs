@@ -7,20 +7,19 @@ using server.Strategies.ActionStrategy.Interfaces;
 
 namespace server.Strategies.ActionStrategy
 {
-    public class RejectWorkspaceJoinRequestStrategy : IDennoActionStrategy
+    public class AddBoardMemberStrategy : IDennoActionStrategy
     {
         private readonly ApplicationDBContext _dbContext;
 
-        public RejectWorkspaceJoinRequestStrategy(
-            ApplicationDBContext dContext)
+        public AddBoardMemberStrategy(ApplicationDBContext dbContext)
         {
-            _dbContext = dContext;
+            _dbContext = dbContext;
         }
 
         public async Task<DennoAction> Execute(DennoActionContext context)
         {
-            if (!context.WorkspaceId.HasValue)
-                throw new ArgumentNullException(nameof(context.WorkspaceId), "WorkspaceId is required");
+            if (!context.BoardId.HasValue)
+                throw new ArgumentNullException(nameof(context.BoardId), "BoardId is required");
 
             if (string.IsNullOrEmpty(context.TargetUserId))
                 throw new ArgumentNullException(nameof(context.TargetUserId), "TargetUserId is required");
@@ -28,11 +27,25 @@ namespace server.Strategies.ActionStrategy
             if (string.IsNullOrEmpty(context.MemberCreatorId))
                 throw new ArgumentNullException(nameof(context.MemberCreatorId), "MemberCreatorId is required");
 
+            // Action-specific business rules
+            if (context.MemberCreatorId == context.TargetUserId)
+                throw new InvalidOperationException("User cannot add themselves as a member");
+
+            if (_dbContext.BoardMembers.Any(m => m.BoardId == context.BoardId && m.AppUserId == context.TargetUserId))
+                throw new InvalidOperationException("User is already a member of this board");
+
+            var newMember = new BoardMember()
+            {
+                BoardId = context.BoardId.Value,
+                AppUserId = context.TargetUserId
+            };
+
             var action = new DennoAction()
             {
                 MemberCreatorId = context.MemberCreatorId,
-                ActionType = ActionTypes.RejectWorkspaceJoinRequest,
-                WorkspaceId = context.WorkspaceId,
+                ActionType = ActionTypes.AddMemberToBoard,
+                IsBoardActivity = context.IsBoardActivity,
+                BoardId = context.BoardId,
                 TargetUserId = context.TargetUserId,
                 Date = DateTime.Now
             };
@@ -49,9 +62,9 @@ namespace server.Strategies.ActionStrategy
                 RecipientId = context.TargetUserId
             };
 
-            // Delete workspace join requests related to user was added
+            // Delete board join requests related to user was added
             var existedJoinRequest = await _dbContext.JoinRequests
-                .FirstOrDefaultAsync(j => j.WorkspaceId == context.WorkspaceId && j.RequesterId == context.TargetUserId);
+                .FirstOrDefaultAsync(j => j.BoardId == context.BoardId && j.RequesterId == context.TargetUserId);
 
             if (existedJoinRequest != null)
             {
@@ -61,13 +74,10 @@ namespace server.Strategies.ActionStrategy
             _dbContext.Actions.Add(action);
             _dbContext.Notifications.Add(notification);
             _dbContext.NotificationRecipients.Add(recipient);
+            _dbContext.BoardMembers.Add(newMember);
 
             // Load needed navigation properties
-            await _dbContext.Entry(action)
-                .Reference(a => a.MemberCreator)
-                .LoadAsync();
-                
-            //action.MemberCreator = await _dbContext.Users.FindAsync(context.MemberCreatorId);
+            action.MemberCreator = await _dbContext.Users.FindAsync(context.MemberCreatorId);
 
             return action;
         }

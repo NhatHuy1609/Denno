@@ -8,6 +8,10 @@ using server.Dtos.Response;
 using server.Dtos.Response.Board;
 using server.Enums;
 using server.Entities;
+using System.Security.Claims;
+using server.Strategies.ActionStrategy;
+using server.Constants;
+using server.Strategies.ActionStrategy.Contexts;
 
 namespace server.Controllers
 {
@@ -21,17 +25,23 @@ namespace server.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<BoardsController> _logger;
         private readonly UserManager<AppUser> _userManager;
+        private readonly IActionService _actionService;
+        private readonly IEmailService _emailService;
 
         public BoardsController(
             IMapper mapper,
             IUnitOfWork unitOfWork,
             ILogger<BoardsController> logger,
-            UserManager<AppUser> userManager)
+            UserManager<AppUser> userManager,
+            IActionService actionService,
+            IEmailService emailService)
         {
             _mapper = mapper;
             _logger = logger;
             _unitOfWork = unitOfWork;
             _userManager = userManager;
+            _actionService = actionService;
+            _emailService = emailService;
         }
         
         [HttpGet]
@@ -76,7 +86,7 @@ namespace server.Controllers
         [HttpPost("[controller]")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult Create([FromBody] CreateBoardRequestDto requestDto)
+        public async Task<IActionResult> Create([FromBody] CreateBoardRequestDto requestDto)
         {
             if (!ModelState.IsValid)
             {
@@ -87,11 +97,57 @@ namespace server.Controllers
                 });
             }
 
+            var ownerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var newBoard = _mapper.Map<Board>(requestDto);
-            _unitOfWork.Boards.Add(newBoard);
-            _unitOfWork.Complete();
+
+            var actionContext = new CreateBoardActionContext()
+            {
+                MemberCreatorId = ownerId,
+                IsBoardActivity = true,
+                BoardId = newBoard.Id,
+                WorkspaceId = newBoard.WorkspaceId,
+                BoardData = newBoard
+            };
+
+            var actionResult = await _actionService.CreateActionAsync(ActionTypes.CreateBoard, actionContext);
             
             return CreatedAtAction(nameof(Create), newBoard);
+        }
+
+        [HttpPost("[controller]/{id}/members")]
+        public async Task<IActionResult> AddBoardMemberAsync(Guid id, [FromBody] AddBoardMemberRequestDto requestDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new ApiErrorResponse() { StatusMessage = "Invalid request data" });
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized(new ApiErrorResponse() { StatusMessage = "User not authenticated" });
+
+            var board = await _unitOfWork.Boards.GetByIdAsync(id);
+            if (board == null)
+                return NotFound(new ApiErrorResponse { StatusMessage = "Board not found" });
+
+            var addedUser = await _unitOfWork.Users.GetUserByEmailAsync(requestDto.Email);
+            if (addedUser == null)
+                return NotFound(new ApiErrorResponse { StatusMessage = "User not found" });
+
+            var actionContext = new DennoActionContext
+            {
+                MemberCreatorId = userId,
+                IsBoardActivity = true,
+                BoardId = board.Id,
+                TargetUserId = addedUser.Id
+            };
+
+            var action = await _actionService.CreateActionAsync(ActionTypes.AddMemberToBoard, actionContext);
+            if (action != null)
+            {
+                _emailService.SendActionEmailInBackgroundAsync(action);
+                _logger.LogInformation("Successfully sent email to notify that user was added to new board");
+            }
+
+            return Ok(action);
         }
     }
 }

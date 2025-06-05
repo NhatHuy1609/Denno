@@ -1,8 +1,9 @@
-﻿namespace server.Strategies.ActionStrategy
+﻿namespace server.Strategies.ActionStrategy.Contexts
 {
     public class DennoActionContext
     {
         public string MemberCreatorId { get; set; }
+        public bool IsBoardActivity { get; set; } = false;
         public Guid? CardId { get; set; }
         public Guid? BoardId { get; set; }
         public Guid? ListId { get; set; }

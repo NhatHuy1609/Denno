@@ -254,18 +254,10 @@ namespace server.Controllers
             // Send email after creating new action successfully
             if (action != null)
             {
-                _ = Task.Run(async () =>
-                {
-                    try
-                    {
-                        await _emailService.SendActionEmailAsync(action);
-                        _logger.LogInformation("Successfully sent email to notify that user was added to new workspace");
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError($"Failed to send action notification email after retries: {ex.Message}");
-                    }
-                });
+                _emailService.SendActionEmailInBackgroundAsync(action);
+                _logger.LogInformation("Successfully sent email to notify that user was added to new workspace");
+
+                await _notificationRealtimeService.SendActionNotificationToUsersAsync(action);
             }
 
             return Ok(_mapper.Map<AddWorkspaceMemberActionResponse>(action));
@@ -414,6 +406,7 @@ namespace server.Controllers
             if (action != null)
             {
                 _emailService.SendActionEmailInBackgroundAsync(action);
+                await _notificationRealtimeService.SendActionNotificationToUsersAsync(action);
             }
 
             return Ok(_mapper.Map<JoinWorkspaceByLinkActionResponse>(action));
@@ -448,7 +441,6 @@ namespace server.Controllers
                 _emailService.SendActionEmailInBackgroundAsync(action);
                 _logger.LogInformation("Successfully sent email to notify that user sent a join request to workspace");
 
-                //_notificationRealtimeService.SendActionNotificationToUsersInBackground(action);
                 await _notificationRealtimeService.SendActionNotificationToUsersAsync(action);
             }
 

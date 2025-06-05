@@ -8,5 +8,6 @@
         public const string ApproveWorkspaceJoinRequest = "approveWorkspaceJoinRequest";
         public const string RejectWorkspaceJoinRequest = "rejectWorkspaceJoinRequest";
         public const string SendWorkspaceJoinRequest = "sendWorkspaceJoinRequest";
+        public const string CreateBoard = "createBoard";
     }
 }

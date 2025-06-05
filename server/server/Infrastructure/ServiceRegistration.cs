@@ -41,7 +41,7 @@ namespace server.Infrastructure
             services.AddTransient<IEmailService, EmailService>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddTransient<IActionService, ActionService>();
-            services.AddTransient<ActionFactory, ActionFactory>();
+            services.AddScoped<IBoardService, BoardService>();
 
             services.AddDbContext<ApplicationDBContext>(options =>
             {
@@ -55,6 +55,7 @@ namespace server.Infrastructure
             services.AddScoped<ApproveWorkspaceJoinRequestNotificationResponseFactory>();
             services.AddScoped<RejectWorkspaceJoinRequestNotificationResponseFactory>();
             services.AddScoped<SendWorkspaceJoinRequestNotificationResponseFactory>();
+            services.AddScoped<AddMemberToBoardNotificationResponseFactory>();
 
             // Background services
             services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
