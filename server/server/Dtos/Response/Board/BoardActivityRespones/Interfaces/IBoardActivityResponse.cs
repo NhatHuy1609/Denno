@@ -2,10 +2,9 @@
 {
     public interface IBoardActivityResponse
     {
-        int Id { get; set; }
+        Guid ActionId { get; set; }
         string Type { get; set; }
         DateTime Date { get; set; }
         string MemberCreatorId { get; set; }
-        Guid ActionId { get; set; }
     }
 }
