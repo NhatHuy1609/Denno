@@ -172,5 +172,25 @@ namespace server.Controllers
 
             return Ok(action);
         }
+
+        [HttpPost("[controller]/{boardId}/join")]
+        public async Task<IActionResult> JoinBoardAsync(Guid boardId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ApiErrorResponse() { StatusMessage = "Invalid request data" });
+            }
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var actionContext = new DennoActionContext()
+            {
+                MemberCreatorId = userId,
+                IsBoardActivity = true,
+                BoardId = boardId
+            };
+
+            return Ok();
+        }
     }
 }
