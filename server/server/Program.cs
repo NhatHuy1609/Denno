@@ -2,8 +2,11 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using Serilog;
 using server.Exceptions;
+using server.Extensions;
+using server.Factories.BoardActivityResponseFactory.Helpers;
 using server.Infrastructure;
 using server.Infrastructure.Configurations;
+using System.Reflection;
 using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,6 +28,10 @@ builder.Services.AddApplicationServices(builder.Configuration.GetConnectionStrin
 builder.Services.AddApplicationIdentity();
 builder.Services.AddApplicationJwtAuth(builder.Configuration.GetSection("Jwt").Get<JwtConfiguration>());
 builder.Services.AddApplicationApiVersioning();
+
+// Add custom factories
+builder.Services.AddBoardActivityResponseFactories(Assembly.GetExecutingAssembly());
+builder.Services.AddScoped<BoardActivityResponseFactoryResolver>();
 
 // Configure Serilog
 builder.Host.UseSerilog((context, loggerConfiguration) =>

@@ -17,6 +17,7 @@ namespace server.Strategies.ActionStrategy
 
         public async Task<DennoAction> Execute(DennoActionContext context)
         {
+            // Cast the context to CreateBoardActionContext
             var createContext = context as CreateBoardActionContext ??
                                 throw new ArgumentException("Invalid context type for CreateBoardStrategy");
 
@@ -39,13 +40,11 @@ namespace server.Strategies.ActionStrategy
                 BoardId = context.BoardId,
                 WorkspaceId = context.WorkspaceId,
                 ActionType = ActionTypes.CreateBoard,
+                IsBoardActivity = context.IsBoardActivity,
             };
 
             _dbContext.Boards.Add(boardData);
             _dbContext.Actions.Add(action);
-
-            // Load needed navigation properties
-            action.MemberCreator = await _dbContext.Users.FindAsync(context.MemberCreatorId);
 
             return action;
         }

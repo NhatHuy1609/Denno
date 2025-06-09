@@ -46,8 +46,7 @@ namespace server.Strategies.ActionStrategy
                 ActionType = ActionTypes.AddMemberToBoard,
                 IsBoardActivity = context.IsBoardActivity,
                 BoardId = context.BoardId,
-                TargetUserId = context.TargetUserId,
-                Date = DateTime.Now
+                TargetUserId = context.TargetUserId
             };
 
             var notification = new Notification

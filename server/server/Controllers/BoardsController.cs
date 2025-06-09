@@ -27,6 +27,7 @@ namespace server.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly IActionService _actionService;
         private readonly IEmailService _emailService;
+        private readonly IBoardService _boardService;
 
         public BoardsController(
             IMapper mapper,
@@ -34,7 +35,8 @@ namespace server.Controllers
             ILogger<BoardsController> logger,
             UserManager<AppUser> userManager,
             IActionService actionService,
-            IEmailService emailService)
+            IEmailService emailService,
+            IBoardService boardService)
         {
             _mapper = mapper;
             _logger = logger;
@@ -42,8 +44,29 @@ namespace server.Controllers
             _userManager = userManager;
             _actionService = actionService;
             _emailService = emailService;
+            _boardService = boardService;
         }
-        
+
+        [HttpGet("[controller]/{boardId}/activities")]
+        public async Task<IActionResult> GetBoardActivitiesAsync(Guid boardId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var activities = await _boardService.GetBoardActivityResponsesAsync(boardId);
+            if (activities == null || !activities.Any())
+            {
+                return NotFound(new ApiErrorResponse()
+                {
+                    StatusMessage = "No activities found for this board"
+                });
+            }
+
+            return Ok(activities);
+        }
+
         [HttpGet]
         [Route("workspaces/{workspaceId}/boards")]
         [ProducesResponseType(typeof(IEnumerable<BoardResponseDto>), StatusCodes.Status200OK)]
@@ -141,11 +164,11 @@ namespace server.Controllers
             };
 
             var action = await _actionService.CreateActionAsync(ActionTypes.AddMemberToBoard, actionContext);
-            if (action != null)
-            {
-                _emailService.SendActionEmailInBackgroundAsync(action);
-                _logger.LogInformation("Successfully sent email to notify that user was added to new board");
-            }
+            //if (action != null)
+            //{
+            //    _emailService.SendActionEmailInBackgroundAsync(action);
+            //    _logger.LogInformation("Successfully sent email to notify that user was added to new board");
+            //}
 
             return Ok(action);
         }
