@@ -6,18 +6,16 @@ using System.Security.Claims;
 
 namespace server.Authorization.Handlers
 {
-    public class WorkspaceMemberHandler : AuthorizationHandler<WorkspaceMemberRequirement>
+    public class JoinBoardAsWorkspaceMemberHandler : AuthorizationHandler<WorkspaceMemberRequirement>
     {
         private readonly ApplicationDBContext _dbContext;
 
-        public WorkspaceMemberHandler(ApplicationDBContext dbContext)
+        public JoinBoardAsWorkspaceMemberHandler(ApplicationDBContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        protected override async Task HandleRequirementAsync(
-            AuthorizationHandlerContext context,
-            WorkspaceMemberRequirement requirement)
+        protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, WorkspaceMemberRequirement requirement)
         {
             var userId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId))
@@ -31,9 +29,9 @@ namespace server.Authorization.Handlers
                 return;
             }
 
-            // Try to find the workspace ID in the route values
-            var possibleKeys = new[] { "workspaceId", "id" };
-            var workspaceId = possibleKeys
+            // Try to find the board ID in the route values
+            var possibleKeys = new[] { "boardId", "id" };
+            var boardId = possibleKeys
                 .Select(key =>
                 {
                     if (httpContext.Request.RouteValues.ContainsKey(key) &&
@@ -45,12 +43,20 @@ namespace server.Authorization.Handlers
                 })
                 .FirstOrDefault(id => id.HasValue);
 
-            if (workspaceId == null)
+            if (boardId == null)
+                return;
+
+            // Check if the user is a member of the workspace associated with the board
+            var workspaceId = await _dbContext.Boards
+                .Where(b => b.Id == boardId)
+                .Select(b => b.WorkspaceId)
+                .FirstOrDefaultAsync();
+
+            if (workspaceId == Guid.Empty)
             {
-                return; // No workspace ID found in the route
+                return;
             }
 
-            // Check if the user is a member of the workspace
             var isMember = await _dbContext.WorkspaceMembers
                 .AnyAsync(wm => wm.AppUserId == userId && wm.WorkspaceId == workspaceId);
 

@@ -63,6 +63,7 @@ namespace server.Services
                 ActionTypes.SendWorkspaceJoinRequest => new SendWorkspaceJoinRequestStrategy(_dbContext),
                 ActionTypes.AddMemberToBoard => new AddBoardMemberStrategy(_dbContext),
                 ActionTypes.CreateBoard => new CreateBoardStategy(_dbContext),
+                ActionTypes.JoinBoard => new JoinBoardStrategy(_dbContext),
                 _ => throw new ArgumentException($"Unsupported action type: {actionType}")
             };
         }

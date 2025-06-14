@@ -12,6 +12,8 @@ using System.Security.Claims;
 using server.Strategies.ActionStrategy;
 using server.Constants;
 using server.Strategies.ActionStrategy.Contexts;
+using Microsoft.AspNetCore.Authorization;
+using server.Authorization.Constants;
 
 namespace server.Controllers
 {
@@ -174,6 +176,7 @@ namespace server.Controllers
         }
 
         [HttpPost("[controller]/{boardId}/join")]
+        [Authorize(Policy = PolicyNames.WorkspaceMemberViaBoard)]
         public async Task<IActionResult> JoinBoardAsync(Guid boardId)
         {
             if (!ModelState.IsValid)
@@ -187,8 +190,10 @@ namespace server.Controllers
             {
                 MemberCreatorId = userId,
                 IsBoardActivity = true,
-                BoardId = boardId
+                BoardId = boardId,
             };
+
+            var action = await _actionService.CreateActionAsync(ActionTypes.JoinBoard, actionContext);
 
             return Ok();
         }
