@@ -1,4 +1,6 @@
-﻿using server.Data;
+﻿using Org.BouncyCastle.Cms;
+using server.Constants;
+using server.Data;
 using server.Entities;
 using server.Strategies.ActionStrategy.Contexts;
 using server.Strategies.ActionStrategy.Interfaces;
@@ -14,9 +16,29 @@ namespace server.Strategies.ActionStrategy
             _dbContext = dbContext;
         }
 
-        public Task<DennoAction> Execute(DennoActionContext context)
+        public async Task<DennoAction> Execute(DennoActionContext context)
         {
-            throw new NotImplementedException();
+            ArgumentNullException.ThrowIfNull(context.BoardId);
+            ArgumentNullException.ThrowIfNull(context.MemberCreatorId);
+
+            var newMember = new BoardMember()
+            {
+                BoardId = context.BoardId.Value,
+                AppUserId = context.TargetUserId
+            };
+
+            var action = new DennoAction()
+            {
+                MemberCreatorId = context.MemberCreatorId,
+                ActionType = ActionTypes.JoinBoard,
+                IsBoardActivity = context.IsBoardActivity,
+                BoardId = context.BoardId,
+            };
+
+            _dbContext.Actions.Add(action);
+            _dbContext.BoardMembers.Add(newMember);
+
+            return action;
         }
     }
 }

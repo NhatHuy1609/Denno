@@ -9,5 +9,6 @@
         public const string SendWorkspaceJoinRequest = "sendWorkspaceJoinRequest";
         public const string CreateBoard = "createBoard";
         public const string AddMemberToBoard = "addMemberToBoard";
+        public const string JoinBoard = "joinBoard";
     }
 }
