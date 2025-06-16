@@ -14,6 +14,8 @@ using server.Constants;
 using server.Strategies.ActionStrategy.Contexts;
 using Microsoft.AspNetCore.Authorization;
 using server.Authorization.Constants;
+using server.Services.QueueHostedService;
+using server.Services.QueueHostedService.Extensions;
 
 namespace server.Controllers
 {
@@ -30,6 +32,7 @@ namespace server.Controllers
         private readonly IActionService _actionService;
         private readonly IEmailService _emailService;
         private readonly IBoardService _boardService;
+        private readonly IBackgroundTaskQueue _taskQueueService;
 
         public BoardsController(
             IMapper mapper,
@@ -38,7 +41,8 @@ namespace server.Controllers
             UserManager<AppUser> userManager,
             IActionService actionService,
             IEmailService emailService,
-            IBoardService boardService)
+            IBoardService boardService,
+            IBackgroundTaskQueue taskQueueService)
         {
             _mapper = mapper;
             _logger = logger;
@@ -47,6 +51,7 @@ namespace server.Controllers
             _actionService = actionService;
             _emailService = emailService;
             _boardService = boardService;
+            _taskQueueService = taskQueueService;
         }
 
         [HttpGet("[controller]/{boardId}/activities")]
@@ -194,8 +199,14 @@ namespace server.Controllers
             };
 
             var action = await _actionService.CreateActionAsync(ActionTypes.JoinBoard, actionContext);
+            //if (action != null)
+            //{
+            //    _emailService.SendActionEmailInBackgroundAsync(action);
+            //    _logger.LogInformation("Successfully sent email to notify that user has successfully joined board");
+            //}
 
             return Ok();
         }
     }
 }
+
