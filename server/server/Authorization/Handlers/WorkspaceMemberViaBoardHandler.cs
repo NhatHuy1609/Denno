@@ -2,15 +2,16 @@
 using Microsoft.EntityFrameworkCore;
 using server.Authorization.Requirements;
 using server.Data;
+using server.Entities;
 using System.Security.Claims;
 
 namespace server.Authorization.Handlers
 {
-    public class JoinBoardAsWorkspaceMemberHandler : AuthorizationHandler<WorkspaceMemberRequirement>
+    public class WorkspaceMemberViaBoardHandler : AuthorizationHandler<WorkspaceMemberRequirement>
     {
         private readonly ApplicationDBContext _dbContext;
 
-        public JoinBoardAsWorkspaceMemberHandler(ApplicationDBContext dbContext)
+        public WorkspaceMemberViaBoardHandler(ApplicationDBContext dbContext)
         {
             _dbContext = dbContext;
         }
@@ -47,18 +48,13 @@ namespace server.Authorization.Handlers
                 return;
 
             // Check if the user is a member of the workspace associated with the board
-            var workspaceId = await _dbContext.Boards
-                .Where(b => b.Id == boardId)
-                .Select(b => b.WorkspaceId)
-                .FirstOrDefaultAsync();
-
-            if (workspaceId == Guid.Empty)
-            {
-                return;
-            }
-
-            var isMember = await _dbContext.WorkspaceMembers
-                .AnyAsync(wm => wm.AppUserId == userId && wm.WorkspaceId == workspaceId);
+            var isMember = await _dbContext.Boards
+                .Where(b => b.Id == boardId.Value)
+                .Join(_dbContext.WorkspaceMembers,
+                        board => board.WorkspaceId,
+                        workspaceMember => workspaceMember.WorkspaceId,
+                        (board, workspaceMember) => workspaceMember)
+                .AnyAsync(workspaceMember => workspaceMember.AppUserId == userId);
 
             if (isMember)
             {

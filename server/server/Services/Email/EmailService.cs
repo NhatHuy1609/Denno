@@ -13,6 +13,7 @@ using server.Infrastructure.Configurations;
 using server.Interfaces;
 using server.Models;
 using server.Services.QueueHostedService;
+using server.Services.QueueHostedService.Extensions;
 
 namespace server.Services.Email
 {
@@ -135,34 +136,27 @@ namespace server.Services.Email
             });
         }
 
-        public async Task SendActionEmailAsync(DennoAction action)
-        {
-            await SendActionEmailInternalAsync(action, _dbContext);
-        }
-
         public void SendActionEmailInBackgroundAsync(DennoAction action)
         {
             if (action != null)
             {
-                _taskQueue.QueueBackgroundWorkItem(async (cancellationToken, serviceProvider) =>
+                _taskQueue.EnqueueScopedWorkItem<EmailService>(async (service) =>
                 {
-                    var dbContext = serviceProvider.GetRequiredService<ApplicationDBContext>();
-
-                    await SendActionEmailInternalAsync(action, dbContext);
+                    await service.SendActionEmailAsync(action);
                 });
             }
         }
 
-        private async Task SendActionEmailInternalAsync(DennoAction action, ApplicationDBContext dbContext)
+        private async Task SendActionEmailAsync(DennoAction action)
         {
             // Take notification recipients who will receive email about action
-            var notification = await dbContext.Notifications
+            var notification = await _dbContext.Notifications
                 .FirstOrDefaultAsync(n => n.ActionId == action.Id);
 
             if (notification == null)
                 throw new ArgumentNullException("Notification Object can not be null");
 
-            var recipients = await dbContext.NotificationRecipients
+            var recipients = await _dbContext.NotificationRecipients
                 .AsNoTracking()
                 .Include(n => n.Recipient)
                 .Where(n => n.NotificationId == notification.Id)
