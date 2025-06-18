@@ -171,11 +171,10 @@ namespace server.Controllers
             };
 
             var action = await _actionService.CreateActionAsync(ActionTypes.AddMemberToBoard, actionContext);
-            //if (action != null)
-            //{
-            //    _emailService.SendActionEmailInBackgroundAsync(action);
-            //    _logger.LogInformation("Successfully sent email to notify that user was added to new board");
-            //}
+            if (action != null)
+            {
+                //await _emailService.SendBoardActionEmailsAsync(action, isRunInBackground: true);
+            }
 
             return Ok(action);
         }
@@ -199,11 +198,10 @@ namespace server.Controllers
             };
 
             var action = await _actionService.CreateActionAsync(ActionTypes.JoinBoard, actionContext);
-            //if (action != null)
-            //{
-            //    _emailService.SendActionEmailInBackgroundAsync(action);
-            //    _logger.LogInformation("Successfully sent email to notify that user has successfully joined board");
-            //}
+            if (action != null)
+            {
+                //await _emailService.SendBoardActionEmailsAsync(action, isRunInBackground: true);
+            }
 
             return Ok();
         }

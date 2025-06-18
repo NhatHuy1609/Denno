@@ -33,5 +33,7 @@ namespace server.Entities
         public virtual ICollection<DennoAction> Actions { get; set; } = new List<DennoAction>();
 
         public virtual ICollection<NotificationRecipient> NotificationRecipients { get; set; } = new List<NotificationRecipient>();
+
+        public virtual ICollection<BoardUserSettings> BoardUserSettings { get; set; } = new List<BoardUserSettings>();
     }
 }
