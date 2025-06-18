@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using MimeKit;
+using Org.BouncyCastle.Cms;
 using Polly;
 using RazorEngine;
 using RazorEngine.Templating;
@@ -14,6 +15,7 @@ using server.Interfaces;
 using server.Models;
 using server.Services.QueueHostedService;
 using server.Services.QueueHostedService.Extensions;
+using System.Security.Cryptography.Pkcs;
 
 namespace server.Services.Email
 {
@@ -147,7 +149,7 @@ namespace server.Services.Email
             }
         }
 
-        private async Task SendActionEmailAsync(DennoAction action)
+        public async Task SendActionEmailAsync(DennoAction action)
         {
             // Take notification recipients who will receive email about action
             var notification = await _dbContext.Notifications
@@ -171,6 +173,71 @@ namespace server.Services.Email
             });
 
             await Task.WhenAll(emailTasks);
+        }
+
+        public async Task SendBoardActionEmailsAsync(DennoAction action, bool isRunInBackground)
+        {
+            var recipients = await GetBoardEmailRecipientsAsync(action.Id);
+
+            if (recipients == null || recipients.Count == 0)
+            {
+                _logger.LogWarning("No email recipients found for action ID: {ActionId}", action.Id);
+                return;
+            }
+
+            // Send emails in parallel instead of waiting for each one sequentiall
+            if (isRunInBackground)
+            {
+                _taskQueue.EnqueueScopedWorkItem<EmailService>(async (service) =>
+                {
+                    await service.SendEmailToRecipients(recipients, action);
+                });
+                _logger.LogInformation("Queued email sending for action ID: {ActionId}", action.Id);
+            } else
+            {
+                await SendEmailToRecipients(recipients, action);
+                _logger.LogInformation("Sent emails for action ID: {ActionId}", action.Id);
+            }
+
+            _logger.LogInformation("Successfully sent emails for action ID: {ActionId}", action.Id);
+        }
+
+        private async Task<List<string?>> GetBoardEmailRecipientsAsync(Guid actionId)
+        {
+            var notification = await _dbContext.Notifications
+                .Include(n => n.Action)
+                .FirstOrDefaultAsync(n => n.ActionId == actionId);
+
+            ArgumentNullException.ThrowIfNull(notification, "Notification Object can not be null");
+
+            var boardId = notification.Action?.BoardId
+                ?? throw new ArgumentNullException("BoardId cannot be null for action");
+
+            var recipients = await _dbContext.NotificationRecipients
+                .AsNoTracking()
+                .Include(n => n.Recipient)
+                .Where(n => n.NotificationId == notification.Id)
+                .Join(_dbContext.BoardUserSettings,
+                    nr => new { UserId = nr.RecipientId, BoardId = boardId },
+                    setting => new { setting.UserId, setting.BoardId },
+                    (nr, setting) => new { nr, setting }
+                )
+                .Where(result => result.setting.IsWatching)
+                .Select(result => result.nr.Recipient.Email)
+                .ToListAsync();
+
+            return recipients;
+        }
+
+        private async Task<bool[]> SendEmailToRecipients(List<string> recipientEmails, DennoAction action)
+        {
+            var emailTasks = recipientEmails.Select(email =>
+            {
+                var mailData = BuildActionEmailData(email, action);
+                return SendEmailAsync(mailData, true);
+            });
+
+            return await Task.WhenAll(emailTasks);
         }
 
         private EmailData BuildActionEmailData(string recipientEmail, DennoAction action)

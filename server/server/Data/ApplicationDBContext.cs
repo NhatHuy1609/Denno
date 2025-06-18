@@ -33,6 +33,7 @@ namespace server.Data
         public DbSet<NotificationRecipient> NotificationRecipients { get; set; }
         public DbSet<InvitationSecret> InvitationSecrets { get; set; }
         public DbSet<JoinRequest> JoinRequests { get; set; }
+        public DbSet<BoardUserSettings> BoardUserSettings { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -254,6 +255,25 @@ namespace server.Data
                 .WithMany(b => b.JoinRequests)
                 .HasForeignKey(j => j.BoardId)
                 .OnDelete(DeleteBehavior.ClientCascade);
+
+            // Configure BoardUserSettings table
+            modelBuilder.Entity<BoardUserSettings>(entity =>
+            {
+                entity.HasKey(b => new { b.UserId, b.BoardId });
+
+                entity.HasOne(b => b.User)
+                    .WithMany(u => u.BoardUserSettings)
+                    .HasForeignKey(b => b.UserId)
+                    .OnDelete(DeleteBehavior.ClientCascade);
+
+                entity.HasOne(b => b.Board)
+                    .WithMany(b => b.BoardUserSettings)
+                    .HasForeignKey(b => b.BoardId)
+                    .OnDelete(DeleteBehavior.ClientCascade);
+
+                entity.HasIndex(b => new { b.UserId, b.BoardId })
+                    .IsUnique();
+            });
         }
     }
 }
