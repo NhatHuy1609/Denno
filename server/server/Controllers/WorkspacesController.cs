@@ -29,38 +29,35 @@ namespace server.Controllers
     {
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly UserManager<AppUser> _userManager;
         private readonly IFileUploadService _uploadService;
+        private readonly IAuthService _authService;
         private readonly IActionService _actionService;
         private readonly ILogger<WorkspacesController> _logger;
         private readonly IEmailService _emailService;
         private readonly IWorkspaceService _workspaceService;
         private readonly INotificationRealtimeService _notificationRealtimeService;
-        private readonly IBackgroundTaskQueue _backgroundTask;
         private readonly IHubContext<NotificationHub, INotificationHubClient> _hubContext;
 
         public WorkspacesController(
             IMapper mapper,
             IUnitOfWork unitOfWork,
-            UserManager<AppUser> userManager,
             IFileUploadService uploadService,
+            IAuthService authService,
             IActionService actionService,
             ILogger<WorkspacesController> logger,
             IEmailService emailService,
             IWorkspaceService workspaceService,
             INotificationRealtimeService notificationRealtimeService,
-            IBackgroundTaskQueue backgroundTask,
             IHubContext<NotificationHub, INotificationHubClient> hubContext)
         {
             _unitOfWork = unitOfWork;
-            _userManager = userManager;
             _uploadService = uploadService;
+            _authService = authService;
             _actionService = actionService;
             _logger = logger;
             _emailService = emailService;
             _workspaceService = workspaceService;
             _notificationRealtimeService = notificationRealtimeService;
-            _backgroundTask = backgroundTask;
             _mapper = mapper;
             _hubContext = hubContext;
         }
@@ -262,17 +259,17 @@ namespace server.Controllers
             return Ok(_mapper.Map<AddWorkspaceMemberActionResponse>(action));
         }
 
-        [HttpGet("[controller]/{id}/members")]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetWorkspaceMembersAsync(Guid id)
-        {
-            var workspace = await _unitOfWork.Workspaces.GetByIdAsync(id);
+        //[HttpGet("[controller]/{id}/members")]
+        //[ProducesResponseType(StatusCodes.Status404NotFound)]
+        //public async Task<IActionResult> GetWorkspaceMembersAsync(Guid id)
+        //{
+        //    var workspace = await _unitOfWork.Workspaces.GetByIdAsync(id);
 
-            if (workspace == null)
-                return NotFound(new ApiErrorResponse() { StatusMessage = "Workspace not found" });
+        //    if (workspace == null)
+        //        return NotFound(new ApiErrorResponse() { StatusMessage = "Workspace not found" });
 
-            return Ok();
-        }
+        //    return Ok();
+        //}
 
         [HttpPost("[controller]/{id}/invitationSecret")]
         public async Task<IActionResult> CreateInvitationSecretAsync(Guid id)
@@ -283,11 +280,12 @@ namespace server.Controllers
             {
                 var newInvitationSecret = new InvitationSecret()
                 {
+                    Target = InvitationTarget.Workspace,
+                    WorkspaceId = id,
                     SecretCode = SecretCodeGenerator.GenerateHexCode(),
-                    InviterId = User.FindFirstValue(ClaimTypes.NameIdentifier),
+                    InviterId = _authService.GetCurrentUserId(),
                     CreatedAt = DateTime.Now,
-                    ExpiresAt = DateTime.Now.AddDays(3),
-                    WorkspaceId = id
+                    ExpiresAt = DateTime.Now.AddDays(3)
                 };
 
                 await _unitOfWork.InvitationSecrets.CreateAsync(newInvitationSecret);
