@@ -46,5 +46,25 @@ namespace server.Repositories
                 .Include(i => i.Workspace)
                 .FirstOrDefaultAsync(i => i.WorkspaceId == workspaceId);  
         }
+
+        public async Task<InvitationSecret?> GetBoardInvitationSecretAsync(Guid boardId)
+        {
+            return await _dbContext.InvitationSecrets
+                .Include(i => i.Inviter)
+                .Include(i => i.Board)
+                .FirstOrDefaultAsync(i => i.BoardId == boardId && i.Target == InvitationTarget.Board);
+        }
+
+        public async Task DeleteBoardInvitationSecretAsync(Guid boardId)
+        {
+            var invitationSecret = await _dbContext.InvitationSecrets
+                .FirstOrDefaultAsync(i => i.BoardId == boardId && i.Target == InvitationTarget.Board);
+
+            if (invitationSecret == null)
+                return;
+
+            _dbContext.InvitationSecrets.Remove(invitationSecret);
+            await _dbContext.SaveChangesAsync();
+        }
     }
 }

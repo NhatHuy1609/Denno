@@ -8,6 +8,7 @@ namespace server.Interfaces
 {
     public interface IAuthService
     {
+        string GetCurrentUserId();
         string GenerateRefreshTokenString();
         Task<string> GenerateTokenString(string userEmail);
         Task<LoginResponseDto> RefreshToken(RefreshTokenModel refreshTokenModel);

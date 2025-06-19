@@ -35,5 +35,19 @@ namespace server.Services
 
             return boardActivityResponses;
         }
+
+        public async Task<bool> IsBoardMemberAsync(Guid boardId, string userId)
+        {
+            var board = await _dbContext.Boards
+                .Include(b => b.BoardMembers)
+                .FirstOrDefaultAsync(b => b.Id == boardId);
+
+            if (board == null)
+            {
+                return false;
+            }
+
+            return board.BoardMembers.Any(bm => bm.AppUserId == userId);
+        }
     }
 }

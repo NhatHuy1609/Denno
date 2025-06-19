@@ -9,13 +9,15 @@ using server.Dtos.Response.Board;
 using server.Enums;
 using server.Entities;
 using System.Security.Claims;
-using server.Strategies.ActionStrategy;
 using server.Constants;
 using server.Strategies.ActionStrategy.Contexts;
 using Microsoft.AspNetCore.Authorization;
 using server.Authorization.Constants;
 using server.Services.QueueHostedService;
-using server.Services.QueueHostedService.Extensions;
+using server.Dtos.Response.Workspace;
+using server.Helpers;
+using server.Dtos.Response.InvitationSecret;
+using server.Dtos.Requests.Workspace;
 
 namespace server.Controllers
 {
@@ -32,6 +34,7 @@ namespace server.Controllers
         private readonly IActionService _actionService;
         private readonly IEmailService _emailService;
         private readonly IBoardService _boardService;
+        private readonly IAuthService _authService;
         private readonly IBackgroundTaskQueue _taskQueueService;
 
         public BoardsController(
@@ -42,6 +45,7 @@ namespace server.Controllers
             IActionService actionService,
             IEmailService emailService,
             IBoardService boardService,
+            IAuthService authService,
             IBackgroundTaskQueue taskQueueService)
         {
             _mapper = mapper;
@@ -51,6 +55,7 @@ namespace server.Controllers
             _actionService = actionService;
             _emailService = emailService;
             _boardService = boardService;
+            _authService = authService;
             _taskQueueService = taskQueueService;
         }
 
@@ -188,7 +193,7 @@ namespace server.Controllers
                 return BadRequest(new ApiErrorResponse() { StatusMessage = "Invalid request data" });
             }
 
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = _authService.GetCurrentUserId();
 
             var actionContext = new DennoActionContext()
             {
@@ -198,6 +203,128 @@ namespace server.Controllers
             };
 
             var action = await _actionService.CreateActionAsync(ActionTypes.JoinBoard, actionContext);
+            if (action != null)
+            {
+                //await _emailService.SendBoardActionEmailsAsync(action, isRunInBackground: true);
+            }
+
+            return Ok();
+        }
+
+        [HttpPost("[controller]/{boardId}/invitationSecret")]
+        public async Task<IActionResult> CreateBoardInvitationSecretAsync(Guid boardId, CreateBoardInvitationSecretRequest request)
+        {
+            var invitationSecret = await _unitOfWork.InvitationSecrets.GetBoardInvitationSecretAsync(boardId);
+
+            if (invitationSecret == null)
+            {
+                var newInvitationSecret = new InvitationSecret()
+                {
+                    Target = InvitationTarget.Board,
+                    BoardId = boardId,
+                    BoardRole = request.BoardRole,
+                    SecretCode = SecretCodeGenerator.GenerateHexCode(),
+                    InviterId = _authService.GetCurrentUserId(),
+                    CreatedAt = DateTime.Now,
+                    ExpiresAt = DateTime.Now.AddDays(3),
+                };
+
+                await _unitOfWork.InvitationSecrets.CreateAsync(newInvitationSecret);
+
+                return Ok(_mapper.Map<BoardInvitationSecretResponse>(newInvitationSecret));
+            }
+
+            return Ok(_mapper.Map<BoardInvitationSecretResponse>(invitationSecret));
+        }
+
+        [HttpGet("[controller]/{boardId}/invitationSecret")]
+        public async Task<IActionResult> GetBoardInvitationSecretAsync(Guid boardId)
+        {
+            var invitationSecret = await _unitOfWork.InvitationSecrets.GetBoardInvitationSecretAsync(boardId);
+
+            if (invitationSecret == null)
+            {
+                return NotFound(new ApiErrorResponse()
+                {
+                    StatusMessage = "InvitationSecret not found"
+                });
+            }
+
+            return Ok(_mapper.Map<BoardInvitationSecretResponse>(invitationSecret));
+        }
+
+        [HttpPost("[controller]/{id}/invitationSecret/verification")]
+        public async Task<IActionResult> VerifyBoardInvitationSecretAsync(Guid id, VerifyBoardInvitationSecretRequest request)
+        {
+            var invitationSecret = await _unitOfWork.InvitationSecrets.GetBoardInvitationSecretAsync(id);
+
+            if (invitationSecret == null)
+            {
+                return NotFound(new ApiErrorResponse()
+                {
+                    StatusMessage = "Ivitation secret not found"
+                });
+            }
+
+            if (DateTime.Now > invitationSecret.ExpiresAt)
+            {
+                return BadRequest(new ApiErrorResponse()
+                {
+                    StatusMessage = "Invitation secret has expired"
+                });
+            }
+
+            if (string.IsNullOrEmpty(request.SecretCode))
+            {
+                return BadRequest(new ApiErrorResponse
+                {
+                    StatusMessage = "Secret code is required."
+                });
+            }
+
+            if (invitationSecret.SecretCode != request.SecretCode)
+            {
+                return BadRequest(new ApiErrorResponse
+                {
+                    StatusMessage = "Invalid secret code."
+                });
+            }
+
+            return Ok();
+        }
+
+        [HttpDelete("[controller]/{boardId}/invitationSecret")]
+        public async Task<IActionResult> DisableBoardInvitationSecretAsync(Guid boardId)
+        {
+            await _unitOfWork.InvitationSecrets.DeleteBoardInvitationSecretAsync(boardId);
+
+            return Ok();
+        }
+
+        [HttpPost("[controller]/{boardId}/joinByLink")]
+        public async Task<IActionResult> JoinBoardByLinkAsync(Guid boardId)
+        {
+            var userId = _authService.GetCurrentUserId();
+
+            var isBoardMember = await _boardService.IsBoardMemberAsync(boardId, userId);
+
+            if (isBoardMember)
+            {
+                return Conflict(new ApiErrorResponse
+                {
+                    StatusMessage = "User is already a member of this board"
+                });
+            }
+
+            var actionContext = new DennoActionContext()
+            {
+                MemberCreatorId = userId,
+                IsBoardActivity = true,
+                BoardId = boardId
+            };
+
+            var action = await _actionService.CreateActionAsync(ActionTypes.JoinBoardByLink, actionContext);
+
             if (action != null)
             {
                 //await _emailService.SendBoardActionEmailsAsync(action, isRunInBackground: true);
