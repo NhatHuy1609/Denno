@@ -64,6 +64,10 @@ namespace server.Services
                 ActionTypes.AddMemberToBoard => new AddBoardMemberStrategy(_dbContext),
                 ActionTypes.CreateBoard => new CreateBoardStategy(_dbContext),
                 ActionTypes.JoinBoard => new JoinBoardStrategy(_dbContext),
+                ActionTypes.JoinBoardByLink => new JoinBoardByLinkStrategy(_dbContext),
+                ActionTypes.SendBoardJoinRequest => new SendBoardJoinRequestStrategy(_dbContext),
+                ActionTypes.ApproveBoardJoinRequest => new ApproveBoardJoinRequestStrategy(_dbContext),
+                ActionTypes.RejectBoardJoinRequest => new RejectBoardJoinRequestStrategy(_dbContext),
                 _ => throw new ArgumentException($"Unsupported action type: {actionType}")
             };
         }

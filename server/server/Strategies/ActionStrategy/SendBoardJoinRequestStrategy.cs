@@ -34,7 +34,8 @@ namespace server.Strategies.ActionStrategy
                 MemberCreatorId = context.MemberCreatorId,
                 ActionType = ActionTypes.SendBoardJoinRequest,
                 BoardId = boardId,
-                Date = DateTime.Now
+                Date = DateTime.Now,
+                IsBoardActivity = context.IsBoardActivity
             };
 
             var newJoinRequest = new JoinRequest()

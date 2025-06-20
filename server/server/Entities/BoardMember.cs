@@ -17,6 +17,9 @@ namespace server.Entities
         Observer = 0,
 
         [Description("Can add, delete, and edit items on the board.")]
-        Member = 1
+        Member = 1,
+
+        [Description("Admin of the board")]
+        Admin = 2
     }
 }
