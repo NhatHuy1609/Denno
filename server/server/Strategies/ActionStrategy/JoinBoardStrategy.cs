@@ -21,18 +21,21 @@ namespace server.Strategies.ActionStrategy
             ArgumentNullException.ThrowIfNull(context.BoardId);
             ArgumentNullException.ThrowIfNull(context.MemberCreatorId);
 
+            var boardId = context.BoardId.Value;
+            var userId = context.MemberCreatorId;
+
             var newMember = new BoardMember()
             {
-                BoardId = context.BoardId.Value,
-                AppUserId = context.TargetUserId
+                BoardId = boardId,
+                AppUserId = userId
             };
 
             var action = new DennoAction()
             {
-                MemberCreatorId = context.MemberCreatorId,
                 ActionType = ActionTypes.JoinBoard,
+                MemberCreatorId = userId,
+                BoardId = boardId,
                 IsBoardActivity = context.IsBoardActivity,
-                BoardId = context.BoardId,
             };
 
             _dbContext.Actions.Add(action);

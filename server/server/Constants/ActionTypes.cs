@@ -12,5 +12,7 @@
         public const string JoinBoard = "joinBoard";
         public const string JoinBoardByLink = "joinBoardByLink";
         public const string SendBoardJoinRequest = "sendBoardJoinRequest";
+        public const string ApproveBoardJoinRequest = "approveBoardJoinRequest";
+        public const string RejectBoardJoinRequest = "rejectBoardJoinRequest";
     }
 }

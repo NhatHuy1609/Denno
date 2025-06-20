@@ -351,10 +351,70 @@ namespace server.Controllers
 
             var action = await _actionService.CreateActionAsync(ActionTypes.SendBoardJoinRequest, actionContext);
 
-            //if (action != null)
-            //{
-            //    _emailService.SendActionEmailInBackgroundAsync(action);
-            //}
+            if (action != null)
+            {
+                //_emailService.SendActionEmailInBackgroundAsync(action);
+            }
+
+            return Ok();
+        }
+
+        [HttpPost("[controller]/joinRequests/{requestId}/approval")]
+        public async Task<IActionResult> AppoveBoardJoinRequestAsync(int requestId, ApproveBoardJoinRequestRequest request)
+        {
+            var joinRequest = await _unitOfWork.JoinRequests.GetJoinRequestByIdAsync(requestId);
+
+            if (joinRequest == null)
+            {
+                return NotFound();
+            }
+
+            var userId = _authService.GetCurrentUserId();
+
+            var actionContext = new ApproveBoardJoinRequestActionContext()
+            {
+                MemberCreatorId = userId,
+                BoardId = joinRequest.BoardId,
+                TargetUserId = joinRequest.RequesterId,
+                MemberRole = request.MemberRole
+            };
+
+            var action = await _actionService.CreateActionAsync(ActionTypes.ApproveBoardJoinRequest, actionContext);
+
+            if (action != null)
+            {
+                //await _emailService.SendActionEmailAsync(action);
+            }
+
+            return Ok();
+        }
+
+        [HttpDelete("[controller]/joinRequests/{requestId}/rejection")]
+        public async Task<IActionResult> RejectBoardJoinRequestAsync(int requestId)
+        {
+            var joinRequest = await _unitOfWork.JoinRequests.GetJoinRequestByIdAsync(requestId);
+
+            if (joinRequest == null)
+            {
+                return NotFound();
+            }
+
+            var userId = _authService.GetCurrentUserId();
+
+            var actionContext = new DennoActionContext()
+            {
+                MemberCreatorId = userId,
+                BoardId = joinRequest.BoardId,
+                TargetUserId = joinRequest.RequesterId,
+                IsBoardActivity = true,
+            };
+
+            var action = await _actionService.CreateActionAsync(ActionTypes.RejectBoardJoinRequest, actionContext);
+
+            if (action != null)
+            {
+                //await _emailService.SendActionEmailAsync(action);
+            }
 
             return Ok();
         }

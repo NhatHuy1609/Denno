@@ -37,7 +37,8 @@ namespace server.Strategies.ActionStrategy
                 MemberCreatorId = memberId,
                 ActionType = ActionTypes.JoinBoardByLink,
                 BoardId = boardId,
-                Date = DateTime.Now
+                Date = DateTime.Now,
+                IsBoardActivity = context.IsBoardActivity
             };
 
             var newMember = new BoardMember
