@@ -18,6 +18,7 @@ using server.Dtos.Response.Workspace;
 using server.Helpers;
 using server.Dtos.Response.InvitationSecret;
 using server.Dtos.Requests.Workspace;
+using server.Services.Realtime;
 
 namespace server.Controllers
 {
@@ -329,6 +330,31 @@ namespace server.Controllers
             {
                 //await _emailService.SendBoardActionEmailsAsync(action, isRunInBackground: true);
             }
+
+            return Ok();
+        }
+
+
+        [HttpPost("[controller]/{boardId}/joinRequests")]
+        public async Task<IActionResult> CreateJoinRequestAsync([FromRoute] Guid boardId, CreateBoardJoinRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var actionContext = new DennoActionContext()
+            {
+                MemberCreatorId = request.RequesterId, // Requester is creator
+                BoardId = boardId,
+            };
+
+            var action = await _actionService.CreateActionAsync(ActionTypes.SendBoardJoinRequest, actionContext);
+
+            //if (action != null)
+            //{
+            //    _emailService.SendActionEmailInBackgroundAsync(action);
+            //}
 
             return Ok();
         }

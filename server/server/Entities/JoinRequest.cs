@@ -8,6 +8,7 @@ namespace server.Entities
         [Key]
         public int Id { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+
         public string RequesterId { get; set; }
         [JsonIgnore]
         public AppUser Requester { get; set; }

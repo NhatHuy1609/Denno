@@ -11,5 +11,6 @@
         public const string AddMemberToBoard = "addMemberToBoard";
         public const string JoinBoard = "joinBoard";
         public const string JoinBoardByLink = "joinBoardByLink";
+        public const string SendBoardJoinRequest = "sendBoardJoinRequest";
     }
 }
