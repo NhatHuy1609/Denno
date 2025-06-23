@@ -334,6 +334,14 @@ namespace server.Controllers
             return Ok();
         }
 
+        [HttpGet("[controller]/{boardId}/joinRequests")]
+        public async Task<IActionResult> GetBoardJoinRequestsAsync(Guid boardId)
+        {
+            var joinRequests = await _unitOfWork.JoinRequests.GetJoinRequestsByBoardIdAsync(boardId);
+
+            return Ok(_mapper.Map<List<BoardJoinRequestResponse>>(joinRequests));
+        }
+
 
         [HttpPost("[controller]/{boardId}/joinRequests")]
         public async Task<IActionResult> CreateJoinRequestAsync([FromRoute] Guid boardId, CreateBoardJoinRequest request)
