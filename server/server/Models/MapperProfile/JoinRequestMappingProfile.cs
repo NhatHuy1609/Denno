@@ -10,7 +10,7 @@ namespace server.Models.MapperProfile
         public JoinRequestMappingProfile()
         {
             CreateMap<JoinRequest, WorkspaceJoinRequestResponse>()
-                .ForMember(dest => dest.Requester, opt => opt.MapFrom(src => new Dtos.Response.Board.Requester
+                .ForMember(dest => dest.Requester, opt => opt.MapFrom(src => new Dtos.Response.Workspace.Requester
                 {
                     Id = src.Requester.Id,
                     Name = src.Requester.FullName,

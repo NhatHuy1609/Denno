@@ -121,4 +121,12 @@ export class WorkspaceService {
       createWorkspaceJoinRequestDto
     )
   }
+
+  static approveWorkspaceJoinRequest(requestId: number) {
+    return httpPost(`${this.basePath}/joinRequests/${requestId}/approval`)
+  }
+
+  static rejectWorkspaceJoinRequest(requestId: number) {
+    return httpDel(`${this.basePath}/joinRequests//${requestId}/rejection`)
+  }
 }
