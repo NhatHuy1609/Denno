@@ -1,5 +1,5 @@
 import { DefaultError, useMutation, UseMutationOptions } from "@tanstack/react-query"
-import { JoinRequestService } from "@/service/api/joinRequest"
+import { WorkspaceService } from "@/service/api/workspace"
 
 function useRejectWorkspaceJoinRequest(
   options: Pick<
@@ -24,7 +24,7 @@ function useRejectWorkspaceJoinRequest(
     mutationKey: ['workspace', 'joinRequest', 'reject', ...mutationKey],
     onMutate,
     mutationFn: async (requestId) => {
-      const response = await JoinRequestService.rejectWorkspaceJoinRequest(requestId)
+      const response = await WorkspaceService.rejectWorkspaceJoinRequest(requestId)
       return response.data
     },
     onSuccess,
