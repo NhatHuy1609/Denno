@@ -1,4 +1,5 @@
-﻿using server.Dtos.Response.Card;
+﻿using server.Dtos.Requests.Users;
+using server.Dtos.Response.Card;
 using server.Enums;
 
 namespace server.Dtos.Response.Board;
@@ -11,4 +12,7 @@ public class BoardResponseDto
     public BoardVisibility Visibility { get; set; }
     public bool StarredStatus { get; set; } = false;
     public string Background { get; set; } = string.Empty;
+
+    public List<BoardMemberResponseDto> Members { get; set; } = new List<BoardMemberResponseDto>();
 }
+

@@ -19,6 +19,7 @@ using server.Helpers;
 using server.Dtos.Response.InvitationSecret;
 using server.Dtos.Requests.Workspace;
 using server.Services.Realtime;
+using server.Models.Query;
 
 namespace server.Controllers
 {
@@ -97,14 +98,14 @@ namespace server.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(BoardResponseDto), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetBoardByIdAsync(Guid boardId)
+        public async Task<IActionResult> GetBoardByIdAsync(Guid boardId, [FromQuery] BoardQueryOptions query)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
 
-            var board = await _unitOfWork.Boards.GetByIdAsync(boardId);
+            var board = await _unitOfWork.Boards.GetBoardByIdAsync(boardId, query);
 
             if (board == null)
             {
