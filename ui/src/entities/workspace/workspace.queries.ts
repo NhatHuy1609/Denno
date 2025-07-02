@@ -9,6 +9,7 @@ export class WorkspaceQueries {
     root: ['workspace'] as const,
     list: () => [...this.keys.root, 'workspaces', 'list']
   }
+  
   static workspaceQuery(workspaceId: string, filter?: WorkspaceFilterQuery) {
     const params: WorkspaceQueryParamsDto = filter ? {
       ...filter

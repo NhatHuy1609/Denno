@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { enumContracts } from '../_enums'
+import { userContracts } from '@/entities/user'
 
 const BoardDto = z.object({
   id: z.string(),
@@ -7,7 +8,13 @@ const BoardDto = z.object({
   background: z.string(),
   starredStatus: z.boolean(),
   workspaceId: z.string(),
-  visibility: enumContracts.BoardVisibilityEnumSchema
+  visibility: enumContracts.BoardVisibilityEnumSchema,
+  
+  members: z.array(z.object({
+    memberId: z.string(),
+    member: userContracts.UserSchema,
+    boardMemberRole: z.string()
+  }))
 })
 
 // Request

@@ -1,6 +1,7 @@
 import { BoardService } from '@/service/api/board';
 import { queryOptions } from '@tanstack/react-query';
 import { transformBoardDtoToBoard, transformBoardsDtoToBoards } from './board.lib';
+import { boardTypes } from '.';
 
 export class BoardQueries {
   static readonly keys = {
@@ -19,11 +20,13 @@ export class BoardQueries {
     })
   }
 
-  static boardQuery(boardId: string) {
+  static boardQuery(boardId: string, filter?: boardTypes.BoardQueryFilter) {
     return queryOptions({
-      queryKey: [...this.keys.detail(), boardId],
+      queryKey: [...this.keys.detail(), filter, boardId],
       queryFn: async({signal}) => {
-        const response = await BoardService.boardQuery(boardId)
+        const response = await BoardService.boardQuery(boardId, {
+          params: filter
+        })
         return transformBoardDtoToBoard(response.data)  
       }
     })
