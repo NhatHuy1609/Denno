@@ -6,6 +6,7 @@ import AuthProvider from '@/app/_providers/AuthProvider/AuthProvider'
 import { QueryClientProvider } from '@/app/_providers/QueryClientProvider'
 import { Toaster } from '@/ui'
 import { SignalRProvider } from '@/app/_providers/SignalRProvider/SignalRProvider'
+import { TooltipProvider } from '@/ui/components/Tooltip'
 
 const ThemeProviderComp = dynamic(() => import('@/app/_components/ThemeProviderComp'), {
   ssr: false
@@ -18,7 +19,9 @@ const RootLayoutComp = ({ children }: { children: React.ReactNode }) => {
         <SignalRProvider>
           <AuthProvider>
             <ThemeProviderComp>
-              <div className='size-full'>{children}</div>
+              <TooltipProvider>
+                <div className='size-full'>{children}</div>
+              </TooltipProvider>
               <Toaster />
             </ThemeProviderComp>
           </AuthProvider>

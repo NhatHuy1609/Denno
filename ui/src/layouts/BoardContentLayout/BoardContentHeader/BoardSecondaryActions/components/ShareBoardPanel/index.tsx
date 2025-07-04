@@ -1,6 +1,7 @@
 import React from 'react'
 import CustomizableButton from '@/ui/components/CustomizableButton'
 import { TbUserShare } from 'react-icons/tb'
+import PopoverActionWrapper from '@/app/_components/PopoverActionWrapper'
 
 function ShareBoardPanel() {
   return (
