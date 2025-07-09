@@ -4,7 +4,7 @@ import { TooltipContentProps } from '@radix-ui/react-tooltip'
 
 interface TooltipWrapperProps {
   children: ReactNode
-  content: ReactNode
+  content: ReactNode | string
   side?: 'top' | 'right' | 'bottom' | 'left'
   sideOffset?: number
   delayDuration?: number
@@ -23,11 +23,19 @@ function TooltipWrapper({
   contentProps,
   disabled = false
 }: TooltipWrapperProps) {
+  const renderContent = () => {
+    if (typeof content === 'string') {
+      return <span>{content}</span>
+    }
+
+    return content
+  }
+
   return (
     <Tooltip delayDuration={delayDuration}>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
       <TooltipContent side={side} sideOffset={sideOffset} className={className} {...contentProps}>
-        {content}
+        {renderContent()}
       </TooltipContent>
     </Tooltip>
   )
