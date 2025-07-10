@@ -3,6 +3,8 @@ import { enumContracts } from '@/service/api/_enums'
 import { userContracts } from '../user'
 import { BoardQueryOptionsDto } from '@/service/api/_models/query-models/board/board.contracts'
 
+export const BoardMemberRoleSchema = z.enum(['Member', 'Admin', 'Observer'])
+
 export const BoardSchema = z.object({
   id: z.string(),
   name: z.string(),

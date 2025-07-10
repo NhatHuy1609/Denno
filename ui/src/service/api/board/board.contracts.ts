@@ -25,6 +25,12 @@ export const CreateBoardDtoSchema = z.object({
   visibility: z.string()
 }).describe("CreateBoardDtoSchema")
 
+export const AddBoardMemberDtoSchema = z.object({
+  email: z.string().email(),
+  description: z.string(),
+  role: enumContracts.BoardMemberRoleEnumSchema
+}).describe("AddBoardMemberDtoSchema")
+
 // Response
 export const BoardResponseDtoSchema = BoardDto.describe("BoardResponseDtoSchema")
 

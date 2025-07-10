@@ -143,7 +143,7 @@ export default function InviteMemberModalBody({ closeModalFn }: InviteMemberModa
   }
 
   const showDisableLinkButton = Boolean(invitationSecret?.secretCode)
-  console.log('Invitation secret: ', invitationSecret)
+  // console.log('Invitation secret: ', invitationSecret)
   // console.log('IS show disable link button', showDisableLinkButton)
 
   // Handle create invitation link and copy to clipboard

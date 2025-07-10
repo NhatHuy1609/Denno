@@ -42,6 +42,7 @@ type ButtonProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'disabled
     value?: string
     startIcon?: ReactNode
     endIcon?: ReactNode
+    loading?: boolean
     className?: string
   }
 
@@ -52,6 +53,7 @@ const CustomizableButton = ({
   intent,
   size,
   disabled,
+  loading = false,
   className,
   ...props
 }: ButtonProps) => {
@@ -64,6 +66,14 @@ const CustomizableButton = ({
       {startIcon}
       {value && <span className='text-sm'>{value}</span>}
       {endIcon}
+      {loading && (
+        <div
+          style={{
+            scale: 0.55
+          }}
+          className='inline-block aspect-square h-full animate-spin rounded-full border-2 border-gray-300 border-t-transparent'
+        ></div>
+      )}
     </button>
   )
 }
