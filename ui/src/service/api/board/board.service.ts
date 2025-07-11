@@ -1,7 +1,7 @@
 import { httpPost, httpGet } from '../_req'
 import { AxiosContracts } from '@/lib/axios/AxiosContracts'
 import { AddBoardMemberDto, CreateBoardDto } from './board.types'
-import { CreateBoardDtoSchema } from './board.contracts'
+import { AddBoardMemberDtoSchema, CreateBoardDtoSchema } from './board.contracts'
 import { boardContractsDto, boardTypesDto } from '.'
 import { BoardQueryOptionsDto } from '../_models/query-models/board/board.types'
 import { actionTypesDto } from '../action'
@@ -28,7 +28,7 @@ export class BoardService {
 
   static addBoardMemberMutation(data: { boardId: string, addBoardMemberDto: AddBoardMemberDto }) {
     const addBoardMemberDto = AxiosContracts.requestContract(
-      CreateBoardDtoSchema,
+      AddBoardMemberDtoSchema,
       data.addBoardMemberDto)
 
     return httpPost<actionTypesDto.ActionResponseDto>(`${this.basePath}/${data.boardId}/members`, addBoardMemberDto)
