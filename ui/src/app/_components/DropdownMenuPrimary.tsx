@@ -12,6 +12,7 @@ import { cn } from '@/lib/styles/utils'
 
 export interface DropdownMenuPrimaryItemProps<T> {
   value: T
+  label: string
   description?: string
   available?: boolean
 }
@@ -19,8 +20,10 @@ export interface DropdownMenuPrimaryItemProps<T> {
 interface DropdownMenuPrimaryProps<T> {
   contentTitle?: string
   triggerTitle: string
-  items: DropdownMenuPrimaryItemProps<T>[]
+  triggerClassName?: string
+  contentClassName?: string
   defaultSelectedIndex?: number
+  items: DropdownMenuPrimaryItemProps<T>[]
   onSelect?: (item: DropdownMenuPrimaryItemProps<T>) => void
   renderOtherItems?: () => ReactNode
 }
@@ -28,9 +31,11 @@ interface DropdownMenuPrimaryProps<T> {
 function DropdownMenuPrimary<T>({
   contentTitle,
   triggerTitle,
+  triggerClassName,
+  contentClassName,
+  defaultSelectedIndex = 0,
   items,
   onSelect,
-  defaultSelectedIndex = 0,
   renderOtherItems
 }: DropdownMenuPrimaryProps<T>) {
   const [isOpen, setIsOpen] = useState(false)
@@ -50,10 +55,10 @@ function DropdownMenuPrimary<T>({
 
   return (
     <DropdownMenu onOpenChange={setIsOpen} open={isOpen}>
-      <DropdownMenuTrigger asChild className='min-w-32 justify-center'>
+      <DropdownMenuTrigger asChild className={cn('min-w-32 justify-center', triggerClassName)}>
         <CustomizableButton
           intent='secondary'
-          value={String(items[selectedIndex]?.value) || triggerTitle}
+          value={String(items[selectedIndex]?.label) || triggerTitle}
           size='medium'
           endIcon={<FaAngleDown className='text-lg' />}
           className={cn('max-h-fit', {
@@ -61,7 +66,9 @@ function DropdownMenuPrimary<T>({
           })}
         />
       </DropdownMenuTrigger>
-      <DropdownMenuContent className='w-78 rounded-md bg-white py-2 shadow-lg'>
+      <DropdownMenuContent
+        className={cn('w-78 rounded-md bg-white py-2 shadow-lg', contentClassName)}
+      >
         {contentTitle && <DropdownMenuLabel title={contentTitle} />}
         {items.map((item, index) => (
           <DropdownMenuItem
@@ -70,7 +77,7 @@ function DropdownMenuPrimary<T>({
             onSelect={() => handleSelectItem(index)}
           >
             {/* Render value and description if value is not empty */}
-            {item.value && (
+            {item.label && (
               <div
                 className={cn(
                   'flex cursor-pointer flex-col bg-blue-100 px-4 py-2 hover:bg-blue-300 hover:outline-none',
@@ -78,7 +85,7 @@ function DropdownMenuPrimary<T>({
                   item.available === false ? 'cursor-not-allowed opacity-50' : ''
                 )}
               >
-                <span className='text-sm font-semibold text-blue-500'>{String(item.value)}</span>
+                <span className='text-sm font-semibold text-blue-500'>{String(item.label)}</span>
                 <span className='text-sm text-gray-500'>{item.description}</span>
               </div>
             )}

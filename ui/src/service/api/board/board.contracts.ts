@@ -31,7 +31,15 @@ export const AddBoardMemberDtoSchema = z.object({
   role: enumContracts.BoardMemberRoleEnumSchema
 }).describe("AddBoardMemberDtoSchema")
 
+export const CreateBoardInvitationSecretDtoSchema = z.object({
+  boardRole: enumContracts.BoardMemberRoleEnumSchema
+}).describe('CreateBoardInvitationSecretDtoSchema')
+
 // Response
 export const BoardResponseDtoSchema = BoardDto.describe("BoardResponseDtoSchema")
 
 export const BoardsResponseDtoSchema = z.array(BoardDto).describe("BoardsResponseDtoSchema")
+
+export const BoardInvitationSecretResponseDtoSchema = z.object({
+  secretCode: z.string()
+}).describe("BoardInvitationSecretResponseDtoSchema")
