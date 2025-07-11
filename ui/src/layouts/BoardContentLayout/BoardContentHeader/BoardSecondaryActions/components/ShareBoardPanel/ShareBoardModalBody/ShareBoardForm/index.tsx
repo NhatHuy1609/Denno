@@ -42,11 +42,13 @@ function ShareBoardForm() {
   const dropdownItems: Array<DropdownMenuPrimaryItemProps<boardTypes.BoardMemberRole>> = [
     {
       value: 'Member',
+      label: 'Member',
       description: '',
       available: true
     },
     {
       value: 'Observer',
+      label: 'Observer',
       description: 'Add people with limited permissions to this board.',
       available: true
     }
@@ -153,7 +155,7 @@ function ShareBoardForm() {
 
   return (
     <div className='flex w-full items-center gap-2'>
-      <div className='relative w-full'>
+      <div className='relative w-[65%]'>
         <div
           className={cn(
             'flex size-auto flex-wrap items-center overflow-hidden rounded-sm border-[1.5px] border-gray-200 bg-white p-1',

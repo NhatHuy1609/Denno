@@ -1,7 +1,7 @@
 import React from 'react'
 
 function BoardMembersManagementSection() {
-  return <div>BoardMembersManagementSection</div>
+  return <div className='mt-2'>BoardMembersManagementSection</div>
 }
 
 export default BoardMembersManagementSection

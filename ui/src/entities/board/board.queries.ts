@@ -1,7 +1,7 @@
 import { BoardService } from '@/service/api/board';
 import { queryOptions } from '@tanstack/react-query';
 import { transformBoardDtoToBoard, transformBoardsDtoToBoards } from './board.lib';
-import { boardTypes } from '.';
+import { boardLib, boardTypes } from '.';
 
 export class BoardQueries {
   static readonly keys = {
@@ -31,4 +31,14 @@ export class BoardQueries {
       }
     })
   }
+
+    static boardInvitationSecretQuery(boardId: string) {
+      return queryOptions({
+        queryKey: [...this.keys.root, 'invitationSecret', boardId] as unknown[],
+        queryFn: async ({ signal }) => {
+          const response = await BoardService.boardInvitationSecretQuery(boardId)
+          return boardLib.mapToInvitationSecret(response.data)
+        }
+      })
+    } 
 }

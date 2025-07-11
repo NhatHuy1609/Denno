@@ -33,11 +33,7 @@ export default function InviteMemberModalBody({ closeModalFn }: InviteMemberModa
 
   const [selectedUsers, setSelectedUsers] = useState<Array<userTypes.User>>([])
 
-  const {
-    data: invitationSecret,
-    isError,
-    refetch
-  } = useInvitationSecretQuery(workspaceId, {
+  const { data: invitationSecret } = useInvitationSecretQuery(workspaceId, {
     retry: 1
   })
 
@@ -69,19 +65,19 @@ export default function InviteMemberModalBody({ closeModalFn }: InviteMemberModa
   const [searchTerm, setSearchTerm] = useState<string>('')
   const debouncedSearchTerm = useDebounce(searchTerm, 650)
 
-  // Handle create invitation link and copy to clipboard
-  const [_, copy] = useCopyToClipboard()
-  const [isCopiedSuccess, setIsCopiedSuccess] = useState(false)
-  const { createInvitationLink: createInvitationLink, isCreatingLink } =
-    useCreateInvitationLink(workspaceId)
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
   // Fetch searched users using the debounced search term
   // This will only trigger when the search term changes
   const searchedUserFilter: SearchedUserFilter = {
     email: debouncedSearchTerm
   }
   const { data: searchedUsers } = useUsersQuery(searchedUserFilter)
+
+  // Handle create invitation link on client and copy to clipboard
+  const [_, copy] = useCopyToClipboard()
+  const [isCopiedSuccess, setIsCopiedSuccess] = useState(false)
+  const { createInvitationLink: createInvitationLink, isCreatingLink } =
+    useCreateInvitationLink(workspaceId)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Check if there are any searched users
   useEffect(() => {
