@@ -19,7 +19,7 @@ const buttonVariants = cva(
       },
       disabled: {
         false: null,
-        true: ['opacity-50', 'cursor-not-allowed', 'bg-gray-200', 'text-black']
+        true: ['opacity-50', 'cursor-not-allowed', 'text-black']
       }
     },
     compoundVariants: [
@@ -64,14 +64,14 @@ const CustomizableButton = ({
       {...props}
     >
       {startIcon}
-      {value && <span className='text-sm'>{value}</span>}
+      {value && !loading && <span className='text-sm'>{value}</span>}
       {endIcon}
       {loading && (
         <div
           style={{
             scale: 0.55
           }}
-          className='inline-block aspect-square h-full animate-spin rounded-full border-2 border-gray-300 border-t-transparent'
+          className='aspect-square h-fit animate-spin rounded-full border-2 border-gray-300 border-t-transparent p-4'
         ></div>
       )}
     </button>

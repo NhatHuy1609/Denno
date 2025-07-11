@@ -11,14 +11,17 @@ import SearchedUsersResult from './SearchedUsersResult'
 import SelectedUsersDisplay from './SelectedUsersDisplay'
 import { cn } from '@/lib/styles/utils'
 import useAddMultipleBoardMemberMutation from '@/app/_hooks/mutation/board/useAddMutipleBoardMember'
-import { boardTypes } from '@/entities/board'
+import { BoardQueries, boardTypes } from '@/entities/board'
 import { getLocalStorageItem } from '@/utils/local-storage'
 import { PersistedStateKey } from '@/data/persisted-keys'
+import { toastError, toastSuccess } from '@/ui'
+import { useQueryClient } from '@tanstack/react-query'
 
 type SearchedUserFilter = Pick<userTypes.UsersFilterQuery, 'email'>
 
 function ShareBoardForm() {
   const boardId = getLocalStorageItem(PersistedStateKey.RecentAccessBoard)
+  const queryClient = useQueryClient()
 
   // State to manage selected users for sharing the board
   const [selectedUsers, setSelectedUsers] = useState<Array<userTypes.User>>([])
@@ -39,15 +42,13 @@ function ShareBoardForm() {
   const dropdownItems: Array<DropdownMenuPrimaryItemProps<boardTypes.BoardMemberRole>> = [
     {
       value: 'Member',
-      description: 'Boards must have at least one admin.'
-    },
-    {
-      value: 'Admin',
-      description: ''
+      description: '',
+      available: true
     },
     {
       value: 'Observer',
-      description: 'Add people with limited permissions to this board.'
+      description: 'Add people with limited permissions to this board.',
+      available: true
     }
   ]
 
@@ -66,6 +67,18 @@ function ShareBoardForm() {
       // Optionally, reset the search term and hide the search results
       setSearchTerm('')
       setShowSearchedUsersResult(false)
+      // Invalidate the board query to refresh the board members list
+      queryClient.invalidateQueries({
+        queryKey: BoardQueries.boardQuery(boardId, {
+          includeBoardMembers: true
+        }).queryKey
+      })
+
+      toastSuccess('Board members added successfully!')
+    },
+    onError: (error) => {
+      console.error('Error adding board members:', error)
+      toastError('Failed to add board members. Please try again.')
     }
   })
 
@@ -94,7 +107,7 @@ function ShareBoardForm() {
 
     // Call the mutation to add multiple board members
     await addBoardMembersAsync({
-      boardId: 'current-board-id', // Replace with actual board ID
+      boardId, // Replace with actual board ID
       memberEmails,
       description,
       role: selectedRole.current
@@ -188,12 +201,12 @@ function ShareBoardForm() {
           triggerTitle='Member'
           items={dropdownItems}
           onSelect={handleSelectBoardMemberRoleToShare}
-          renderOtherItems={() => (
-            <div className='flex flex-col bg-red-100 px-4 py-2 text-sm text-red-600 hover:bg-red-200'>
-              <span className='font-semibold'>Leave board</span>
-              <span className='text-gray-500'>Boards must have at least one admin.</span>
-            </div>
-          )}
+          // renderOtherItems={() => (
+          //   <div className='flex flex-col bg-red-100 px-4 py-2 text-sm text-red-600 hover:bg-red-200'>
+          //     <span className='font-semibold'>Leave board</span>
+          //     <span className='text-gray-500'>Boards must have at least one admin.</span>
+          //   </div>
+          // )}
         />
         <CustomizableButton
           size='medium'
