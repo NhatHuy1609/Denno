@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { BoardQueries, boardTypes } from '@/entities/board'
 import { PersistedStateKey } from '@/data/persisted-keys'
 import { getLocalStorageItem } from '@/utils/local-storage'
@@ -34,13 +34,31 @@ function ShareBoardWithLink() {
     })
 
   // Handle create invitation link on client and copy to clipboard
+  const [shareBoardLinkPermission, setShareBoardLinkPermission] =
+    useState<boardTypes.BoardMemberRole | null>(null)
   const [_, copy] = useCopyToClipboard()
   const [isCopiedSuccess, setIsCopiedSuccess] = useState(false)
   const { createBoardInvitationLink, isCreatingLink } = useCreateBoardInvitationLink(
     boardId,
-    'Member'
+    shareBoardLinkPermission ?? 'Member'
   )
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Effect to handle the change in share board link permission when link is existing
+  useEffect(() => {
+    const handleUpdateShareBoardLinkPermission = async () => {
+      // Deleting the existing board invitation secret if it exists
+      if (boardInvitationSecret?.secretCode) {
+        await disableBoardShareLinkAsync(boardId)
+      }
+      // Creating a new board invitation link with the updated permission
+      await handleCreateBoardShareLinkButton()
+    }
+
+    if (shareBoardLinkPermission) {
+      handleUpdateShareBoardLinkPermission()
+    }
+  }, [shareBoardLinkPermission])
 
   // Handle create board invitation link and copy to clipboard
   const handleCreateBoardShareLinkButton = async () => {
@@ -126,10 +144,20 @@ function ShareBoardWithLink() {
       {
         value: 'Observer',
         label: 'Can join as observer',
-        available: false,
+        available: true,
         description: 'Board observers can view and comment.'
       }
     ]
+
+  const handleSelectShareBoardLinkPermission = (
+    item: DropdownMenuPrimaryItemProps<boardTypes.BoardMemberRole>
+  ) => {
+    const { value } = item
+    if (!value) return
+
+    // Update the share board link permission state
+    setShareBoardLinkPermission(value)
+  }
 
   return (
     <>
@@ -152,6 +180,7 @@ function ShareBoardWithLink() {
             triggerTitle='Change permissions'
             triggerClassName='flex-1'
             items={permissionsDropdownItems}
+            onSelect={handleSelectShareBoardLinkPermission}
           />
         )}
       </div>

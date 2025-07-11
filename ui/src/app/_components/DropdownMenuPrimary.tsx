@@ -57,9 +57,9 @@ function DropdownMenuPrimary<T>({
     <DropdownMenu onOpenChange={setIsOpen} open={isOpen}>
       <DropdownMenuTrigger asChild className={cn('min-w-32 justify-center', triggerClassName)}>
         <CustomizableButton
-          intent='secondary'
-          value={String(items[selectedIndex]?.label) || triggerTitle}
           size='medium'
+          intent='secondary'
+          value={triggerTitle ? triggerTitle : String(items[selectedIndex]?.label)}
           endIcon={<FaAngleDown className='text-lg' />}
           className={cn('max-h-fit', {
             'bg-blue-100 text-blue-500 hover:bg-blue-200': isOpen
