@@ -17,6 +17,17 @@ export const BoardSchema = z.object({
     memberId: z.string(),
     member: userContracts.UserSchema,
     boardMemberRole: z.string()
+  })),
+  joinRequests: z.array(z.object({
+    id: z.number().int(),
+    boardId: z.string(),
+    requestedAt: z.string(),
+    requester: z.object({
+      id: z.string(),
+      name: z.string(),
+      email: z.string().email(),
+      avatar: z.string()
+    })
   }))
 })
 
