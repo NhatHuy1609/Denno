@@ -199,17 +199,7 @@ function ShareBoardForm() {
         )}
       </div>
       <div className='flex h-full gap-2'>
-        <DropdownMenuPrimary
-          triggerTitle='Member'
-          items={dropdownItems}
-          onSelect={handleSelectBoardMemberRoleToShare}
-          // renderOtherItems={() => (
-          //   <div className='flex flex-col bg-red-100 px-4 py-2 text-sm text-red-600 hover:bg-red-200'>
-          //     <span className='font-semibold'>Leave board</span>
-          //     <span className='text-gray-500'>Boards must have at least one admin.</span>
-          //   </div>
-          // )}
-        />
+        <DropdownMenuPrimary items={dropdownItems} onSelect={handleSelectBoardMemberRoleToShare} />
         <CustomizableButton
           size='medium'
           value='Share'

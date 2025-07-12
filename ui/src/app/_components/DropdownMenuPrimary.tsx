@@ -19,7 +19,7 @@ export interface DropdownMenuPrimaryItemProps<T> {
 
 interface DropdownMenuPrimaryProps<T> {
   contentTitle?: string
-  triggerTitle: string
+  triggerTitle?: string
   triggerClassName?: string
   contentClassName?: string
   defaultSelectedIndex?: number
