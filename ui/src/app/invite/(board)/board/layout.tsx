@@ -1,3 +1,5 @@
+'use client'
+
 import { useMe } from '@/app/_hooks/query/user/useMe'
 import React from 'react'
 import PrivateLayout from './_layouts/PrivateLayout'

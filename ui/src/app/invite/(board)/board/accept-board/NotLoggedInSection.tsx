@@ -17,7 +17,10 @@ function NotLoggedInSection() {
   })
 
   const handleClickLink = () => {
-    setLocalStorageItem(PersistedStateKey.RedirectAfterLogin, `/invite/${boardId}/${secretCode}`)
+    setLocalStorageItem(
+      PersistedStateKey.RedirectAfterLogin,
+      `/invite/board/${boardId}/${secretCode}`
+    )
   }
 
   return (

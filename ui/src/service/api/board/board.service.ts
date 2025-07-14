@@ -24,7 +24,7 @@ export class BoardService {
   }
 
   static boardQuery(boardId: string, config?: { signal?: AbortSignal, params?: BoardQueryOptionsDto } ) {
-    return httpGet<boardTypesDto.BoardResponseDto>(`/boards/${boardId}`, config)
+    return httpGet<boardTypesDto.BoardResponseDto>(`${this.basePath}/${boardId}`, config)
   }
 
   static addBoardMemberMutation(data: { boardId: string, addBoardMemberDto: AddBoardMemberDto }) {
