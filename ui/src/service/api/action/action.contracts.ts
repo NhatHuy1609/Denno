@@ -32,3 +32,11 @@ export const JoinWorkspaceByLinkActionResponseDtoSchema = ActionDtoSchema.pick({
   workspaceId: true,
   memberCreatorId: true
 }).describe("JoinWorkspaceByLinkActionResponseDtoSchema")
+
+export const JoinBoardByLinkActionResponseDtoSchema = ActionDtoSchema.pick({
+  id: true,
+  date: true,
+  actionType: true,
+  workspaceId: true,
+  memberCreatorId: true
+}).describe("JoinBoardByLinkActionResponseDtoSchema")

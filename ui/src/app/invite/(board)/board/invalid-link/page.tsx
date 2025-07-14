@@ -1,10 +1,11 @@
+'use client'
+
 import { useMe } from '@/app/_hooks/query/user/useMe'
 import React from 'react'
-import LoggedInSection from './LoggedInSection'
 import NotLoggedInSection from './NotLoggedInSection'
+import LoggedInSection from './LoggedInSection'
 
-// This is page for accepting an invite link to a board.
-function BoardInviteAcceptPage() {
+function BoardInvalidLinkPage() {
   const { data: currentUser } = useMe()
   const isLoggedIn = Boolean(currentUser)
 
@@ -19,4 +20,4 @@ function BoardInviteAcceptPage() {
   return <div className='flex w-full justify-center'>{renderSection()}</div>
 }
 
-export default BoardInviteAcceptPage
+export default BoardInvalidLinkPage

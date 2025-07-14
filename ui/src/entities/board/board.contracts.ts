@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { enumContracts } from '@/service/api/_enums'
 import { userContracts } from '../user'
 import { BoardQueryOptionsDto } from '@/service/api/_models/query-models/board/board.contracts'
+import { UserSchema } from '../user/user.contracts'
 
 export const BoardMemberRoleSchema = z.enum(['Member', 'Admin', 'Observer'])
 
@@ -32,6 +33,32 @@ export const BoardSchema = z.object({
 })
 
 export const BoardsSchema = z.array(BoardSchema)
+
+export const DetailedBoardInvitationSchema = z.object({
+  inviter: UserSchema.pick({
+    id: true,
+    fullName: true,
+    email: true
+  }),
+  board: BoardSchema.pick({
+    id: true,
+    name: true
+  })
+}).describe('DetailedBoardInvitationSchema')
+
+export const BoardJoinRequestSchema = z.object({
+  id: z.number(),
+  requestedAt: z.string().datetime(),
+  boardId: z.string(),
+  requester: UserSchema.pick({
+    id: true,
+    fullName: true,
+    email: true,
+    avatar: true
+  })
+}).describe('BoardJoinRequestSchema')
+
+export const BoardJoinRequestsSchema = z.array(BoardJoinRequestSchema).describe('BoardJoinRequestsSchema')
 
 // Query Filter
 export const BoardQueryFilter = BoardQueryOptionsDto

@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { enumContracts } from '../_enums'
 import { userContracts } from '@/entities/user'
+import { userContractsDto } from '../user'
 
 const BoardDto = z.object({
   id: z.string(),
@@ -46,6 +47,10 @@ export const CreateBoardInvitationSecretDtoSchema = z.object({
   boardRole: enumContracts.BoardMemberRoleEnumSchema
 }).describe('CreateBoardInvitationSecretDtoSchema')
 
+export const VerifyBoardInvitationSecretRequestDtoSchema = z.object({
+  secretCode: z.string()
+}).describe("VerifyBoardInvitationSecretRequestDtoSchema")
+
 // Response
 export const BoardResponseDtoSchema = BoardDto.describe("BoardResponseDtoSchema")
 
@@ -66,3 +71,14 @@ export const BoardJoinRequestResponseDtoSchema = z.object({
     avatar: z.string()
   })
 }).describe('BoardJoinRequestResponseDtoSchema')
+
+export const CreateBoardJoinRequestDtoSchema = z.object({
+  requesterId: z.string()
+}).describe("CreateBoardJoinRequestDtoSchema")
+
+export const BoardJoinRequestsResponseDtoSchema = z.array(BoardJoinRequestResponseDtoSchema).describe('BoardJoinRequestsResponseDtoSchema')
+
+export const DetailedBoardInvitationSecretResponseDtoSchema = z.object({
+  inviter: userContractsDto.GetUserResponseDtoSchema,
+  board: BoardResponseDtoSchema
+}).describe('DetailedBoardInvitationSecretResponseDtoSchema')

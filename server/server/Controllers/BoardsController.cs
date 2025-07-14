@@ -255,6 +255,19 @@ namespace server.Controllers
             return Ok(_mapper.Map<BoardInvitationSecretResponse>(invitationSecret));
         }
 
+        [HttpGet("[controller]/{id}/invitationSecret/detailed")]
+        public async Task<IActionResult> GetDetailedInvitationSecretAsync(Guid id)
+        {
+            var detailedInvitation = await _unitOfWork.InvitationSecrets.GetBoardInvitationSecretAsync(id);
+
+            if (detailedInvitation == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(_mapper.Map<DetailedWorkspaceInvitationSecretResponse>(detailedInvitation));
+        }
+
         [HttpPost("[controller]/{id}/invitationSecret/verification")]
         public async Task<IActionResult> VerifyBoardInvitationSecretAsync(Guid id, VerifyBoardInvitationSecretRequest request)
         {

@@ -7,6 +7,7 @@ import React from 'react'
 function BoardJoinRequestsTab() {
   const boardId = getLocalStorageItem(PersistedStateKey.RecentAccessBoard)
   const { data: boardData, isPending } = useBoardQuery(boardId, {
+    includeBoardMembers: true,
     includeJoinRequests: true
   })
 

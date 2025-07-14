@@ -45,8 +45,10 @@ function BoardMemberItem({ member, memberRole }: BoardMemberItemProps) {
       </div>
       <DropdownMenuPrimary
         items={boardMemberRoles}
+        triggerTitle={boardMemberRoles.find((role) => role.value === memberRole)?.label}
+        defaultSelectedIndex={boardMemberRoles.findIndex((role) => role.value === memberRole)}
         renderOtherItems={() => (
-          <div className='flex flex-col bg-red-100 px-4 py-2 text-sm text-red-600 hover:bg-red-200'>
+          <div className='flex flex-col px-4 py-2 text-sm text-red-600 hover:bg-gray-100'>
             <span className='font-semibold'>Leave board</span>
             <span className='text-gray-500'>Boards must have at least one admin.</span>
           </div>

@@ -1,5 +1,5 @@
 import { InvitationSecret } from "../invitationSecret/invitationSecret.types";
-import { Board, Boards } from "./board.types";
+import { Board, BoardJoinRequest, BoardJoinRequests, Boards, DetailedBoardInvitation } from "./board.types";
 import { boardTypesDto } from "@/service/api/board";
 
 export function transformBoardDtoToBoard(
@@ -22,4 +22,38 @@ export function mapToInvitationSecret(
   return {
     ...dto
   };
+}
+
+export function mapToDetailedBoardInvitation(
+  dto: boardTypesDto.DetailedBoardInvitationSecretResponseDto
+): DetailedBoardInvitation {
+  return {
+    inviter: {
+      id: dto.inviter.id,
+      fullName: dto.inviter.fullName,
+      email: dto.inviter.email
+    },
+    board: {
+      id: dto.board.id,
+      name: dto.board.name
+    }
+  }
+}
+
+export function mapToBoardJoinRequest(
+  dto: boardTypesDto.BoardJoinRequestResponseDto
+): BoardJoinRequest {
+  return {
+    ...dto,
+    requester: {
+      ...dto.requester,
+      fullName: dto.requester.name
+    }
+  }
+}
+
+export function mapToBoardJoinRequests(
+  dto: boardTypesDto.BoardJoinRequestsResponseDto
+): BoardJoinRequests {
+  return dto.map(boardJoinRequest => mapToBoardJoinRequest(boardJoinRequest))
 }

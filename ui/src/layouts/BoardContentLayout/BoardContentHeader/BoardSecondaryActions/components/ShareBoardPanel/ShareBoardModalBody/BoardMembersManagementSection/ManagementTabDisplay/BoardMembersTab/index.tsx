@@ -8,7 +8,8 @@ import BoardMemberItem from './BoardMemberItem'
 export default function BoardMembersTab() {
   const boardId = getLocalStorageItem(PersistedStateKey.RecentAccessBoard)
   const { data: boardData, isPending } = useBoardQuery(boardId, {
-    includeBoardMembers: true
+    includeBoardMembers: true,
+    includeJoinRequests: true
   })
 
   const { members } = boardData || {}

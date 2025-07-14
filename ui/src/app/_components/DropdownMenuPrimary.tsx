@@ -80,12 +80,20 @@ function DropdownMenuPrimary<T>({
             {item.label && (
               <div
                 className={cn(
-                  'flex cursor-pointer flex-col bg-blue-100 px-4 py-2 hover:bg-blue-300 hover:outline-none',
-                  selectedIndex === index ? 'border-l-2 border-blue-500' : '',
+                  'flex cursor-pointer flex-col px-4 py-2 hover:bg-gray-100 hover:outline-none',
+                  selectedIndex === index
+                    ? 'border-l-2 border-blue-500 bg-blue-100 hover:bg-blue-200'
+                    : '',
                   item.available === false ? 'cursor-not-allowed opacity-50' : ''
                 )}
               >
-                <span className='text-sm font-semibold text-blue-500'>{String(item.label)}</span>
+                <span
+                  className={cn('text-sm font-semibold text-gray-600', {
+                    'text-blue-500': selectedIndex === index
+                  })}
+                >
+                  {String(item.label)}
+                </span>
                 <span className='text-sm text-gray-500'>{item.description}</span>
               </div>
             )}
