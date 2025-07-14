@@ -2,9 +2,6 @@ import React, { useState } from 'react'
 import ManagementTabs from './ManagementTabs'
 import { ManagementTab } from './types'
 import ManagementTabDisplay from './ManagementTabDisplay'
-import { PersistedStateKey } from '@/data/persisted-keys'
-import { getLocalStorageItem } from '@/utils/local-storage'
-import { useBoardQuery } from '@/app/_hooks/query'
 
 function BoardMembersManagementSection() {
   const [activeTab, setActiveTab] = useState<ManagementTab>('members')

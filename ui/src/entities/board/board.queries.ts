@@ -1,6 +1,6 @@
 import { BoardService } from '@/service/api/board';
 import { queryOptions } from '@tanstack/react-query';
-import { transformBoardDtoToBoard, transformBoardsDtoToBoards } from './board.lib';
+import { mapToBoardJoinRequests, mapToDetailedBoardInvitation, transformBoardDtoToBoard, transformBoardsDtoToBoards } from './board.lib';
 import { boardLib, boardTypes } from '.';
 
 export class BoardQueries {
@@ -32,13 +32,34 @@ export class BoardQueries {
     })
   }
 
-    static boardInvitationSecretQuery(boardId: string) {
-      return queryOptions({
-        queryKey: [...this.keys.root, 'invitationSecret', boardId] as unknown[],
-        queryFn: async ({ signal }) => {
-          const response = await BoardService.boardInvitationSecretQuery(boardId)
-          return boardLib.mapToInvitationSecret(response.data)
-        }
-      })
-    } 
+  static boardInvitationSecretQuery(boardId: string) {
+    return queryOptions({
+      queryKey: [...this.keys.root, 'invitationSecret', boardId] as unknown[],
+      queryFn: async ({ signal }) => {
+        const response = await BoardService.boardInvitationSecretQuery(boardId)
+        return boardLib.mapToInvitationSecret(response.data)
+      }
+    })
+  } 
+
+  
+  static detailedBoardInvitationQuery(boardId: string) {
+    return queryOptions({
+      queryKey: [...this.keys.root, 'invitationSecret', boardId, 'detailed'] as unknown[],
+      queryFn: async ({ signal }) => {
+        const response = await BoardService.detailedBoardInvitationSecretQuery(boardId)
+        return mapToDetailedBoardInvitation(response.data)
+      }
+    })
+  }
+
+  static boardJoinRequestsQuery(boardId: string) {
+    return queryOptions({
+      queryKey: [...this.keys.root, 'joinRequests', `boardId=${boardId}`] as unknown[],
+      queryFn: async ({ signal }) => {
+        const response = await BoardService.boardJoinRequestsQuery(boardId)
+        return mapToBoardJoinRequests(response.data)
+      }
+    })
+  }
 }

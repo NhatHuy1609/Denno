@@ -5,7 +5,12 @@ import {
   BoardsResponseDtoSchema,
   AddBoardMemberDtoSchema,
   BoardInvitationSecretResponseDtoSchema,
-  CreateBoardInvitationSecretDtoSchema
+  CreateBoardInvitationSecretDtoSchema,
+  VerifyBoardInvitationSecretRequestDtoSchema,
+  DetailedBoardInvitationSecretResponseDtoSchema,
+  BoardJoinRequestResponseDtoSchema,
+  BoardJoinRequestsResponseDtoSchema,
+  CreateBoardJoinRequestDtoSchema
 } from './board.contracts'
 
 export type CreateBoardDto = z.infer<typeof CreateBoardDtoSchema>
@@ -14,3 +19,8 @@ export type BoardsResponseDto = z.infer<typeof BoardsResponseDtoSchema>
 export type AddBoardMemberDto = z.infer<typeof AddBoardMemberDtoSchema>
 export type CreateBoardInvitationSecretDto = z.infer<typeof CreateBoardInvitationSecretDtoSchema>
 export type BoardInvitationSecretResponseDto = z.infer<typeof BoardInvitationSecretResponseDtoSchema>
+export type VerifyBoardInvitationSecretRequestDto = z.infer<typeof VerifyBoardInvitationSecretRequestDtoSchema>
+export type DetailedBoardInvitationSecretResponseDto = z.infer<typeof DetailedBoardInvitationSecretResponseDtoSchema>
+export type BoardJoinRequestResponseDto = z.infer<typeof BoardJoinRequestResponseDtoSchema>
+export type BoardJoinRequestsResponseDto = z.infer<typeof BoardJoinRequestsResponseDtoSchema>
+export type CreateBoardJoinRequestDto = z.infer<typeof CreateBoardJoinRequestDtoSchema>
