@@ -4,6 +4,7 @@ import { ManagementTab } from '../types'
 import { getLocalStorageItem } from '@/utils/local-storage'
 import { PersistedStateKey } from '@/data/persisted-keys'
 import { useBoardQuery } from '@/app/_hooks/query'
+import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 
 interface ManagementTabsProps {
   tabs: Array<{ title: string; key: ManagementTab }>
@@ -12,7 +13,10 @@ interface ManagementTabsProps {
 }
 
 export default function ManagementTabs({ tabs, activeTab, handleSelectTab }: ManagementTabsProps) {
-  const boardId = getLocalStorageItem(PersistedStateKey.RecentAccessBoard)
+  const [boardId, setRecentAccessBoardId] = useSyncedLocalStorage<string>(
+    PersistedStateKey.RecentAccessBoard,
+    ''
+  )
   const { data: boardData } = useBoardQuery(boardId, {
     includeBoardMembers: true,
     includeJoinRequests: true

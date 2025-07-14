@@ -4,9 +4,13 @@ import { PersistedStateKey } from '@/data/persisted-keys'
 import { getLocalStorageItem } from '@/utils/local-storage'
 import WaterFallLoading from '@/app/_components/Loadings/WaterFallLoading'
 import BoardMemberItem from './BoardMemberItem'
+import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 
 export default function BoardMembersTab() {
-  const boardId = getLocalStorageItem(PersistedStateKey.RecentAccessBoard)
+  const [boardId, setRecentAccessBoardId] = useSyncedLocalStorage<string>(
+    PersistedStateKey.RecentAccessBoard,
+    ''
+  )
   const { data: boardData, isPending } = useBoardQuery(boardId, {
     includeBoardMembers: true,
     includeJoinRequests: true

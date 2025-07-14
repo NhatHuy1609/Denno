@@ -3,11 +3,15 @@ import MemberItem from './MemberItem'
 import { useBoardQuery } from '@/app/_hooks/query'
 import { getLocalStorageItem } from '@/utils/local-storage'
 import { PersistedStateKey } from '@/data/persisted-keys'
+import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 
 type Props = {}
 
 function MembersList({}: Props) {
-  const boardId = getLocalStorageItem(PersistedStateKey.RecentAccessBoard)
+  const [boardId, setRecentAccessBoardId] = useSyncedLocalStorage<string>(
+    PersistedStateKey.RecentAccessBoard,
+    ''
+  )
   const { data: board } = useBoardQuery(boardId, {
     includeBoardMembers: true
   })

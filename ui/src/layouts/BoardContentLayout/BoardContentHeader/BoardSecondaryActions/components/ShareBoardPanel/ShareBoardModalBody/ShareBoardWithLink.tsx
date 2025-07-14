@@ -15,9 +15,13 @@ import WaterFallLoading from '@/app/_components/Loadings/WaterFallLoading'
 import DropdownMenuPrimary, {
   DropdownMenuPrimaryItemProps
 } from '@/app/_components/DropdownMenuPrimary'
+import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 
 function ShareBoardWithLink() {
-  const boardId = getLocalStorageItem(PersistedStateKey.RecentAccessBoard)
+  const [boardId, setRecentAccessBoardId] = useSyncedLocalStorage<string>(
+    PersistedStateKey.RecentAccessBoard,
+    ''
+  )
   const queryClient = useQueryClient()
 
   const { data: boardInvitationSecret } = useBoardInvitationSecretQuery(boardId, {

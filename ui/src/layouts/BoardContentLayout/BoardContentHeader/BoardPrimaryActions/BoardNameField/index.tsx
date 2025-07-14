@@ -6,9 +6,13 @@ import { useBoardQuery } from '@/app/_hooks/query'
 import { useOnClickOutSide } from '@/app/_hooks/useOnClickOutSide'
 import PrimaryInputText from '@/app/_components/PrimaryInputText'
 import CustomizableButton from '@/ui/components/CustomizableButton'
+import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 
 function BoardNameField() {
-  const boardId = getLocalStorageItem(PersistedStateKey.RecentAccessBoard)
+  const [boardId, setRecentAccessBoardId] = useSyncedLocalStorage<string>(
+    PersistedStateKey.RecentAccessBoard,
+    ''
+  )
   const { data: board } = useBoardQuery(boardId)
 
   const containerRef = useRef<HTMLDivElement>(null)

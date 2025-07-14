@@ -16,11 +16,15 @@ import { getLocalStorageItem } from '@/utils/local-storage'
 import { PersistedStateKey } from '@/data/persisted-keys'
 import { toastError, toastSuccess } from '@/ui'
 import { useQueryClient } from '@tanstack/react-query'
+import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 
 type SearchedUserFilter = Pick<userTypes.UsersFilterQuery, 'email'>
 
 function ShareBoardForm() {
-  const boardId = getLocalStorageItem(PersistedStateKey.RecentAccessBoard)
+  const [boardId, setRecentAccessBoardId] = useSyncedLocalStorage<string>(
+    PersistedStateKey.RecentAccessBoard,
+    ''
+  )
   const queryClient = useQueryClient()
 
   // State to manage selected users for sharing the board
