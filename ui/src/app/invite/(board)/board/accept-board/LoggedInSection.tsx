@@ -23,7 +23,7 @@ export default function LoggedInSection() {
 
   const { mutateAsync: joinBoard } = useJoinBoardByLinkMutation({
     onSuccess: () => {
-      router.replace(`/board/${boardId}/members`)
+      router.replace(`/board/${boardId}`)
     },
     onError: (error) => {
       console.error(error)

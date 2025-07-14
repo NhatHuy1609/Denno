@@ -37,6 +37,7 @@ function SignInForm() {
       const data = response?.data
       const userName = data?.user?.userName
 
+      // Redirect to the page where the user was before logging in
       const redirectAfterLoginPath = getLocalStorageItem(PersistedStateKey.RedirectAfterLogin)
       if (redirectAfterLoginPath) {
         router.push(redirectAfterLoginPath)

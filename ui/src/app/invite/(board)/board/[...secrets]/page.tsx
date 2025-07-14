@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useEffect, useState } from 'react'
 import { setLocalStorageItem } from '@/utils/local-storage'
 import { PersistedStateKey } from '@/data/persisted-keys'
@@ -35,10 +37,10 @@ function BoardInvitePage() {
       setFixLoading(true)
     },
     onSuccess: () => {
-      router.replace('/invite/accept-board')
+      router.replace('/invite/board/accept-board')
     },
     onError: () => {
-      router.replace('/invite/invalid-link')
+      router.replace('/invite/board/invalid-link')
     },
     onSettled: () => {
       setFixLoading(false)
