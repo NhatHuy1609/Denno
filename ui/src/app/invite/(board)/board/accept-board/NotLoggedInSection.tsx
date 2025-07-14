@@ -11,10 +11,7 @@ function NotLoggedInSection() {
   const [_, boardId, secretCode] = invitationPathArray
 
   // Get the invitation data to display the invitation details
-  const { data: invitation } = useDetailedBoardInvitationQuery(boardId, {
-    enabled: Boolean(boardId && secretCode),
-    retry: 1
-  })
+  const { data: invitation } = useDetailedBoardInvitationQuery(boardId)
 
   const handleClickLink = () => {
     setLocalStorageItem(
