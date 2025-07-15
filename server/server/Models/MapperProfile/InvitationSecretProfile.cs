@@ -12,6 +12,7 @@ namespace server.Models.MapperProfile
             CreateMap<InvitationSecret, BoardInvitationSecretResponse>();
             CreateMap<InvitationSecret, WorkspaceInvitationSecretResponseDto>();
             CreateMap<InvitationSecret, DetailedWorkspaceInvitationSecretResponse>();
+            CreateMap<InvitationSecret, DetailedBoardInvitationSecretResponse>();
         }
     }
 }

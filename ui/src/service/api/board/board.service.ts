@@ -19,8 +19,7 @@ export class BoardService {
   }
 
   static boardsByWorkspaceIdQuery(workspaceId: string) {
-    return httpGet(`/workspaces/${workspaceId}/boards`)
-            .then(AxiosContracts.responseContract(boardContractsDto.BoardsResponseDtoSchema))
+    return httpGet<boardTypesDto.BoardsResponseDto>(`/workspaces/${workspaceId}/boards`)
   }
 
   static boardQuery(boardId: string, config?: { signal?: AbortSignal, params?: BoardQueryOptionsDto } ) {

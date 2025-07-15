@@ -1,13 +1,16 @@
 import { z } from 'zod'
 import { UserSchema } from '../user/user.contracts';
 
+export const WorkspaceVisibilityEnumSchema = z.enum(['Public', 'Private'])
+export const WorkspaceMemberTypeEnumSchema = z.enum(['Normal', 'Admin'])
+
 export const WorkspaceSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
   description: z.string(),
   idOwner: z.string(),
   logo: z.string().nullable(),
-  visibility: z.enum(['Private', 'Workspace', 'Public']),
+  visibility: WorkspaceVisibilityEnumSchema,
   boardCounts: z.array(z.object({
     idMember: z.string(),
     boardCount: z.number(),
@@ -17,7 +20,7 @@ export const WorkspaceSchema = z.object({
     email: z.string(),
     avatar: z.string(),
     fullName: z.string(),
-    memberType: z.enum(['Normal', 'Admin']),
+    memberType: WorkspaceMemberTypeEnumSchema,
   })).optional(),
   joinRequests: z.array(z.object({
     id: z.string(),
@@ -28,9 +31,9 @@ export const WorkspaceSchema = z.object({
       email: z.string()
     })
   })).optional()
-}).describe('WorkspaceResponseDtoSchema')
+}).describe('WorkspaceSchema')
 
-export const WorkspacesSchema = z.array(WorkspaceSchema)
+export const WorkspacesSchema = z.array(WorkspaceSchema).describe('WorkspacesSchema')
 
 export const WorkspaceFilterQuerySchema = z.object({
   fields: z.string().default("").optional(),

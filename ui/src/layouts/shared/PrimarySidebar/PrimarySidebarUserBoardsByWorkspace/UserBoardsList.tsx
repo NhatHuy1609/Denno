@@ -7,6 +7,7 @@ import { getLocalStorageItem } from '@/utils/local-storage'
 import { boardTypes } from '@/entities/board'
 import { FaAngleDown, FaAngleUp } from 'react-icons/fa6'
 import BoardLinkNavigation from '@/app/_components/BoardLinkNavigation'
+import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 
 const MAX_QUANTITY_CAN_BE_DISPLAYED = 4
 
@@ -30,7 +31,10 @@ function UserBoardItem({ boardItem }: { boardItem: boardTypes.Board }) {
 }
 
 function UserBoardsList() {
-  const workspaceId = getLocalStorageItem(PersistedStateKey.RecentAccessWorkspace) as string
+  const [workspaceId, setRecentAccessWorkspaceId] = useSyncedLocalStorage(
+    PersistedStateKey.RecentAccessWorkspace,
+    ''
+  )
   const { data: boards = [] } = useBoardsByWorkspace(workspaceId)
 
   const [boardQuantityToDisplay, setBoardQuantityToDisplay] = useState<number>(() =>
