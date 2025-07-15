@@ -4,13 +4,17 @@ import { getLocalStorageItem } from '@/utils/local-storage'
 import { useWorkspaceQuery } from '@/app/_hooks/query'
 import WorkspaceLogo from '@/app/_components/WorkspaceLogo'
 import { FaAngleLeft } from 'react-icons/fa6'
+import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 
 interface IProps {
   hideSideboard: () => void
 }
 
 function PrimarySidebarHeader({ hideSideboard }: IProps) {
-  const workspaceId = getLocalStorageItem(PersistedStateKey.RecentAccessWorkspace)
+  const [workspaceId, setRecentAccessWorkspaceId] = useSyncedLocalStorage(
+    PersistedStateKey.RecentAccessWorkspace,
+    ''
+  )
   const { data: workspace } = useWorkspaceQuery(workspaceId as string)
 
   const { name = '', logo } = workspace || {}

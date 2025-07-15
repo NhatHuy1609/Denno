@@ -3,6 +3,8 @@ import { enumContracts } from '@/service/api/_enums'
 import { userContracts } from '../user'
 import { BoardQueryOptionsDto } from '@/service/api/_models/query-models/board/board.contracts'
 import { UserSchema } from '../user/user.contracts'
+import { WorkspaceSchema } from '../workspace/workspace.contracts'
+import { workspaceContracts } from '../workspace'
 
 export const BoardMemberRoleSchema = z.enum(['Member', 'Admin', 'Observer'])
 
@@ -29,7 +31,15 @@ export const BoardSchema = z.object({
       email: z.string().email(),
       avatar: z.string()
     })
-  }))
+  })),
+  workspace: z.object({
+    id: z.string().uuid(),
+    ownerId: z.string(),
+    name: z.string(),
+    description: z.string(),
+    logoUrl: z.string().optional(),
+    visibility: workspaceContracts.WorkspaceVisibilityEnumSchema
+  })
 })
 
 export const BoardsSchema = z.array(BoardSchema)

@@ -26,7 +26,15 @@ const BoardDto = z.object({
       email: z.string().email(),
       avatar: z.string()
     })
-  }))
+  })),
+  workspace: z.object({
+    id: z.string().uuid(),
+    ownerId: z.string(),
+    name: z.string(),
+    description: z.string(),
+    logoUrl: z.string().optional(),
+    visibility: enumContracts.WorkspaceVisibilityEnumSchema
+  })
 })
 
 // Request

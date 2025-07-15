@@ -9,6 +9,7 @@ import { useForm, Controller } from 'react-hook-form'
 import { useWorkspaceQuery } from '@/app/_hooks/query'
 import useUpdateWorkspaceMutation from './workpsaceUpdate.mutation'
 import { Button, Form, toastSuccess } from '@/ui'
+import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 
 const UpdateFormSchema = workspaceContractsDto.UpdateWorkspaceDtoSchema
 type UpdateFormValues = workspaceTypesDto.UpdateWorkspaceDto
@@ -18,7 +19,10 @@ interface IWorkspaceUpdateFormProps {
 }
 
 function WorkspaceUpdateForm({ hideFormFn }: IWorkspaceUpdateFormProps) {
-  const workspaceId = getLocalStorageItem(PersistedStateKey.RecentAccessWorkspace)
+  const [workspaceId, setRecentAccessWorkspaceId] = useSyncedLocalStorage(
+    PersistedStateKey.RecentAccessWorkspace,
+    ''
+  )
   const { data: workspace } = useWorkspaceQuery(workspaceId)
 
   const {

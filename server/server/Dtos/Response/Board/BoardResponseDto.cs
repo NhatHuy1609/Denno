@@ -1,4 +1,5 @@
-﻿using server.Enums;
+﻿using server.Dtos.Response.Workspace;
+using server.Enums;
 
 namespace server.Dtos.Response.Board;
 
@@ -13,5 +14,6 @@ public class BoardResponseDto
 
     public List<BoardMemberResponseDto> Members { get; set; } = new List<BoardMemberResponseDto>();
     public List<BoardJoinRequestResponse> JoinRequests { get; set; } = new List<BoardJoinRequestResponse>();
+    public WorkspaceResponseDto Workspace { get; set; }
 }
 

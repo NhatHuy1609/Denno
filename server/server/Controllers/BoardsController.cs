@@ -265,7 +265,7 @@ namespace server.Controllers
                 return NotFound();
             }
 
-            return Ok(_mapper.Map<DetailedWorkspaceInvitationSecretResponse>(detailedInvitation));
+            return Ok(_mapper.Map<DetailedBoardInvitationSecretResponse>(detailedInvitation));
         }
 
         [HttpPost("[controller]/{id}/invitationSecret/verification")]
