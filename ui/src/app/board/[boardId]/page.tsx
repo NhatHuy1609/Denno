@@ -1,18 +1,24 @@
 'use client'
 
 import React, { useEffect } from 'react'
-import { useParams } from 'next/navigation'
-import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 import { PersistedStateKey } from '@/data/persisted-keys'
-import BoardView from '@/app/_features/BoardViews/BoardView'
+import { useParams, useRouter } from 'next/navigation'
+import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 import { useBoardQuery } from '@/app/_hooks/query'
+import { useMe } from '@/app/_hooks/query/user/useMe'
+import BoardView from '@/app/_features/BoardViews/BoardView'
+import PrivateBoardAccessRequest from './PrivateBoardAccessRequest'
 
 function BoardHomePage() {
+  const router = useRouter()
+  const { data: currentUser } = useMe()
   const { boardId } = useParams<{ boardId: string }>()
   const { data: boardData } = useBoardQuery(boardId, {
-    includeWorkspace: true
+    includeWorkspace: true,
+    includeBoardMembers: true
   })
-  const { workspaceId } = boardData || {}
+
+  const { workspaceId, members } = boardData || {}
 
   const [_1, setRecentAccessBoardId] = useSyncedLocalStorage(
     PersistedStateKey.RecentAccessBoard,
@@ -37,7 +43,12 @@ function BoardHomePage() {
     }
   }, [workspaceId])
 
-  console.log('WORKSPACE ID GOT BY FETCHED BOARD: ', workspaceId)
+  // Handle redirect if current user is not a member of the board
+  if (currentUser && members) {
+    if (!members.some((member) => member.memberId === currentUser.id)) {
+      return <PrivateBoardAccessRequest />
+    }
+  }
 
   return (
     <div className='flex size-full max-w-full flex-col'>

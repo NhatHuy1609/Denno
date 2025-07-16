@@ -1,7 +1,9 @@
+'use client'
+
 import React, { useEffect } from 'react'
+import { PersistedStateKey } from '@/data/persisted-keys'
 import { useParams } from 'next/navigation'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
-import { PersistedStateKey } from '@/data/persisted-keys'
 
 function layout({ children }: { children: React.ReactNode }) {
   const { workspaceId } = useParams<{ workspaceId: string }>()
