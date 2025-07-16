@@ -25,7 +25,7 @@ function PermissionGate<T>({
     const result = canWithReason(action, resource, resourceData)
     if (!result.allowed) {
       return (
-        <div className='permission-denied'>
+        <div className='flex flex-col'>
           {fallback}
           {process.env.NODE_ENV === 'development' && <small>Reason: {result.reason}</small>}
         </div>
