@@ -1,9 +1,9 @@
 import React from 'react'
-import { userTypes } from '@/entities/user'
 import { useRouter } from 'next/navigation'
+import { userTypes } from '@/entities/user'
+import { useMe } from '@/app/_hooks/query/user/useMe'
 import Avatar from '@/ui/components/Avatar'
 import UnderlineLinkButton from '@/app/_components/UnderlineLinkButton'
-import { useMe } from '@/app/_hooks/query/user/useMe'
 
 export default function LoggedInSection() {
   const router = useRouter()
