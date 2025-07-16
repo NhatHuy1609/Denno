@@ -4,7 +4,6 @@ import {
   PolicyContext, 
   PolicyResult,
   PolicyKey,
-  IPolicy 
 } from './types'
 import { PolicyRegistry } from './policy-registry'
 
