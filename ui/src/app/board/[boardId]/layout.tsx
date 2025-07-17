@@ -2,9 +2,16 @@
 
 import React from 'react'
 import BoardContentLayoutComp from '@/layouts/BoardContentLayout'
+import { useMe } from '@/app/_hooks/query/user/useMe'
 
 function BoardContentLayout({ children }: { children: React.ReactNode }) {
-  return <BoardContentLayoutComp>{children}</BoardContentLayoutComp>
+  const { data: currentUser } = useMe()
+
+  if (currentUser) {
+    return <BoardContentLayoutComp>{children}</BoardContentLayoutComp>
+  }
+
+  return <>{children}</>
 }
 
 export default BoardContentLayout
