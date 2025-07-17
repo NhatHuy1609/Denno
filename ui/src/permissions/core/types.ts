@@ -1,6 +1,7 @@
 import { userTypes } from "@/entities/user"
 
 export type PolicyAction =
+  | 'view' // FOR UI
   | 'create'
   | 'read'
   | 'update'

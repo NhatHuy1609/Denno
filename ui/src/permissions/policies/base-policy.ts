@@ -6,4 +6,18 @@ export abstract class BasePolicy<T = any> implements IPolicy<T> {
   protected isSameUser(context: PolicyContext, targetUserId: string): boolean {
     return context.user.id === targetUserId
   }
+
+  protected allow(reason: string): PolicyResult {
+    return {
+      allowed: true,
+      reason
+    }
+  }
+
+  protected deny(reason: string): PolicyResult {
+    return {
+      allowed: false,
+      reason
+    }
+  }
 }
