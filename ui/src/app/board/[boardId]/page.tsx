@@ -2,7 +2,6 @@
 
 import React from 'react'
 import { useParams } from 'next/navigation'
-import { useMe } from '@/app/_hooks/query/user/useMe'
 import BoardView from '@/app/_features/BoardViews/BoardView'
 import PrivateBoardAccessRequest from './PrivateBoardAccessRequest'
 import useBoardPolicyAccess from '@/permissions/hooks/useBoardPolicyAccess'
@@ -10,9 +9,17 @@ import useRecentAccessSync from './useRecentAccessSync'
 
 function BoardHomePage() {
   const { boardId } = useParams<{ boardId: string }>()
-  const { workspaceId = '', canView: canViewBoard } = useBoardPolicyAccess(boardId)
+  const {
+    workspaceId = '',
+    canView: canViewBoard,
+    isLoading: isCheckingBoardViewPolicyAccess
+  } = useBoardPolicyAccess(boardId)
 
   useRecentAccessSync(boardId, workspaceId)
+
+  if (isCheckingBoardViewPolicyAccess) {
+    return null
+  }
 
   // Checks if the user should be denied access to the board.
   if (!canViewBoard) {
