@@ -1,18 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { cn } from '@/lib/styles/utils'
-import { getLocalStorageItem } from '@/utils/local-storage'
 import { PersistedStateKey } from '@/data/persisted-keys'
 import { useBoardQuery } from '@/app/_hooks/query'
 import { useOnClickOutSide } from '@/app/_hooks/useOnClickOutSide'
 import PrimaryInputText from '@/app/_components/PrimaryInputText'
-import CustomizableButton from '@/ui/components/CustomizableButton'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 
 function BoardNameField() {
-  const [boardId, setRecentAccessBoardId] = useSyncedLocalStorage<string>(
-    PersistedStateKey.RecentAccessBoard,
-    ''
-  )
+  const [boardId] = useSyncedLocalStorage<string>(PersistedStateKey.RecentAccessBoard, '')
   const { data: board } = useBoardQuery(boardId)
 
   const containerRef = useRef<HTMLDivElement>(null)
@@ -23,7 +18,7 @@ function BoardNameField() {
   const inputRef = useRef<HTMLInputElement>(null)
   const [isShowInput, setIsShowInput] = useState(false)
 
-  const { name } = board || {}
+  const { name: boardName } = board || {}
   const inputValue = inputRef.current?.value || ''
 
   // Handle click outside to hide the input and update the board name
@@ -59,13 +54,13 @@ function BoardNameField() {
       inputRef.current.style.width = `${spanWidth + 12}px` // Adding some padding
       containerRef.current.style.width = `${spanWidth + 20}px` // Adjusting container width
     }
-  }, [inputValue])
+  }, [inputValue, boardName])
 
   return (
     <div className='relative flex h-full items-center' ref={containerRef}>
       <PrimaryInputText
         ref={inputRef}
-        defaultValue={name}
+        defaultValue={boardName}
         className={cn('absolute w-full text-xl font-medium', {
           hidden: !isShowInput
         })}
@@ -79,7 +74,7 @@ function BoardNameField() {
           }
         )}
       >
-        {name || ''}
+        {boardName || ''}
       </h1>
 
       {/* This span is used for measuring the input text width dynamically to auto-resize the input element */}
@@ -93,7 +88,7 @@ function BoardNameField() {
           whiteSpace: 'nowrap'
         }}
       >
-        {name || ''}
+        {boardName || ''}
       </span>
     </div>
   )

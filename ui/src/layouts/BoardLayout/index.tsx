@@ -30,7 +30,7 @@ function BoardLayoutComp({
       {showHeader && <PrimaryHeader />}
       <section className='max-w-screen relative z-[1] flex h-[calc(100%-var(--header-height))]'>
         {showSidebar && <PrimarySidebar />}
-        <div className='h-full flex-1'>{children}</div>
+        <div className='h-full flex-1 overflow-x-auto'>{children}</div>
       </section>
     </main>
   )

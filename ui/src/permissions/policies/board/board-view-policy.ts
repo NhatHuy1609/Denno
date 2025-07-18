@@ -68,10 +68,12 @@ export class BoardViewPolicy extends BoardBasePolicy {
     const { members: workspaceMembers = [] } = workspaceData || {}
 
     const isBoardMember = this.isBoardMember(context, board)
-    const isWorkspaceAdmin = filterBy(workspaceMembers, (m) => m.memberType === 'Admin')
+    const workspaceAdmins = filterBy(workspaceMembers, (m) => m.memberType === 'Admin')
+    const isWorkspaceAdmin = includesBy(workspaceAdmins, (m) => m.id === context.user.id)
 
     return (isBoardMember || isWorkspaceAdmin)
       ? this.allow('User is a member of the board or workspace admin')
       : this.deny('User is not a member of the board or workspace admin')
   }
 }
+

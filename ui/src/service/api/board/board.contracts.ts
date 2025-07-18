@@ -59,6 +59,10 @@ export const VerifyBoardInvitationSecretRequestDtoSchema = z.object({
   secretCode: z.string()
 }).describe("VerifyBoardInvitationSecretRequestDtoSchema")
 
+export const CreateBoardJoinRequestDtoSchema = z.object({
+  requesterId: z.string()
+}).describe("CreateBoardJoinRequestDtoSchema")
+
 // Response
 export const BoardResponseDtoSchema = BoardDto.describe("BoardResponseDtoSchema")
 
@@ -79,10 +83,6 @@ export const BoardJoinRequestResponseDtoSchema = z.object({
     avatar: z.string()
   })
 }).describe('BoardJoinRequestResponseDtoSchema')
-
-export const CreateBoardJoinRequestDtoSchema = z.object({
-  requesterId: z.string()
-}).describe("CreateBoardJoinRequestDtoSchema")
 
 export const BoardJoinRequestsResponseDtoSchema = z.array(BoardJoinRequestResponseDtoSchema).describe('BoardJoinRequestsResponseDtoSchema')
 

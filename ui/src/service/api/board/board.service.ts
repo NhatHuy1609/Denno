@@ -88,4 +88,12 @@ export class BoardService {
       createBoardJoinRequestDto
     )
   }
+
+  static approveBoardJoinRequest(requestId: number) {
+    return httpPost(`${this.basePath}/joinRequests/${requestId}/approval`)
+  }
+
+  static rejectBoardJoinRequest(requestId: number) {
+    return httpDel(`${this.basePath}/joinRequests//${requestId}/rejection`)
+  }
 }

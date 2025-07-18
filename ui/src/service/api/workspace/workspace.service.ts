@@ -3,7 +3,7 @@ import { AxiosContracts } from '@/lib/axios/AxiosContracts'
 import { 
   AddWorkspaceMemberDto, 
   CreateWorkspaceDto, 
-  CreateWorkspaceJoinRequestDto, 
+  CreateWorkspaceJoinRequestDto,
   DetailedWorkspaceInvitationSecretResponseDto, 
   UpdateWorkspaceDto, 
   UpdateWorkspaceLogoDto, 
