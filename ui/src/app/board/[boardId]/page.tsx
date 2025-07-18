@@ -2,12 +2,17 @@
 
 import React from 'react'
 import { useParams } from 'next/navigation'
-import BoardView from '@/app/_features/BoardViews/BoardView'
-import PrivateBoardAccessRequest from './PrivateBoardAccessRequest'
 import useBoardPolicyAccess from '@/permissions/hooks/useBoardPolicyAccess'
 import useRecentAccessSync from './useRecentAccessSync'
+import { useRequireAuth } from '@/app/_hooks/useRequireAuth'
+import WaterFallLoading from '@/app/_components/Loadings/WaterFallLoading'
+import BoardView from '@/app/_features/BoardViews/BoardView'
+import PrivateBoardAccessRequest from './PrivateBoardAccessRequest'
 
 function BoardHomePage() {
+  // Apply auth guard
+  const { isCheckingAuth } = useRequireAuth()
+
   const { boardId } = useParams<{ boardId: string }>()
   const {
     workspaceId = '',
@@ -17,8 +22,13 @@ function BoardHomePage() {
 
   useRecentAccessSync(boardId, workspaceId)
 
-  if (isCheckingBoardViewPolicyAccess) {
-    return null
+  // Show loading when checking auth or board view policy access
+  if (isCheckingAuth || isCheckingBoardViewPolicyAccess) {
+    return (
+      <div className='mt-10 flex w-full items-center justify-center'>
+        <WaterFallLoading />
+      </div>
+    )
   }
 
   // Checks if the user should be denied access to the board.
