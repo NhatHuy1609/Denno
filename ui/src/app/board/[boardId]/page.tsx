@@ -4,14 +4,14 @@ import React from 'react'
 import { useParams } from 'next/navigation'
 import useBoardPolicyAccess from '@/permissions/hooks/useBoardPolicyAccess'
 import useRecentAccessSync from './useRecentAccessSync'
-import { useRequireAuth } from '@/app/_hooks/useRequireAuth'
 import WaterFallLoading from '@/app/_components/Loadings/WaterFallLoading'
 import BoardView from '@/app/_features/BoardViews/BoardView'
 import PrivateBoardAccessRequest from './PrivateBoardAccessRequest'
+import { useRequireAuth } from '@/app/_hooks/useRequireAuth'
 
 function BoardHomePage() {
   // Apply auth guard
-  const { isCheckingAuth } = useRequireAuth()
+  const { isCheckingAuth, currentUser } = useRequireAuth()
 
   const { boardId } = useParams<{ boardId: string }>()
   const {
@@ -22,7 +22,6 @@ function BoardHomePage() {
 
   useRecentAccessSync(boardId, workspaceId)
 
-  // Show loading when checking auth or board view policy access
   if (isCheckingAuth || isCheckingBoardViewPolicyAccess) {
     return (
       <div className='mt-10 flex w-full items-center justify-center'>
@@ -37,7 +36,7 @@ function BoardHomePage() {
   }
 
   return (
-    <div className='flex size-full max-w-full flex-col'>
+    <div className='size-full max-w-full'>
       <BoardView />
     </div>
   )

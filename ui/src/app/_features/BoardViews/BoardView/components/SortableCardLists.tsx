@@ -565,7 +565,7 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
       onDragEnd={onDragEnd}
       sensors={sensors}
     >
-      <div className='absolute inset-0 overflow-x-auto'>
+      <div className='flex-1 overflow-x-auto'>
         <SortableContext items={[...containers]} strategy={horizontalListSortingStrategy}>
           <div className='flex max-w-fit list-none gap-2 p-2'>
             {containers?.map((containerId) => (

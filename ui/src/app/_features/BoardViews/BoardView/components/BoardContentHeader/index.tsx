@@ -2,7 +2,7 @@ import React from 'react'
 import BoardPrimaryActions from './BoardPrimaryActions'
 import BoardSecondaryActions from './BoardSecondaryActions'
 
-function BoardContentHeader() {
+function BoardViewHeader() {
   return (
     <header
       style={{
@@ -18,4 +18,4 @@ function BoardContentHeader() {
   )
 }
 
-export default BoardContentHeader
+export default BoardViewHeader

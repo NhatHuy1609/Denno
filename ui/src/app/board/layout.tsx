@@ -2,8 +2,8 @@
 
 import '@/app/board-page-themes.css'
 import React, { useEffect } from 'react'
-import BoardLayoutComp from '@/layouts/BoardLayout'
 import { useMe } from '../_hooks/query/user/useMe'
+import BoardLayoutComp from '@/layouts/BoardLayout'
 import LandingHeader from '../_components/LandingHeader'
 
 function MainBoardLayout({ children }: { children: React.ReactNode }) {
