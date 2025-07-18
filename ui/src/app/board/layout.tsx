@@ -19,6 +19,7 @@ function MainBoardLayout({ children }: { children: React.ReactNode }) {
 
   if (!currentUser) {
     return (
+      // Layout 1
       <section className='size-full'>
         <LandingHeader />
         {children}
