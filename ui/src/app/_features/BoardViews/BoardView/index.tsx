@@ -9,7 +9,7 @@ function BoardView() {
   const { data: cardLists } = useCardListsByBoards(boardId as string)
 
   return (
-    <div className='relative flex h-full flex-col'>
+    <div className='relative flex h-full flex-1 flex-col overflow-x-auto'>
       <BoardViewHeader />
       {cardLists && <SortableCardLists cardLists={cardLists} />}
     </div>
