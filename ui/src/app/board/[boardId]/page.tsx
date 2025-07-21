@@ -2,12 +2,13 @@
 
 import React from 'react'
 import { useParams } from 'next/navigation'
+import { useRequireAuth } from '@/app/_hooks/useRequireAuth'
 import useBoardPolicyAccess from '@/permissions/hooks/useBoardPolicyAccess'
 import useRecentAccessSync from './useRecentAccessSync'
 import WaterFallLoading from '@/app/_components/Loadings/WaterFallLoading'
 import BoardView from '@/app/_features/BoardViews/BoardView'
 import PrivateBoardAccessRequest from './PrivateBoardAccessRequest'
-import { useRequireAuth } from '@/app/_hooks/useRequireAuth'
+import PrimarySidebar from '@/layouts/shared/PrimarySidebar'
 
 function BoardHomePage() {
   // Apply auth guard
@@ -36,7 +37,8 @@ function BoardHomePage() {
   }
 
   return (
-    <div className='size-full max-w-full'>
+    <div className='flex size-full max-w-full'>
+      <PrimarySidebar />
       <BoardView />
     </div>
   )

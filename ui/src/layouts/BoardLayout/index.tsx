@@ -1,7 +1,6 @@
 import React from 'react'
 import { useParams } from 'next/navigation'
 import { useBoardQuery } from '@/app/_hooks/query'
-import PrimarySidebar from '../shared/PrimarySidebar'
 import PrimaryHeader from '../shared/PrimaryHeader'
 
 function BoardLayoutComp({
@@ -28,9 +27,8 @@ function BoardLayoutComp({
       }}
     >
       {showHeader && <PrimaryHeader />}
-      <section className='max-w-screen relative z-[1] flex h-[calc(100%-var(--header-height))]'>
-        {showSidebar && <PrimarySidebar />}
-        <div className='h-full flex-1 overflow-x-auto'>{children}</div>
+      <section className='max-w-screen relative z-[1] h-[calc(100%-var(--header-height))]'>
+        {children}
       </section>
     </main>
   )
