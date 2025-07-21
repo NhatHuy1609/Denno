@@ -1,15 +1,12 @@
+import React from 'react'
 import WaterFallLoading from '@/app/_components/Loadings/WaterFallLoading'
 import { useBoardQuery } from '@/app/_hooks/query'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 import { PersistedStateKey } from '@/data/persisted-keys'
-import { getLocalStorageItem } from '@/utils/local-storage'
-import React from 'react'
+import BoardJoinRequestItem from './BoardJoinRequestItem'
 
 function BoardJoinRequestsTab() {
-  const [boardId, setRecentAccessBoardId] = useSyncedLocalStorage<string>(
-    PersistedStateKey.RecentAccessBoard,
-    ''
-  )
+  const [boardId] = useSyncedLocalStorage<string>(PersistedStateKey.RecentAccessBoard, '')
   const { data: boardData, isPending } = useBoardQuery(boardId, {
     includeBoardMembers: true,
     includeJoinRequests: true
@@ -33,7 +30,17 @@ function BoardJoinRequestsTab() {
     )
   }
 
-  return <div>BoardJoinRequestsTab</div>
+  return (
+    <div className='w-full'>
+      <ul className='w-full list-none'>
+        {joinRequests.map((joinRequest) => (
+          <li key={joinRequest.id}>
+            <BoardJoinRequestItem request={joinRequest} />
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
 }
 
 export default BoardJoinRequestsTab

@@ -44,6 +44,7 @@ type ButtonProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'disabled
     endIcon?: ReactNode
     loading?: boolean
     className?: string
+    renderOtherItems?: () => React.ReactNode
   }
 
 const CustomizableButton = ({
@@ -55,6 +56,7 @@ const CustomizableButton = ({
   disabled,
   loading = false,
   className,
+  renderOtherItems,
   ...props
 }: ButtonProps) => {
   return (
@@ -66,6 +68,7 @@ const CustomizableButton = ({
       {startIcon}
       {value && !loading && <span className='text-sm'>{value}</span>}
       {endIcon}
+      {renderOtherItems && renderOtherItems()}
       {loading && (
         <div
           style={{

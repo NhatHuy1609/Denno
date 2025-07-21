@@ -60,11 +60,11 @@ export const BoardJoinRequestSchema = z.object({
   id: z.number(),
   requestedAt: z.string().datetime(),
   boardId: z.string(),
-  requester: UserSchema.pick({
-    id: true,
-    fullName: true,
-    email: true,
-    avatar: true
+  requester: z.object({
+    id: z.string(),
+    name: z.string(),
+    email: z.string().email(),
+    avatar: z.string()
   })
 }).describe('BoardJoinRequestSchema')
 

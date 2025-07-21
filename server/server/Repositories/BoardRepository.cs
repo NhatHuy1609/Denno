@@ -35,7 +35,8 @@ public class BoardRepository: GenericRepository<Board, Guid>, IBoardRepository
             query = query.Include(b => b.Actions);
 
         if (options.IncludeJoinRequests)
-            query = query.Include(b => b.JoinRequests);
+            query = query.Include(b => b.JoinRequests)
+                         .ThenInclude(jq => jq.Requester);
 
         if (options.IncludeBoardUserSettings)
             query = query.Include(b => b.BoardUserSettings);

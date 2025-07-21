@@ -1,15 +1,14 @@
-import React, { useState } from 'react'
+import React from 'react'
 import TabButton from './TabButton'
-import { ManagementTab } from '../types'
-import { getLocalStorageItem } from '@/utils/local-storage'
+import type { ManagementTabs, TabKey } from '../types'
 import { PersistedStateKey } from '@/data/persisted-keys'
 import { useBoardQuery } from '@/app/_hooks/query'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 
 interface ManagementTabsProps {
-  tabs: Array<{ title: string; key: ManagementTab }>
-  activeTab: ManagementTab
-  handleSelectTab: (tabKey: ManagementTab) => void
+  tabs: ManagementTabs
+  activeTab: TabKey
+  handleSelectTab: (tabKey: TabKey) => void
 }
 
 export default function ManagementTabs({ tabs, activeTab, handleSelectTab }: ManagementTabsProps) {
@@ -25,7 +24,7 @@ export default function ManagementTabs({ tabs, activeTab, handleSelectTab }: Man
   // Take needed data from boardData to display tab's quantity
   const { members, joinRequests } = boardData || {}
 
-  const getQuantity = (tabKey: ManagementTab) => {
+  const getQuantity = (tabKey: TabKey) => {
     switch (tabKey) {
       case 'members':
         return members?.length || 0
@@ -34,15 +33,18 @@ export default function ManagementTabs({ tabs, activeTab, handleSelectTab }: Man
     }
   }
 
+  const managementTabs = Object.entries(tabs).map(([tabKey, tabVal]) => tabVal)
+
   return (
     <div className='flex w-full gap-4 border-b-2 border-gray-300'>
-      {tabs.map((tab) => (
+      {managementTabs.map((tab) => (
         <TabButton
           key={tab.key}
           title={tab.title}
           isActive={activeTab === tab.key}
           quantity={getQuantity(tab.key)}
           onClick={() => handleSelectTab(tab.key as 'members' | 'requests')}
+          quantityType={tab.type}
         />
       ))}
     </div>

@@ -12,7 +12,7 @@ import PrimarySidebar from '@/layouts/shared/PrimarySidebar'
 
 function BoardHomePage() {
   // Apply auth guard
-  const { isCheckingAuth, currentUser } = useRequireAuth()
+  const { isCheckingAuth } = useRequireAuth()
 
   const { boardId } = useParams<{ boardId: string }>()
   const {
