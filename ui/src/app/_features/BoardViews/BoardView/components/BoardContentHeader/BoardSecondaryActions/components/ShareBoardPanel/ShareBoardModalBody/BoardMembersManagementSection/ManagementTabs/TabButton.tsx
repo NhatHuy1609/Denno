@@ -1,14 +1,16 @@
 import React from 'react'
 import { cn } from '@/lib/styles/utils'
+import { ManagementTab } from '../types'
 
 interface TabButtonProps {
   title: string
   isActive: boolean
   onClick: () => void
   quantity?: number
+  quantityType?: ManagementTab['type']
 }
 
-function TabButton({ title, isActive, onClick, quantity = 0 }: TabButtonProps) {
+function TabButton({ title, isActive, onClick, quantity = 0, quantityType }: TabButtonProps) {
   return (
     <div
       className={cn(
@@ -29,7 +31,10 @@ function TabButton({ title, isActive, onClick, quantity = 0 }: TabButtonProps) {
       {quantity > 0 && (
         <span
           className={cn(
-            'inline-block flex size-5 items-center justify-center rounded-full bg-gray-300 p-1 text-xs text-gray-600'
+            'inline-block flex size-5 items-center justify-center rounded-full bg-gray-300 p-1 text-xs text-gray-600',
+            {
+              'bg-red-500 text-white': quantityType === 'notification'
+            }
           )}
         >
           {quantity}

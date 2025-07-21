@@ -1,23 +1,23 @@
 import React, { useState } from 'react'
-import ManagementTabs from './ManagementTabs'
-import { ManagementTab } from './types'
+import type { ManagementTabs, TabKey } from './types'
 import ManagementTabDisplay from './ManagementTabDisplay'
+import ManagementTabsComp from './ManagementTabs'
+
+const tabs: ManagementTabs = {
+  members: { title: 'Board members', key: 'members', type: 'normal' },
+  requests: { title: 'Join requests', key: 'requests', type: 'notification' }
+}
 
 function BoardMembersManagementSection() {
-  const [activeTab, setActiveTab] = useState<ManagementTab>('members')
+  const [activeTab, setActiveTab] = useState<TabKey>('members')
 
-  const tabs: Array<{ title: string; key: ManagementTab }> = [
-    { title: 'Board members', key: 'members' },
-    { title: 'Join requests', key: 'requests' }
-  ]
-
-  const handleSelectTab = (tabKey: ManagementTab) => {
+  const handleSelectTab = (tabKey: TabKey) => {
     setActiveTab(tabKey)
   }
 
   return (
     <div className='mt-2 flex flex-col gap-3'>
-      <ManagementTabs tabs={tabs} handleSelectTab={handleSelectTab} activeTab={activeTab} />
+      <ManagementTabsComp tabs={tabs} handleSelectTab={handleSelectTab} activeTab={activeTab} />
       <ManagementTabDisplay tab={activeTab} />
     </div>
   )

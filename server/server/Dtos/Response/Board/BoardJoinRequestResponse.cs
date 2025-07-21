@@ -1,6 +1,4 @@
-﻿using server.Dtos.Response.Workspace;
-
-namespace server.Dtos.Response.Board
+﻿namespace server.Dtos.Response.Board
 {
     public class BoardJoinRequestResponse
     {

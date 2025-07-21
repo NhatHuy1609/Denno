@@ -1,10 +1,10 @@
 import React from 'react'
-import { ManagementTab } from '../types'
 import BoardMembersTab from './BoardMembersTab'
 import BoardJoinRequestsTab from './BoardJoinRequestsTab'
+import { TabKey } from '../types'
 
 interface ManagementTabDisplayProps {
-  tab: ManagementTab
+  tab: TabKey
 }
 
 function ManagementTabDisplay({ tab }: ManagementTabDisplayProps) {
