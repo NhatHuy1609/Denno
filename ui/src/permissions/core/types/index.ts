@@ -1,4 +1,5 @@
 import { userTypes } from "@/entities/user"
+import { PolicyReason } from "./result-reasons"
 
 export type PolicyAction =
   | 'view' // FOR UI
@@ -22,7 +23,7 @@ export type PolicyContext = {
 
 export type PolicyResult = {
   allowed: boolean
-  reason?: string
+  reason?: PolicyReason
 }
 
 export interface IPolicy<T = any> {

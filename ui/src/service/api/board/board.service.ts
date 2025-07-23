@@ -1,8 +1,8 @@
 import { httpPost, httpGet, httpDel } from '../_req'
 import { AxiosContracts } from '@/lib/axios/AxiosContracts'
-import { AddBoardMemberDto, BoardInvitationSecretResponseDto, BoardJoinRequestResponseDto, BoardJoinRequestsResponseDto, CreateBoardDto, CreateBoardInvitationSecretDto, CreateBoardJoinRequestDto, DetailedBoardInvitationSecretResponseDto, VerifyBoardInvitationSecretRequestDto } from './board.types'
-import { AddBoardMemberDtoSchema, CreateBoardDtoSchema, CreateBoardInvitationSecretDtoSchema, CreateBoardJoinRequestDtoSchema, VerifyBoardInvitationSecretRequestDtoSchema } from './board.contracts'
-import { boardContractsDto, boardTypesDto } from '.'
+import { AddBoardMemberDto, ApproveBoardJoinRequestDto, BoardInvitationSecretResponseDto, BoardJoinRequestResponseDto, BoardJoinRequestsResponseDto, CreateBoardDto, CreateBoardInvitationSecretDto, CreateBoardJoinRequestDto, DetailedBoardInvitationSecretResponseDto, VerifyBoardInvitationSecretRequestDto } from './board.types'
+import { AddBoardMemberDtoSchema, ApproveBoardJoinRequestDtoSchema, CreateBoardDtoSchema, CreateBoardInvitationSecretDtoSchema, CreateBoardJoinRequestDtoSchema, VerifyBoardInvitationSecretRequestDtoSchema } from './board.contracts'
+import {  boardTypesDto } from '.'
 import { BoardQueryOptionsDto } from '../_models/query-models/board/board.types'
 import { actionTypesDto } from '../action'
 import { JoinBoardByLinkActionResponseDto } from '../action/action.types'
@@ -89,8 +89,13 @@ export class BoardService {
     )
   }
 
-  static approveBoardJoinRequest(requestId: number) {
-    return httpPost(`${this.basePath}/joinRequests/${requestId}/approval`)
+  static approveBoardJoinRequest(data: { requestId: number, approveBoardJoinRequestDto: ApproveBoardJoinRequestDto }) {
+    const approveBoardJoinRequestDto = AxiosContracts.requestContract(
+      ApproveBoardJoinRequestDtoSchema,
+      data.approveBoardJoinRequestDto
+    )
+
+    return httpPost(`${this.basePath}/joinRequests/${data.requestId}/approval`, approveBoardJoinRequestDto)
   }
 
   static rejectBoardJoinRequest(requestId: number) {
