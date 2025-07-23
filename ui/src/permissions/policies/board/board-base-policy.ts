@@ -1,5 +1,5 @@
 import { boardTypes } from "@/entities/board";
-import { BasePolicy } from "../base-policy";
+import { BasePolicy } from "../../core/base-policy";
 import { PolicyContext, PolicyResult } from "@/permissions/core/types";
 import { includesBy } from "@/utils/includesBy";
 

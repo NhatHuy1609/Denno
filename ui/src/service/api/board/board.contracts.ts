@@ -63,6 +63,10 @@ export const CreateBoardJoinRequestDtoSchema = z.object({
   requesterId: z.string()
 }).describe("CreateBoardJoinRequestDtoSchema")
 
+export const ApproveBoardJoinRequestDtoSchema = z.object({
+  memberRole: enumContracts.BoardMemberRoleEnumSchema
+}).describe("ApproveBoardJoinRequestDtoSchema")
+
 // Response
 export const BoardResponseDtoSchema = BoardDto.describe("BoardResponseDtoSchema")
 

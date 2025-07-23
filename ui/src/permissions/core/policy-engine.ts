@@ -6,6 +6,7 @@ import {
   PolicyKey,
 } from './types'
 import { PolicyRegistry } from './policy-registry'
+import { PolicyReasonMessages } from './types/result-reasons'
 
 export class PolicyEngine {
   can<T = any>(
@@ -30,7 +31,10 @@ export class PolicyEngine {
     if (!policy) {
       return {
         allowed: false,
-        reason: `No policy found for ${policyKey}`
+        reason: {
+          code: 'POLICY::NOT_FOUND',
+          message: PolicyReasonMessages['POLICY::NOT_FOUND']
+        }
       }
     }
 

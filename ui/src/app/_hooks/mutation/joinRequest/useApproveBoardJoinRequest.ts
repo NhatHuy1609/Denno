@@ -1,12 +1,18 @@
 import { DefaultError, useMutation, UseMutationOptions } from "@tanstack/react-query"
-import { BoardService } from "@/service/api/board"
+import { BoardService, boardTypesDto } from "@/service/api/board"
+import { enumTypes } from "@/service/api/_enums"
+
+type ApproveBoardJoinRequestMutationParams = {
+  requestId: number
+  memberRole: enumTypes.BoardMemberRoleEnum
+}
 
 function useApproveBoardJoinRequest(
   options: Pick<
     UseMutationOptions<
       any,
       DefaultError,
-      number,
+      ApproveBoardJoinRequestMutationParams,
       any
     >,
     'mutationKey' | 'onMutate' | 'onSuccess' | 'onError' | 'onSettled'
@@ -23,8 +29,15 @@ function useApproveBoardJoinRequest(
   return useMutation({
     mutationKey: ['board', 'joinRequest', 'approve', ...mutationKey],
     onMutate,
-    mutationFn: async (requestId) => {
-      const response = await BoardService.approveBoardJoinRequest(requestId)
+    mutationFn: async ({requestId, memberRole}) => {
+      const data = {
+        requestId,
+        approveBoardJoinRequestDto: {
+          memberRole
+        }
+      }
+
+      const response = await BoardService.approveBoardJoinRequest(data)
       return response.data
     },
     onSuccess,
