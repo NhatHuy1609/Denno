@@ -27,7 +27,9 @@ function PermissionGate<T>({
       return (
         <div className='flex flex-col'>
           {fallback}
-          {process.env.NODE_ENV === 'development' && <small>Reason: {result.reason}</small>}
+          {process.env.NODE_ENV === 'development' && (
+            <small>Reason: {result.reason?.message}</small>
+          )}
         </div>
       )
     }

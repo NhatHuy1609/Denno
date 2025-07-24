@@ -8,22 +8,22 @@ export abstract class BasePolicy<T = any> implements IPolicy<T> {
     return context.user.id === targetUserId
   }
 
-  protected allow(code: PolicyReasonCode): PolicyResult {
+  protected allow(code: PolicyReasonCode, message?: string): PolicyResult {
     return {
       allowed: true,
       reason: {
         code,
-        message: PolicyReasonMessages[code]
+        message: message || PolicyReasonMessages[code]
       }
     }
   }
 
-  protected deny(code: PolicyReasonCode): PolicyResult {
+  protected deny(code: PolicyReasonCode, message?: string): PolicyResult {
     return {
       allowed: false,
       reason: {
         code,
-        message: PolicyReasonMessages[code]
+        message: message || PolicyReasonMessages[code]
       }
     }
   }

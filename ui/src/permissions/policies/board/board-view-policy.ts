@@ -16,11 +16,11 @@ export class BoardViewPolicy extends BoardBasePolicy {
     const targetBoard = board || boardData
 
     if (!user || !targetBoard) {
-      return this.deny('GLOBAL::NOT_AUTHENTICATED_OR_MISSING_BOARD')
+      return this.deny('GLOBAL::MISSING_AUTHENTICATION_OR_BOARD')
     }
 
     if (this.isPublicBoard(targetBoard)) {
-      return this.allow('BOARD::IS_PUBLIC')
+      return this.allow('BOARD::ALLOWED_IS_PUBLIC')
     }
 
     if (this.isWorkspaceBoard(targetBoard)) {
@@ -31,7 +31,7 @@ export class BoardViewPolicy extends BoardBasePolicy {
       return this.evaluatePrivateAccess(context, targetBoard)
     }
 
-    return this.deny('BOARD::UNKNOWN_VISIBILITY')
+    return this.deny('BOARD::INVALID_VISIBILITY')
   }
 
   private isPublicBoard(board: boardTypes.Board): boolean {
@@ -46,7 +46,7 @@ export class BoardViewPolicy extends BoardBasePolicy {
     return this.hasVisibility(board, 'Private')
   }
 
-    private evaluateWorkspaceAccess(context: BoardViewAccessContext, board: boardTypes.Board): PolicyResult {
+  private evaluateWorkspaceAccess(context: BoardViewAccessContext, board: boardTypes.Board): PolicyResult {
     const { user, workspaceData } = context
     const workspaceMembers = workspaceData?.members || []
 
@@ -54,8 +54,8 @@ export class BoardViewPolicy extends BoardBasePolicy {
     const isBoardMember = this.isBoardMember(context, board)
 
     return (isWorkspaceMember || isBoardMember)
-      ? this.allow('BOARD::IS_WORKSPACE_LEVEL')
-      : this.deny('BOARD::USER_NOT_IN_BOARD_OR_WORKSPACE')
+      ? this.allow('BOARD::ALLOWED_IS_WORKSPACE_LEVEL')
+      : this.deny('BOARD::DENIED_USER_NOT_IN_BOARD_OR_WORKSPACE')
   }
 
   private evaluatePrivateAccess(context: BoardViewAccessContext, board: boardTypes.Board): PolicyResult {
@@ -67,8 +67,7 @@ export class BoardViewPolicy extends BoardBasePolicy {
     const isWorkspaceAdmin = includesBy(workspaceAdmins, (m) => m.id === context.user.id)
 
     return (isBoardMember || isWorkspaceAdmin)
-      ? this.allow('BOARD::IS_PRIVATE')
-      : this.deny('BOARD::USER_NOT_IN_BOARD_OR_NOT_WORKSPACE_ADMIN')
+      ? this.allow('BOARD::ALLOWED_IS_PRIVATE')
+      : this.deny('BOARD::DENIED_USER_NOT_IN_BOARD_OR_NOT_WORKSPACE_ADMIN')
   }
 }
-

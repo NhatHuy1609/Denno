@@ -47,7 +47,7 @@ export function mapToBoardJoinRequest(
     ...dto,
     requester: {
       ...dto.requester,
-      fullName: dto.requester.name
+      name: dto.requester.name
     }
   }
 }
