@@ -22,6 +22,7 @@ public class BoardMappingProfile: Profile
 
         CreateMap<BoardMember, BoardMemberResponseDto>()
             .ForMember(dest => dest.MemberId, opt => opt.MapFrom(src => src.AppUserId))
-            .ForMember(dest => dest.Member, opt => opt.MapFrom(src => src.AppUser));
+            .ForMember(dest => dest.Member, opt => opt.MapFrom(src => src.AppUser))
+            .ForMember(dest => dest.BoardMemberRole, opt => opt.MapFrom(src => src.Role));
     }
 }

@@ -3,7 +3,6 @@ import { enumContracts } from '@/service/api/_enums'
 import { userContracts } from '../user'
 import { BoardQueryOptionsDto } from '@/service/api/_models/query-models/board/board.contracts'
 import { UserSchema } from '../user/user.contracts'
-import { WorkspaceSchema } from '../workspace/workspace.contracts'
 import { workspaceContracts } from '../workspace'
 
 export const BoardMemberRoleSchema = z.enum(['Member', 'Admin', 'Observer'])
@@ -19,7 +18,7 @@ export const BoardSchema = z.object({
   members: z.array(z.object({
     memberId: z.string(),
     member: userContracts.UserSchema,
-    boardMemberRole: z.string()
+    boardMemberRole: BoardMemberRoleSchema
   })),
   joinRequests: z.array(z.object({
     id: z.number().int(),

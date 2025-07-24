@@ -5,6 +5,7 @@ import DropdownMenuPrimary, {
   DropdownMenuPrimaryItemProps
 } from '@/app/_components/DropdownMenuPrimary'
 import { enumTypes } from '@/service/api/_enums'
+import { useAssignableBoardRoles } from './useAssignableBoardRoles'
 
 interface BoardMemberItemProps {
   member: userTypes.User
@@ -33,6 +34,13 @@ function BoardMemberItem({ member, memberRole }: BoardMemberItemProps) {
     }
   ]
 
+  const assignableRoles = useAssignableBoardRoles({
+    targetMemberId: member.id
+  })
+
+  console.log('ASSIGNABLE ROLES: ', assignableRoles)
+  console.log('MEMBER ROLE: ', memberRole)
+
   return (
     <div className='flex w-full items-center justify-between gap-3'>
       <Avatar src={member.avatar} size='base' name={member.fullName} />
@@ -44,9 +52,9 @@ function BoardMemberItem({ member, memberRole }: BoardMemberItemProps) {
         </div>
       </div>
       <DropdownMenuPrimary
-        items={boardMemberRoles}
-        triggerTitle={boardMemberRoles.find((role) => role.value === memberRole)?.label}
-        defaultSelectedIndex={boardMemberRoles.findIndex((role) => role.value === memberRole)}
+        items={assignableRoles}
+        triggerTitle={assignableRoles.find((role) => role.value === memberRole)?.label}
+        defaultSelectedIndex={assignableRoles.findIndex((role) => role.value === memberRole)}
         renderOtherItems={() => (
           <div className='flex flex-col px-4 py-2 text-sm text-red-600 hover:bg-gray-100'>
             <span className='font-semibold'>Leave board</span>

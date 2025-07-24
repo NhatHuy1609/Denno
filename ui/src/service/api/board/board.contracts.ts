@@ -14,7 +14,7 @@ const BoardDto = z.object({
   members: z.array(z.object({
     memberId: z.string(),
     member: userContracts.UserSchema,
-    boardMemberRole: z.string()
+    boardMemberRole: enumContracts.BoardMemberRoleEnumSchema
   })),
   joinRequests: z.array(z.object({
     id: z.number().int(),

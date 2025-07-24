@@ -9,12 +9,14 @@ export type PolicyAction =
   | 'delete' 
   | 'approve' 
   | 'reject'
+  | 'assign_role'
 
 export type PolicyResource = 
   | 'user'
   | 'workspace'
   | 'board'
   | 'card'
+  | 'board_member'
 
 export type PolicyContext = {
   user: userTypes.User
@@ -26,6 +28,8 @@ export type PolicyResult = {
   reason?: PolicyReason
 }
 
+// context: includes info about the actor performing the action (e.g. user, environment)
+// resource: represents the target entity being acted upon (e.g. board, card, member)
 export interface IPolicy<T = any> {
   evaluate(context: PolicyContext, resource?: T): PolicyResult
 }
