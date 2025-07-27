@@ -18,7 +18,9 @@ export function useAssignableBoardRoles({
   const { data: currentUser } = useMe()
   const [boardId] = useSyncedLocalStorage(PersistedStateKey.RecentAccessBoard, '')
   const [workspaceId] = useSyncedLocalStorage(PersistedStateKey.RecentAccessWorkspace, '')
-  const { data: boardData } = useBoardQuery(boardId)
+  const { data: boardData } = useBoardQuery(boardId, {
+    includeBoardMembers: true
+  })
   const { data: workspaceData } = useWorkspaceQuery(workspaceId)
 
   const { members: boardMembers } = boardData || {}
@@ -33,7 +35,6 @@ export function useAssignableBoardRoles({
       workspaceOwnerId: workspaceOwnerId || '',
     }
   }, [boardMembers, workspaceOwnerId, currentUser])
-
 
   const roles = useMemo(() => {
     return context ? getAssignableBoardMemberRoles(context, {

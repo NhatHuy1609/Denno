@@ -1,10 +1,7 @@
 import React from 'react'
 import { userTypes } from '@/entities/user'
 import Avatar from '@/ui/components/Avatar'
-import DropdownMenuPrimary, {
-  DropdownMenuPrimaryItemProps
-} from '@/app/_components/DropdownMenuPrimary'
-import { enumTypes } from '@/service/api/_enums'
+import DropdownMenuPrimary from '@/app/_components/DropdownMenuPrimary'
 import { useAssignableBoardRoles } from './useAssignableBoardRoles'
 
 interface BoardMemberItemProps {
@@ -13,33 +10,12 @@ interface BoardMemberItemProps {
 }
 
 function BoardMemberItem({ member, memberRole }: BoardMemberItemProps) {
-  const boardMemberRoles: Array<DropdownMenuPrimaryItemProps<enumTypes.BoardMemberRoleEnum>> = [
-    {
-      value: 'Admin',
-      label: 'Admin',
-      description: '',
-      available: true
-    },
-    {
-      value: 'Member',
-      label: 'Member',
-      description: 'Boards must have at least one admin.',
-      available: true
-    },
-    {
-      value: 'Observer',
-      label: 'Observer',
-      description: 'Add people with limited permissions to this board.',
-      available: true
-    }
-  ]
-
   const assignableRoles = useAssignableBoardRoles({
     targetMemberId: member.id
   })
 
   console.log('ASSIGNABLE ROLES: ', assignableRoles)
-  console.log('MEMBER ROLE: ', memberRole)
+  // console.log('MEMBER ROLE: ', memberRole)
 
   return (
     <div className='flex w-full items-center justify-between gap-3'>
