@@ -28,6 +28,11 @@ export type PolicyReasonCode =
   | 'BOARD_MEMBER_ROLE::REQUIRED_ADMIN_LEVEL'
   | 'BOARD_MEMBER_ROLE::REQUIRED_HIGHER_LEVEL_ASSIGNABLE'
   | 'BOARD_MEMBER_ROLE::INVALID_ROLE'
+  | 'BOARD_MEMBER_ROLE::TARGET_MEMBER_NOT_FOUND'
+  | 'BOARD_MEMBER_ROLE::WORKSPACE_OWNER_MUST_BE_ADMIN'
+  | 'BOARD_MEMBER_ROLE::SELF_ROLE_CHANGE_ALLOWED'
+  | 'BOARD_MEMBER_ROLE::ROLE_CHANGE_ALLOWED'
+  | 'BOARD_MEMBER_ROLE::CANNOT_MODIFY_WORKSPACE_OWNER_ROLE'
 
 // 3. Reason messages
 export const PolicyReasonMessages: Record<PolicyReasonCode, string> = {
@@ -48,7 +53,12 @@ export const PolicyReasonMessages: Record<PolicyReasonCode, string> = {
   'BOARD_MEMBER_ROLE::REQUIRED_AT_LEAST_ONE_OTHER_ADMIN': 'At least one other admin is required.',
   'BOARD_MEMBER_ROLE::REQUIRED_ADMIN_LEVEL': 'You must be a board admin to assign member roles.',
   'BOARD_MEMBER_ROLE::REQUIRED_HIGHER_LEVEL_ASSIGNABLE': 'You can only assign roles lower than your own.',
-  'BOARD_MEMBER_ROLE::INVALID_ROLE': 'The selected role is invalid or not recognized.'
+  'BOARD_MEMBER_ROLE::INVALID_ROLE': 'The selected role is invalid or not recognized.',
+  'BOARD_MEMBER_ROLE::TARGET_MEMBER_NOT_FOUND': 'The target member was not found in the board.',
+  'BOARD_MEMBER_ROLE::WORKSPACE_OWNER_MUST_BE_ADMIN': 'The workspace owner must be an admin.',
+  'BOARD_MEMBER_ROLE::SELF_ROLE_CHANGE_ALLOWED': 'You can change your own role.',
+  'BOARD_MEMBER_ROLE::ROLE_CHANGE_ALLOWED': 'Role change is allowed.',
+  'BOARD_MEMBER_ROLE::CANNOT_MODIFY_WORKSPACE_OWNER_ROLE': 'You cannot modify the workspace owner role.',
 }
 
 export type PolicyReason = {

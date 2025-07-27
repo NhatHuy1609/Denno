@@ -9,7 +9,7 @@ export interface BoardAssignMemberRolePolicyContext extends PolicyContext {
 }
 
 export interface BoardAssignMemberRolePolicyResource {
-  targetRole?: boardTypes.BoardMemberRole
+  targetRole: boardTypes.BoardMemberRole
   targetMemberId: string
 }
 
@@ -18,32 +18,92 @@ export class BoardAssignMemberRolePolicy extends BasePolicy {
     context: BoardAssignMemberRolePolicyContext, 
     resource: BoardAssignMemberRolePolicyResource
   ): PolicyResult {
-    const { targetRole } = resource || {}
+    const { targetRole, targetMemberId } = resource || {}
 
     if (!this.isAdminMember(context)) {
       return this.deny('BOARD_MEMBER_ROLE::DENIED_INSUFFICIENT_PERMISSION')
     }
 
-    if (targetRole === 'Member') {
-      return this.evaluateAssignMemberRole(context, resource)
+    if (!this.isValidRole(targetRole)) {
+      return this.deny('BOARD_MEMBER_ROLE::INVALID_ROLE')
     }
 
-    if (targetRole === 'Admin') {
-      return this.evaluateAssignAdminRole(context)
+    const targetMember = this.getTargetMember(context, targetMemberId)
+    if (!targetMember) {
+      return this.deny('BOARD_MEMBER_ROLE::TARGET_MEMBER_NOT_FOUND')
     }
 
-    if (targetRole === 'Observer') {
-      return this.evaluateAssignObserverRole(context, resource)
+    if (targetMemberId === context.workspaceOwnerId && context.user.id !== context.workspaceOwnerId) {
+      return this.deny('BOARD_MEMBER_ROLE::WORKSPACE_OWNER_MUST_BE_ADMIN')
     }
 
-    return this.deny('BOARD_MEMBER_ROLE::INVALID_ROLE')
+    if (targetMemberId === context.user.id) {
+      return this.evaluateSelfRoleChange(context, targetMember, targetRole)
+    }
+
+    return this.evaluateOtherMemberRoleChange(context, targetMember, targetRole)
+  }
+
+  private evaluateSelfRoleChange(
+    context: BoardAssignMemberRolePolicyContext,
+    targetMember: boardTypes.Board['members'][0],
+    targetRole: boardTypes.BoardMemberRole
+  ): PolicyResult {
+    const currentRole = targetMember.boardMemberRole
+    
+    // Admin không thể tự hạ cấp nếu là admin duy nhất
+    if (currentRole === 'Admin' && targetRole !== 'Admin') {
+      const adminCount = this.getAdminCount(context.boardMembers)
+      if (adminCount <= 1) {
+        return this.deny('BOARD_MEMBER_ROLE::REQUIRED_AT_LEAST_ONE_OTHER_ADMIN')
+      }
+    }
+
+    // Workspace owner không thể tự hạ cấp xuống dưới Admin
+    if (context.user.id === context.workspaceOwnerId && targetRole !== 'Admin') {
+      return this.deny('BOARD_MEMBER_ROLE::REQUIRED_AT_LEAST_ONE_OTHER_ADMIN')
+    }
+
+    return this.allow('BOARD_MEMBER_ROLE::SELF_ROLE_CHANGE_ALLOWED')
+  }
+
+  private evaluateOtherMemberRoleChange(
+    context: BoardAssignMemberRolePolicyContext,
+    targetMember: boardTypes.Board['members'][0],
+    targetRole: boardTypes.BoardMemberRole
+  ): PolicyResult {
+    const currentUserRole = this.getCurrentUserRole(context)
+    const targetCurrentRole = targetMember.boardMemberRole
+    
+    const currentUserHierarchy = this.getRoleHierarchy(currentUserRole)
+    const targetCurrentHierarchy = this.getRoleHierarchy(targetCurrentRole)
+    const targetNewHierarchy = this.getRoleHierarchy(targetRole)
+
+    // Không thể thay đổi role của người có cấp bậc bằng hoặc cao hơn mình
+    if (targetCurrentHierarchy >= currentUserHierarchy) {
+      return this.deny('BOARD_MEMBER_ROLE::DENIED_INSUFFICIENT_PERMISSION')
+    }
+
+    // Kiểm tra đặc biệt cho việc hạ cấp admin
+    if (targetCurrentRole === 'Admin' && targetRole !== 'Admin') {
+      const adminCount = this.getAdminCount(context.boardMembers)
+      if (adminCount <= 1) {
+        return this.deny('BOARD_MEMBER_ROLE::REQUIRED_AT_LEAST_ONE_OTHER_ADMIN')
+      }
+    }
+
+    // Workspace owner chỉ có thể được thay đổi bởi chính họ
+    if (targetMember.memberId === context.workspaceOwnerId) {
+      return this.deny('BOARD_MEMBER_ROLE::CANNOT_MODIFY_WORKSPACE_OWNER_ROLE')
+    }
+
+    return this.allow('BOARD_MEMBER_ROLE::ROLE_CHANGE_ALLOWED')
   }
 
   private isAdminMember(context: BoardAssignMemberRolePolicyContext) {
     const { user, boardMembers } = context
-    return boardMembers.some(
-      member => member.boardMemberRole === 'Admin' &&
-      member.memberId === user.id
+    return boardMembers.find(
+      member => member.boardMemberRole === 'Admin' && member.memberId === user.id
     )
   }
 
@@ -104,6 +164,25 @@ export class BoardAssignMemberRolePolicy extends BasePolicy {
     }
 
     return this.allow('BOARD_MEMBER_ROLE::ALLOWED_MEMBER_LEVEL_ASSIGNABLE')
+  }
+
+  private getCurrentUserRole(context: BoardAssignMemberRolePolicyContext): boardTypes.BoardMemberRole | undefined {
+    return context.boardMembers.find(member => member.memberId === context.user.id)?.boardMemberRole
+  }
+
+  private getAdminCount(boardMembers: boardTypes.Board['members']): number {
+    return boardMembers.filter(member => member.boardMemberRole === 'Admin').length
+  }
+
+  private getTargetMember(
+    context: BoardAssignMemberRolePolicyContext, 
+    targetMemberId: string
+  ): boardTypes.Board['members'][0] | undefined {
+    return context.boardMembers.find(member => member.memberId === targetMemberId)
+  }
+
+  private isValidRole(role: string): role is boardTypes.BoardMemberRole {
+    return ['Observer', 'Member', 'Admin'].includes(role)
   }
   
   private getRoleHierarchy(role?: boardTypes.BoardMemberRole): number {

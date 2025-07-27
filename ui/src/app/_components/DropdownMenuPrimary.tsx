@@ -18,6 +18,7 @@ export interface DropdownMenuPrimaryItemProps<T> {
 }
 
 interface DropdownMenuPrimaryProps<T> {
+  disabled?: boolean
   contentTitle?: string
   triggerTitle?: string
   triggerClassName?: string
@@ -29,6 +30,7 @@ interface DropdownMenuPrimaryProps<T> {
 }
 
 function DropdownMenuPrimary<T>({
+  disabled = false,
   contentTitle,
   triggerTitle,
   triggerClassName,

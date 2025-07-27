@@ -62,10 +62,12 @@ export function getAssignableBoardMemberRoles(
         }),
         mapPolicyResult: (result) => {
           const { reason: { code } = {} } = result
-          if (code === 'BOARD_MEMBER_ROLE::REQUIRED_ADMIN_LEVEL') {
-            return 'Boards must have at least one admin'
+          switch (code){
+            case 'BOARD_MEMBER_ROLE::REQUIRED_AT_LEAST_ONE_OTHER_ADMIN':
+              return 'Boards must have at least one admin'
+            default: 
+              return ''
           }
-          return ''
         }
       }
     ],
