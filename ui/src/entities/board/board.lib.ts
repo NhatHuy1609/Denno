@@ -1,6 +1,7 @@
+import { boardTypes } from ".";
+import { boardTypesDto } from "@/service/api/board";
 import { InvitationSecret } from "../invitationSecret/invitationSecret.types";
 import { Board, BoardJoinRequest, BoardJoinRequests, Boards, DetailedBoardInvitation } from "./board.types";
-import { boardTypesDto } from "@/service/api/board";
 
 export function transformBoardDtoToBoard(
   boardDto: boardTypesDto.BoardResponseDto
@@ -56,4 +57,18 @@ export function mapToBoardJoinRequests(
   dto: boardTypesDto.BoardJoinRequestsResponseDto
 ): BoardJoinRequests {
   return dto.map(boardJoinRequest => mapToBoardJoinRequest(boardJoinRequest))
+}
+
+export function getRoleHierarchy(role?: boardTypes.BoardMemberRole): number {
+  if (!role) {
+    return 0
+  }
+
+  const hierarchy = {
+    Observer: 1,
+    Member: 2,
+    Admin: 3
+  }
+
+  return hierarchy[role] || 0
 }

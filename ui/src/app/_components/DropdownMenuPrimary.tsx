@@ -57,7 +57,11 @@ function DropdownMenuPrimary<T>({
 
   return (
     <DropdownMenu onOpenChange={setIsOpen} open={isOpen}>
-      <DropdownMenuTrigger asChild className={cn('min-w-32 justify-center', triggerClassName)}>
+      <DropdownMenuTrigger
+        disabled={disabled}
+        asChild
+        className={cn('min-w-32 justify-center', triggerClassName)}
+      >
         <CustomizableButton
           size='medium'
           intent='secondary'

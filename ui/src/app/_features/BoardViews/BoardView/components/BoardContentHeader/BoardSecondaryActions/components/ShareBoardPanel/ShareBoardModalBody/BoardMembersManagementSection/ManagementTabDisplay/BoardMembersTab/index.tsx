@@ -1,7 +1,6 @@
 import React from 'react'
 import { useBoardQuery } from '@/app/_hooks/query'
 import { PersistedStateKey } from '@/data/persisted-keys'
-import { getLocalStorageItem } from '@/utils/local-storage'
 import WaterFallLoading from '@/app/_components/Loadings/WaterFallLoading'
 import BoardMemberItem from './BoardMemberItem'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'

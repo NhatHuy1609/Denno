@@ -1,6 +1,6 @@
 import { useMe } from "@/app/_hooks/query/user/useMe"
 import { PolicyEngine } from "../core/policy-engine"
-import { PolicyAction, PolicyContext, PolicyResource } from "../core/types"
+import { PolicyAction, PolicyContext, PolicyResource } from "../types"
 
 export const usePermissions = () => {
   const {data: currentUser } = useMe()

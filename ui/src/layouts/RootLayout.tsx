@@ -7,7 +7,7 @@ import { QueryClientProvider } from '@/app/_providers/QueryClientProvider'
 import { Toaster } from '@/ui'
 import { SignalRProvider } from '@/app/_providers/SignalRProvider/SignalRProvider'
 import { TooltipProvider } from '@/ui/components/Tooltip'
-import { PolicyInitializer } from '@/permissions'
+import { PolicyInitializer } from '@/permissions/policy-initializer'
 
 const ThemeProviderComp = dynamic(() => import('@/app/_components/ThemeProviderComp'), {
   ssr: false

@@ -3,6 +3,11 @@ import { userTypes } from '@/entities/user'
 import Avatar from '@/ui/components/Avatar'
 import DropdownMenuPrimary from '@/app/_components/DropdownMenuPrimary'
 import { useAssignableBoardRoles } from './useAssignableBoardRoles'
+import { useMe } from '@/app/_hooks/query/user/useMe'
+import { boardLib, boardTypes } from '@/entities/board'
+import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
+import { PersistedStateKey } from '@/data/persisted-keys'
+import { useBoardMembers } from '@/app/_hooks/query/board/useBoardMembers'
 
 interface BoardMemberItemProps {
   member: userTypes.User
@@ -14,8 +19,19 @@ function BoardMemberItem({ member, memberRole }: BoardMemberItemProps) {
     targetMemberId: member.id
   })
 
-  console.log('ASSIGNABLE ROLES: ', assignableRoles)
-  // console.log('MEMBER ROLE: ', memberRole)
+  const [boardId] = useSyncedLocalStorage(PersistedStateKey.RecentAccessBoard, '')
+  const { data: currentUser } = useMe()
+  const { boardMembers } = useBoardMembers(boardId)
+
+  // Decide if the user can assign a role to the member
+  const currentUserBoardMemberRole = boardMembers.find(
+    (member) => member.memberId === currentUser?.id
+  )?.boardMemberRole
+
+  const canAssignRole =
+    boardLib.getRoleHierarchy(currentUserBoardMemberRole) >
+      boardLib.getRoleHierarchy(memberRole as boardTypes.BoardMemberRole) ||
+    currentUser?.id === member.id
 
   return (
     <div className='flex w-full items-center justify-between gap-3'>
@@ -28,15 +44,16 @@ function BoardMemberItem({ member, memberRole }: BoardMemberItemProps) {
         </div>
       </div>
       <DropdownMenuPrimary
+        disabled={!canAssignRole}
         items={assignableRoles}
         triggerTitle={assignableRoles.find((role) => role.value === memberRole)?.label}
         defaultSelectedIndex={assignableRoles.findIndex((role) => role.value === memberRole)}
         renderOtherItems={() => (
           <div className='flex flex-col px-4 py-2 text-sm text-red-600 hover:bg-gray-100'>
             <span className='font-semibold'>Leave board</span>
-            <span className='text-gray-500'>Boards must have at least one admin.</span>
           </div>
         )}
+        contentClassName='min-w-[290px]'
       />
     </div>
   )

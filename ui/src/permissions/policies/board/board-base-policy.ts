@@ -1,7 +1,8 @@
 import { boardTypes } from "@/entities/board";
-import { BasePolicy } from "../../core/base-policy";
-import { PolicyContext, PolicyResult } from "@/permissions/core/types";
+import { BasePolicy } from "../base-policy";
 import { includesBy } from "@/utils/includesBy";
+import { PolicyContext } from "@/permissions/types/policy-context";
+import { PolicyResult } from "@/permissions/types/policy-result";
 
 export abstract class BoardBasePolicy extends BasePolicy<boardTypes.Board> {
   abstract evaluate(context: PolicyContext, resource?: boardTypes.Board): PolicyResult

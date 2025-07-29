@@ -1,12 +1,11 @@
-import { 
-  PolicyAction, 
-  PolicyResource, 
-  PolicyContext, 
-  PolicyResult,
-  PolicyKey,
-} from './types'
+
 import { PolicyRegistry } from './policy-registry'
-import { PolicyReasonMessages } from './types/result-reasons'
+import { PolicyReasonMessages } from '../result-reasons'
+import { PolicyAction } from '../types/policy-actionts'
+import { PolicyResource } from '../types/policy-resources'
+import { PolicyContext } from '../types/policy-context'
+import { PolicyResult } from '../types/policy-result'
+import { PolicyKey } from '../types/policy'
 
 export class PolicyEngine {
   can<T = any>(
@@ -25,15 +24,15 @@ export class PolicyEngine {
     context: PolicyContext,
     resourceData?: T
   ): PolicyResult {
-    const policyKey: PolicyKey = `${action}:${resource}`
+    const policyKey: PolicyKey = `${resource}:${action}`
     const policy = PolicyRegistry.get(policyKey)
 
     if (!policy) {
       return {
         allowed: false,
         reason: {
-          code: 'POLICY::NOT_FOUND',
-          message: PolicyReasonMessages['POLICY::NOT_FOUND']
+          code: 'POLICY::DENIED_NOT_FOUND',
+          message: PolicyReasonMessages['POLICY::DENIED_NOT_FOUND']
         }
       }
     }
