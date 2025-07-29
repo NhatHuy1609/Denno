@@ -1,7 +1,8 @@
 import type { boardTypes } from "@/entities/board";
-import type { PolicyContext, PolicyResult } from "@/permissions/core/types";
 import type { workspaceTypes } from "@/entities/workspace";
-import { BasePolicy } from "@/permissions/core/base-policy";
+import { BasePolicy } from "@/permissions/policies/base-policy";
+import { PolicyContext } from "@/permissions/types/policy-context";
+import { PolicyResult } from "@/permissions/types/policy-result";
 
 export interface BoardAssignMemberRolePolicyContext extends PolicyContext {
   workspaceOwnerId: workspaceTypes.Workspace['idOwner']
@@ -20,23 +21,28 @@ export class BoardAssignMemberRolePolicy extends BasePolicy {
   ): PolicyResult {
     const { targetRole, targetMemberId } = resource || {}
 
-    if (!this.isAdminMember(context)) {
+    // Check permission: must be Admin or Workspace Owner
+    if (!this.canAssignRole(context)) {
       return this.deny('BOARD_MEMBER_ROLE::DENIED_INSUFFICIENT_PERMISSION')
     }
 
+    // Check if target role is valid
     if (!this.isValidRole(targetRole)) {
       return this.deny('BOARD_MEMBER_ROLE::INVALID_ROLE')
     }
 
+    // Get target member info
     const targetMember = this.getTargetMember(context, targetMemberId)
     if (!targetMember) {
       return this.deny('BOARD_MEMBER_ROLE::TARGET_MEMBER_NOT_FOUND')
     }
 
+    // If the target is the workspace owner – only the owner can modify their own role
     if (targetMemberId === context.workspaceOwnerId && context.user.id !== context.workspaceOwnerId) {
       return this.deny('BOARD_MEMBER_ROLE::WORKSPACE_OWNER_MUST_BE_ADMIN')
     }
 
+    // Distinguish between self-role change and modifying others' roles
     if (targetMemberId === context.user.id) {
       return this.evaluateSelfRoleChange(context, targetMember, targetRole)
     }
@@ -51,7 +57,7 @@ export class BoardAssignMemberRolePolicy extends BasePolicy {
   ): PolicyResult {
     const currentRole = targetMember.boardMemberRole
     
-    // Admin không thể tự hạ cấp nếu là admin duy nhất
+    // Admin cannot demote themselves if they are the only admin
     if (currentRole === 'Admin' && targetRole !== 'Admin') {
       const adminCount = this.getAdminCount(context.boardMembers)
       if (adminCount <= 1) {
@@ -59,7 +65,7 @@ export class BoardAssignMemberRolePolicy extends BasePolicy {
       }
     }
 
-    // Workspace owner không thể tự hạ cấp xuống dưới Admin
+    // Workspace owner must remain at least Admin
     if (context.user.id === context.workspaceOwnerId && targetRole !== 'Admin') {
       return this.deny('BOARD_MEMBER_ROLE::REQUIRED_AT_LEAST_ONE_OTHER_ADMIN')
     }
@@ -77,14 +83,13 @@ export class BoardAssignMemberRolePolicy extends BasePolicy {
     
     const currentUserHierarchy = this.getRoleHierarchy(currentUserRole)
     const targetCurrentHierarchy = this.getRoleHierarchy(targetCurrentRole)
-    const targetNewHierarchy = this.getRoleHierarchy(targetRole)
 
-    // Không thể thay đổi role của người có cấp bậc bằng hoặc cao hơn mình
+    // Cannot modify roles of members with equal or higher role
     if (targetCurrentHierarchy >= currentUserHierarchy) {
       return this.deny('BOARD_MEMBER_ROLE::DENIED_INSUFFICIENT_PERMISSION')
     }
 
-    // Kiểm tra đặc biệt cho việc hạ cấp admin
+    // Special case: demoting an admin
     if (targetCurrentRole === 'Admin' && targetRole !== 'Admin') {
       const adminCount = this.getAdminCount(context.boardMembers)
       if (adminCount <= 1) {
@@ -92,7 +97,7 @@ export class BoardAssignMemberRolePolicy extends BasePolicy {
       }
     }
 
-    // Workspace owner chỉ có thể được thay đổi bởi chính họ
+    // Workspace owner's role can only be changed by themselves
     if (targetMember.memberId === context.workspaceOwnerId) {
       return this.deny('BOARD_MEMBER_ROLE::CANNOT_MODIFY_WORKSPACE_OWNER_ROLE')
     }
@@ -100,70 +105,29 @@ export class BoardAssignMemberRolePolicy extends BasePolicy {
     return this.allow('BOARD_MEMBER_ROLE::ROLE_CHANGE_ALLOWED')
   }
 
-  private isAdminMember(context: BoardAssignMemberRolePolicyContext) {
+/**
+   * Check if the current user has permission to assign roles
+   * (must be Admin or Workspace Owner)
+   */
+  private canAssignRole(context: BoardAssignMemberRolePolicyContext): boolean {
+    return this.isAdminMember(context) || this.isWorkspaceOwner(context)
+  }
+
+  /**
+   * Check if the current user is the workspace owner
+   */
+  private isWorkspaceOwner(context: BoardAssignMemberRolePolicyContext): boolean {
+    return context.user.id === context.workspaceOwnerId
+  }
+
+  /**
+   * Check if the current user is an admin member
+   */
+  private isAdminMember(context: BoardAssignMemberRolePolicyContext): boolean {
     const { user, boardMembers } = context
-    return boardMembers.find(
+    return boardMembers.some(
       member => member.boardMemberRole === 'Admin' && member.memberId === user.id
     )
-  }
-
-  evaluateAssignObserverRole(
-    context: BoardAssignMemberRolePolicyContext,
-    resource: BoardAssignMemberRolePolicyResource  
-  ): PolicyResult {
-    
-    const { boardMembers, workspaceOwnerId } = context
-    const { targetMemberId } = resource
-    
-    const boardAdmins = boardMembers.filter(member => member.boardMemberRole === 'Admin')
-    // If board only has 1 admin
-    if (boardAdmins.length < 2) {
-      return this.deny('BOARD_MEMBER_ROLE::REQUIRED_AT_LEAST_ONE_OTHER_ADMIN')
-    }
-
-    if (targetMemberId === workspaceOwnerId) {
-      return this.deny('BOARD_MEMBER_ROLE::DENIED_INSUFFICIENT_PERMISSION')
-    }
-
-    return this.allow('BOARD_MEMBER_ROLE::ALLOWED_OBSERVER_LEVEL_ASSIGNABLE')
-  }
-
-  private evaluateAssignAdminRole(
-    context: BoardAssignMemberRolePolicyContext,
-  ): PolicyResult {
-    const { user, boardMembers } = context
-    const currentUserRole = boardMembers.find(member => member.memberId === user.id)?.boardMemberRole
-    const currentUserRoleHierarchy = this.getRoleHierarchy(currentUserRole)
-
-    if (currentUserRoleHierarchy < 3) {
-      return this.deny('BOARD_MEMBER_ROLE::REQUIRED_ADMIN_LEVEL')
-    }
-
-    return this.allow('BOARD_MEMBER_ROLE::ALLOWED_ADMIN_LEVEL_ASSIGNABLE')
-  }
-
-  private evaluateAssignMemberRole(
-    context: BoardAssignMemberRolePolicyContext,
-    resource: BoardAssignMemberRolePolicyResource
-  ): PolicyResult {
-    const { user, boardMembers } = context
-    const { targetRole } = resource
-    const currentUserRole = boardMembers.find(member => member.memberId === user.id)?.boardMemberRole
-    
-    const boardAdmins = boardMembers.filter(member => member.boardMemberRole === 'Admin')
-    // If board only has 1 admin
-    if (boardAdmins.length < 2) {
-      return this.deny('BOARD_MEMBER_ROLE::REQUIRED_AT_LEAST_ONE_OTHER_ADMIN')
-    }
-    
-    const targetRoleHierarchy = this.getRoleHierarchy(targetRole)
-    const currentUserRoleHierarchy = this.getRoleHierarchy(currentUserRole)
-    // If current user doesn't have higher role than target role
-    if (currentUserRoleHierarchy < targetRoleHierarchy) {
-      return this.deny('BOARD_MEMBER_ROLE::REQUIRED_HIGHER_LEVEL_ASSIGNABLE')
-    }
-
-    return this.allow('BOARD_MEMBER_ROLE::ALLOWED_MEMBER_LEVEL_ASSIGNABLE')
   }
 
   private getCurrentUserRole(context: BoardAssignMemberRolePolicyContext): boardTypes.BoardMemberRole | undefined {

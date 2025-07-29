@@ -1,4 +1,4 @@
-import { PolicyKey, IPolicy } from "./types"
+import { IPolicy, PolicyKey } from "../types/policy"
 
 export class PolicyRegistry {
   private static policies = new Map<PolicyKey, IPolicy>()

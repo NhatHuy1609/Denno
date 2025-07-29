@@ -1,5 +1,5 @@
 import { PolicyEngine } from "../core/policy-engine"
-import type { PolicyAction, PolicyContext, PolicyResource, PolicyResult } from "../core/types"
+import type { PolicyAction, PolicyContext, PolicyResource, PolicyResult } from "../types"
 
 export function evaluateDynamicDropdownItems<TBase, TDynamic = {}>(
   items: TBase[],

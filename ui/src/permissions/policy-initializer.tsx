@@ -7,8 +7,8 @@ export const PolicyInitializer = () => {
   const initializePolicies = () => {
     console.log('Initializing policies...') // DEBUG
 
-    PolicyRegistry.register('view:board', new BoardViewPolicy())
-    PolicyRegistry.register('assign_role:board_member', new BoardAssignMemberRolePolicy())
+    PolicyRegistry.register('board:view', new BoardViewPolicy())
+    PolicyRegistry.register('board:board_assign_member_role', new BoardAssignMemberRolePolicy())
   }
 
   useEffect(() => {

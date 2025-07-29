@@ -1,5 +1,7 @@
-import { IPolicy, PolicyContext, PolicyResult } from "./types";
-import { PolicyReasonCode, PolicyReasonMessages } from "./types/result-reasons";
+import { PolicyReasonCode, PolicyReasonMessages } from "../result-reasons";
+import { IPolicy } from "../types/policy";
+import { PolicyContext } from "../types/policy-context";
+import { PolicyResult } from "../types/policy-result";
 
 export abstract class BasePolicy<T = any> implements IPolicy<T> {
   abstract evaluate(context: PolicyContext, resource?: T): PolicyResult

@@ -21,12 +21,7 @@ export type PolicyReasonCode =
   | 'BOARD::INVALID_VISIBILITY'
     // Board's member
   | 'BOARD_MEMBER_ROLE::DENIED_INSUFFICIENT_PERMISSION'
-  | 'BOARD_MEMBER_ROLE::ALLOWED_MEMBER_LEVEL_ASSIGNABLE'
-  | 'BOARD_MEMBER_ROLE::ALLOWED_ADMIN_LEVEL_ASSIGNABLE'
-  | 'BOARD_MEMBER_ROLE::ALLOWED_OBSERVER_LEVEL_ASSIGNABLE'
   | 'BOARD_MEMBER_ROLE::REQUIRED_AT_LEAST_ONE_OTHER_ADMIN'
-  | 'BOARD_MEMBER_ROLE::REQUIRED_ADMIN_LEVEL'
-  | 'BOARD_MEMBER_ROLE::REQUIRED_HIGHER_LEVEL_ASSIGNABLE'
   | 'BOARD_MEMBER_ROLE::INVALID_ROLE'
   | 'BOARD_MEMBER_ROLE::TARGET_MEMBER_NOT_FOUND'
   | 'BOARD_MEMBER_ROLE::WORKSPACE_OWNER_MUST_BE_ADMIN'
@@ -47,12 +42,7 @@ export const PolicyReasonMessages: Record<PolicyReasonCode, string> = {
   'BOARD::INVALID_VISIBILITY': 'Unknown board visibility type.',
   // Board's member
   'BOARD_MEMBER_ROLE::DENIED_INSUFFICIENT_PERMISSION': 'You do not have permission to assign member roles.',
-  'BOARD_MEMBER_ROLE::ALLOWED_MEMBER_LEVEL_ASSIGNABLE': 'Member level is assignable.',
-  'BOARD_MEMBER_ROLE::ALLOWED_ADMIN_LEVEL_ASSIGNABLE': 'Admin level is assignable.',
-  'BOARD_MEMBER_ROLE::ALLOWED_OBSERVER_LEVEL_ASSIGNABLE': 'Observer level is assignable.',
   'BOARD_MEMBER_ROLE::REQUIRED_AT_LEAST_ONE_OTHER_ADMIN': 'At least one other admin is required.',
-  'BOARD_MEMBER_ROLE::REQUIRED_ADMIN_LEVEL': 'You must be a board admin to assign member roles.',
-  'BOARD_MEMBER_ROLE::REQUIRED_HIGHER_LEVEL_ASSIGNABLE': 'You can only assign roles lower than your own.',
   'BOARD_MEMBER_ROLE::INVALID_ROLE': 'The selected role is invalid or not recognized.',
   'BOARD_MEMBER_ROLE::TARGET_MEMBER_NOT_FOUND': 'The target member was not found in the board.',
   'BOARD_MEMBER_ROLE::WORKSPACE_OWNER_MUST_BE_ADMIN': 'The workspace owner must be an admin.',

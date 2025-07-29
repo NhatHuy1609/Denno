@@ -1,9 +1,10 @@
 import { boardTypes } from "@/entities/board";
 import { filterBy } from "@/utils/filterBy";
 import { includesBy } from "@/utils/includesBy";
-import { PolicyContext, PolicyResult } from "@/permissions/core/types";
 import { workspaceTypes } from "@/entities/workspace";
 import { BoardBasePolicy } from "./board-base-policy";
+import { PolicyContext } from "@/permissions/types/policy-context";
+import { PolicyResult } from "@/permissions/types/policy-result";
 
 export interface BoardViewAccessContext extends PolicyContext {
   boardData?: boardTypes.Board
