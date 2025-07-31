@@ -1,6 +1,7 @@
 import React from 'react'
 import { usePermissions } from '../hooks/usePermissions'
-import { PolicyAction, PolicyResource } from '../types'
+import { PolicyAction } from '../types/policy-actions'
+import { PolicyResource } from '../types/policy-resources'
 
 interface PermissionGateProps<T = any> {
   action: PolicyAction

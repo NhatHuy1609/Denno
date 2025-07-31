@@ -1,13 +1,10 @@
 import React from 'react'
-import { userTypes } from '@/entities/user'
+import type { userTypes } from '@/entities/user'
 import Avatar from '@/ui/components/Avatar'
 import DropdownMenuPrimary from '@/app/_components/DropdownMenuPrimary'
 import { useAssignableBoardRoles } from './useAssignableBoardRoles'
-import { useMe } from '@/app/_hooks/query/user/useMe'
-import { boardLib, boardTypes } from '@/entities/board'
-import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
-import { PersistedStateKey } from '@/data/persisted-keys'
-import { useBoardMembers } from '@/app/_hooks/query/board/useBoardMembers'
+import { useBoardAssignMemberRole } from '@/app/_features/BoardViews/BoardView/components/BoardContentHeader/BoardSecondaryActions/components/ShareBoardPanel/ShareBoardModalBody/BoardMembersManagementSection/ManagementTabDisplay/BoardMembersTab/useBoardAssignMemberRole'
+import { boardTypes } from '@/entities/board'
 
 interface BoardMemberItemProps {
   member: userTypes.User
@@ -15,23 +12,15 @@ interface BoardMemberItemProps {
 }
 
 function BoardMemberItem({ member, memberRole }: BoardMemberItemProps) {
-  const assignableRoles = useAssignableBoardRoles({
+  const { roles: assignableRoles } = useAssignableBoardRoles({
     targetMemberId: member.id
   })
 
-  const [boardId] = useSyncedLocalStorage(PersistedStateKey.RecentAccessBoard, '')
-  const { data: currentUser } = useMe()
-  const { boardMembers } = useBoardMembers(boardId)
-
   // Decide if the user can assign a role to the member
-  const currentUserBoardMemberRole = boardMembers.find(
-    (member) => member.memberId === currentUser?.id
-  )?.boardMemberRole
-
-  const canAssignRole =
-    boardLib.getRoleHierarchy(currentUserBoardMemberRole) >
-      boardLib.getRoleHierarchy(memberRole as boardTypes.BoardMemberRole) ||
-    currentUser?.id === member.id
+  // const { canAssign: canAssignMemberRole } = useBoardAssignMemberRole({
+  //   targetMemberId: member.id,
+  //   targetMemberRole: memberRole as boardTypes.BoardMemberRole
+  // })
 
   return (
     <div className='flex w-full items-center justify-between gap-3'>
@@ -44,7 +33,7 @@ function BoardMemberItem({ member, memberRole }: BoardMemberItemProps) {
         </div>
       </div>
       <DropdownMenuPrimary
-        disabled={!canAssignRole}
+        // disabled={!canAssignMemberRole}
         items={assignableRoles}
         triggerTitle={assignableRoles.find((role) => role.value === memberRole)?.label}
         defaultSelectedIndex={assignableRoles.findIndex((role) => role.value === memberRole)}

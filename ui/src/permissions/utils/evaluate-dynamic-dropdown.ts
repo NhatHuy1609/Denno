@@ -1,5 +1,8 @@
 import { PolicyEngine } from "../core/policy-engine"
-import type { PolicyAction, PolicyContext, PolicyResource, PolicyResult } from "../types"
+import { PolicyAction } from "../types/policy-actions"
+import { PolicyContext } from "../types/policy-context"
+import { PolicyResource } from "../types/policy-resources"
+import { PolicyResult } from "../types/policy-result"
 
 export function evaluateDynamicDropdownItems<TBase, TDynamic = {}>(
   items: TBase[],
@@ -7,7 +10,7 @@ export function evaluateDynamicDropdownItems<TBase, TDynamic = {}>(
     propertyName: keyof TDynamic
     action: PolicyAction,
     resource: PolicyResource,
-    mapItemToPolicyResource: (item: TBase, context: PolicyContext, resourceData?: any) => any,
+    mapItemToPolicyContext: (item: TBase, context: PolicyContext, resourceData?: any) => any,
     mapPolicyResult?: (result: PolicyResult) => any
   }>,
   context: PolicyContext,
@@ -20,17 +23,17 @@ export function evaluateDynamicDropdownItems<TBase, TDynamic = {}>(
 
     // Evaluate each dynamic property using its specific policy
     propertyEvaluators.forEach(evaluator => {
-      if (!evaluator.mapItemToPolicyResource) {
+      if (!evaluator.mapItemToPolicyContext) {
         throw new Error(`Missing mapItemToPolicyResource for property ${String(evaluator.propertyName)}`)
       }
 
-      const itemResourceData = evaluator.mapItemToPolicyResource(item, context, resourceData)
+      const itemContextData = evaluator.mapItemToPolicyContext(item, context, resourceData)
 
       const result = policyEngine.canWithReason(
         evaluator.action,
         evaluator.resource,
-        context,
-        itemResourceData
+        itemContextData,
+        resourceData
       )
 
       // Map policy result to property value
