@@ -3,7 +3,7 @@ import { useMe } from "@/app/_hooks/query/user/useMe"
 import { PolicyEngine } from "../core/policy-engine"
 import { BoardViewAccessContext } from "../policies/board/board-view-policy"
 
-function useBoardPolicyAccess(boardId: string) {
+function useBoardViewPolicy(boardId: string) {
   const { data: currentUser } = useMe()
   
   const { data: boardData } = useBoardQuery(boardId, {
@@ -15,7 +15,7 @@ function useBoardPolicyAccess(boardId: string) {
     members: true
   })
 
-  // Initialize policy engine for permissions check
+  // Initialize policy engine for policy check
   const policyEngine = new PolicyEngine()
 
   if (!currentUser) {
@@ -44,4 +44,4 @@ function useBoardPolicyAccess(boardId: string) {
   }
 }
 
-export default useBoardPolicyAccess
+export default useBoardViewPolicy

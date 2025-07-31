@@ -1,7 +1,7 @@
 
 import { PolicyRegistry } from './policy-registry'
 import { PolicyReasonMessages } from '../result-reasons'
-import { PolicyAction } from '../types/policy-actionts'
+import { PolicyAction } from '../types/policy-actions'
 import { PolicyResource } from '../types/policy-resources'
 import { PolicyContext } from '../types/policy-context'
 import { PolicyResult } from '../types/policy-result'

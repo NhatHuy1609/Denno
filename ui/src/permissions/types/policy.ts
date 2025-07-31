@@ -1,4 +1,4 @@
-import { PolicyAction } from "./policy-actionts"
+import { PolicyAction } from "./policy-actions"
 import { PolicyContext } from "./policy-context"
 import { PolicyResource } from "./policy-resources"
 import { PolicyResult } from "./policy-result"

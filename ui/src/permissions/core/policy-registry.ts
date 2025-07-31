@@ -1,9 +1,12 @@
 import { IPolicy, PolicyKey } from "../types/policy"
+import { PolicyAction } from "../types/policy-actions"
+import { PolicyResource } from "../types/policy-resources"
 
 export class PolicyRegistry {
   private static policies = new Map<PolicyKey, IPolicy>()
 
-  static register<T = any>(key: PolicyKey, policy: IPolicy<T>): void {
+  static register<T = any>(resource: PolicyResource, action: PolicyAction, policy: IPolicy<T>): void {
+    const key = `${resource}:${action}` as PolicyKey
     this.policies.set(key, policy)
   }
 

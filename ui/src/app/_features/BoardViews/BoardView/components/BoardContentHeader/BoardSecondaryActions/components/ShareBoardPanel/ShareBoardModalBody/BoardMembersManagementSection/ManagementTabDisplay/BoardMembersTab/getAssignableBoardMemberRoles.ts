@@ -1,7 +1,8 @@
 import type { boardTypes } from "@/entities/board";
-import type { PolicyContext } from "@/permissions/core/types";
 import type { DropdownMenuPrimaryItemProps } from "@/app/_components/DropdownMenuPrimary";
 import { evaluateDynamicDropdownItems } from "@/permissions/utils/evaluate-dynamic-dropdown";
+import { PolicyContext } from "@/permissions/types/policy-context";
+import { BoardAssignMemberRolePolicyContext, BoardAssignMemberRolePolicyResource } from "@/permissions/policies/board/board-assign-member-role.policy";
 
 type BaseRoleDefinition = {
   value: boardTypes.BoardMemberRole,
@@ -29,10 +30,8 @@ const baseRoleDefinitions: Array<BaseRoleDefinition> = [
 ]
 
 export function getAssignableBoardMemberRoles(
-  context: PolicyContext,
-  resource: {
-    targetMemberId: string
-  }
+  context: Omit<BoardAssignMemberRolePolicyContext, 'targetRole'> & PolicyContext,
+  resourceData: BoardAssignMemberRolePolicyResource
 ): DropdownMenuPrimaryItemProps<typeof baseRoleDefinitions[number]['value']>[] {
   return evaluateDynamicDropdownItems<
     typeof baseRoleDefinitions[number],
@@ -42,23 +41,23 @@ export function getAssignableBoardMemberRoles(
     [
       {
         propertyName: 'available',
-        action: 'assign_role',
-        resource: 'board_member',
-        mapItemToPolicyResource: (roleItem, _, data) => ({
-          ...data,
+        action: 'board_assign_member_role',
+        resource: 'board',
+        mapItemToPolicyContext: (roleItem, context, data) => ({
+          ...context,
           targetRole: roleItem.value,
-          targetMemberId: data.targetMemberId
+          targetMemberId: context.targetMemberId
         }),
         mapPolicyResult: (result) => result.allowed
       },
       {
         propertyName: 'description',
-        action: 'assign_role',
-        resource: 'board_member',
-        mapItemToPolicyResource: (roleItem, _, data) => ({
-          ...data,
+        action: 'board_assign_member_role',
+        resource: 'board',
+        mapItemToPolicyContext: (roleItem, context, data) => ({
+          ...context,
           targetRole: roleItem.value,
-          targetMemberId: data.targetMemberId
+          targetMemberId: context.targetMemberId
         }),
         mapPolicyResult: (result) => {
           const { reason: { code } = {} } = result
@@ -72,6 +71,6 @@ export function getAssignableBoardMemberRoles(
       }
     ],
     context,
-    resource
+    resourceData
   )
 }

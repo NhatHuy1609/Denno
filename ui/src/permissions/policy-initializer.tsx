@@ -1,19 +1,16 @@
-import { useEffect } from 'react'
 import { PolicyRegistry } from './core/policy-registry'
 import { BoardViewPolicy } from './policies/board/board-view-policy'
 import { BoardAssignMemberRolePolicy } from './policies/board/board-assign-member-role.policy'
 
-export const PolicyInitializer = () => {
-  const initializePolicies = () => {
-    console.log('Initializing policies...') // DEBUG
+export function initializePolicies() {
+  try {
+    PolicyRegistry.register('board', 'view', new BoardViewPolicy())
+    PolicyRegistry.register('board', 'board_assign_member_role', new BoardAssignMemberRolePolicy())
 
-    PolicyRegistry.register('board:view', new BoardViewPolicy())
-    PolicyRegistry.register('board:board_assign_member_role', new BoardAssignMemberRolePolicy())
+    console.log('✅ Policies registered successfully.')
+  } catch (error) {
+    console.error('❌ Failed to initialize policies:', error)
   }
-
-  useEffect(() => {
-    initializePolicies()
-  }, [])
-
-  return null
 }
+
+initializePolicies()
