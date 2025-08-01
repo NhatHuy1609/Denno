@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from 'react'
+import React, { ReactNode, useRef, useState } from 'react'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -29,7 +29,7 @@ interface DropdownMenuPrimaryProps<T> {
   renderOtherItems?: () => ReactNode
 }
 
-function DropdownMenuPrimary<T>({
+export default function DropdownMenuPrimary<T>({
   disabled = false,
   contentTitle,
   triggerTitle,
@@ -58,11 +58,12 @@ function DropdownMenuPrimary<T>({
   return (
     <DropdownMenu onOpenChange={setIsOpen} open={isOpen}>
       <DropdownMenuTrigger
-        disabled={disabled}
         asChild
+        disabled={disabled}
         className={cn('min-w-32 justify-center', triggerClassName)}
       >
         <CustomizableButton
+          autoFocus={isOpen}
           size='medium'
           intent='secondary'
           value={triggerTitle ? triggerTitle : String(items[selectedIndex]?.label)}
@@ -73,13 +74,13 @@ function DropdownMenuPrimary<T>({
         />
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className={cn('w-78 rounded-md bg-white py-2 shadow-lg', contentClassName)}
+        className={cn('w-78 z-[999] rounded-md bg-white py-2 shadow-lg', contentClassName)}
       >
         {contentTitle && <DropdownMenuLabel title={contentTitle} />}
         {items.map((item, index) => (
           <DropdownMenuItem
-            className='hover:outline-none'
             key={index}
+            className='hover:outline-none'
             onSelect={() => handleSelectItem(index)}
           >
             {/* Render value and description if value is not empty */}
@@ -106,10 +107,8 @@ function DropdownMenuPrimary<T>({
           </DropdownMenuItem>
         ))}
         {/* Render description if it's a ReactNode */}
-        {renderOtherItems && <div className='cursor-pointer'>{renderOtherItems()}</div>}
+        {renderOtherItems && renderOtherItems()}
       </DropdownMenuContent>
     </DropdownMenu>
   )
 }
-
-export default DropdownMenuPrimary
