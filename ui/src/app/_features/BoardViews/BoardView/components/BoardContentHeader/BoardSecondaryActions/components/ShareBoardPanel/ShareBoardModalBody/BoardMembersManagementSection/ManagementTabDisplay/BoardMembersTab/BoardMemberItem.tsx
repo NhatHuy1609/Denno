@@ -1,10 +1,10 @@
 import React from 'react'
 import type { userTypes } from '@/entities/user'
+import type { boardTypes } from '@/entities/board'
+import { useAssignableBoardRoles } from './useAssignableBoardRoles'
+import { useBoardAssignMemberRole } from './useBoardAssignMemberRole'
 import Avatar from '@/ui/components/Avatar'
 import DropdownMenuPrimary from '@/app/_components/DropdownMenuPrimary'
-import { useAssignableBoardRoles } from './useAssignableBoardRoles'
-import { useBoardAssignMemberRole } from '@/app/_features/BoardViews/BoardView/components/BoardContentHeader/BoardSecondaryActions/components/ShareBoardPanel/ShareBoardModalBody/BoardMembersManagementSection/ManagementTabDisplay/BoardMembersTab/useBoardAssignMemberRole'
-import { boardTypes } from '@/entities/board'
 
 interface BoardMemberItemProps {
   member: userTypes.User
@@ -12,15 +12,47 @@ interface BoardMemberItemProps {
 }
 
 function BoardMemberItem({ member, memberRole }: BoardMemberItemProps) {
+  // Get dynamic assignable roles for the target member
+  // This will return the roles that the current user can assign to the target member
   const { roles: assignableRoles } = useAssignableBoardRoles({
     targetMemberId: member.id
   })
 
-  // Decide if the user can assign a role to the member
-  // const { canAssign: canAssignMemberRole } = useBoardAssignMemberRole({
-  //   targetMemberId: member.id,
-  //   targetMemberRole: memberRole as boardTypes.BoardMemberRole
-  // })
+  const {
+    canAssign: canAssignMemberRole,
+    workspaceOwnerId,
+    currentAssigner
+  } = useBoardAssignMemberRole({
+    targetMemberId: member.id,
+    targetMemberRole: memberRole as boardTypes.BoardMemberRole
+  })
+
+  // Decide if the current user can select the dropdown
+  const isRoleDropdownDisabled = () => {
+    const memberIsCurrentAssigner = currentAssigner?.id === member.id
+    const memberIsWorkspaceOwner = member.id === workspaceOwnerId
+    const currentUserIsWorkspaceOwner = currentAssigner?.id === workspaceOwnerId
+
+    // If the member is both the workspace owner and the one assigning roles,
+    // allow them to change their own role (dropdown enabled)
+    if (currentUserIsWorkspaceOwner) {
+      return false
+    }
+
+    // If the member is the workspace owner but not the assigner,
+    // prevent role changes (dropdown disabled)
+    if (memberIsWorkspaceOwner) {
+      return true
+    }
+
+    if (memberIsCurrentAssigner) {
+      return false
+    }
+
+    // Disable dropdown if current user can't assign role
+    // or if the target member is not allowed to leave the board
+    return !canAssignMemberRole
+  }
 
   return (
     <div className='flex w-full items-center justify-between gap-3'>
@@ -33,7 +65,7 @@ function BoardMemberItem({ member, memberRole }: BoardMemberItemProps) {
         </div>
       </div>
       <DropdownMenuPrimary
-        // disabled={!canAssignMemberRole}
+        disabled={isRoleDropdownDisabled()}
         items={assignableRoles}
         triggerTitle={assignableRoles.find((role) => role.value === memberRole)?.label}
         defaultSelectedIndex={assignableRoles.findIndex((role) => role.value === memberRole)}
