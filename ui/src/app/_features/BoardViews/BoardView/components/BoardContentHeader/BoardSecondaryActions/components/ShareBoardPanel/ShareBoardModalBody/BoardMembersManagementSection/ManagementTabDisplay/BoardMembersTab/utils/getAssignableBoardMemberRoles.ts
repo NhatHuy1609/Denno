@@ -26,7 +26,7 @@ const baseRoleDefinitions: Array<BaseRoleDefinition> = [
   {
     value: 'Observer',
     label: 'Observer',
-  },
+  }
 ]
 
 export function getAssignableBoardMemberRoles(

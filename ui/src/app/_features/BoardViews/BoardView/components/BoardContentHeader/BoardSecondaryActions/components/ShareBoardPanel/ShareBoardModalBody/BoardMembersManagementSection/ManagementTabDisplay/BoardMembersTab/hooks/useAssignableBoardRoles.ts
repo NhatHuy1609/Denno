@@ -1,5 +1,5 @@
 import { useMemo } from "react"
-import { getAssignableBoardMemberRoles } from "./getAssignableBoardMemberRoles"
+import { getAssignableBoardMemberRoles } from "../utils/getAssignableBoardMemberRoles"
 import { DropdownMenuPrimaryItemProps } from "@/app/_components/DropdownMenuPrimary"
 import { boardTypes } from "@/entities/board"
 import { useSyncedLocalStorage } from "@/app/_hooks/useSyncedLocalStorage"
