@@ -1,10 +1,11 @@
 import React from 'react'
 import type { userTypes } from '@/entities/user'
 import type { boardTypes } from '@/entities/board'
-import { useAssignableBoardRoles } from './useAssignableBoardRoles'
-import { useBoardAssignMemberRole } from './useBoardAssignMemberRole'
 import Avatar from '@/ui/components/Avatar'
 import DropdownMenuPrimary from '@/app/_components/DropdownMenuPrimary'
+import { useBoardAssignMemberRole } from '../hooks/useBoardAssignMemberRole'
+import { useAssignableBoardRoles } from '../hooks/useAssignableBoardRoles'
+import DropdownOtherActions from './DropdownOtherActions'
 
 interface BoardMemberItemProps {
   member: userTypes.User
@@ -65,15 +66,11 @@ function BoardMemberItem({ member, memberRole }: BoardMemberItemProps) {
         </div>
       </div>
       <DropdownMenuPrimary
-        disabled={isRoleDropdownDisabled()}
         items={assignableRoles}
         triggerTitle={assignableRoles.find((role) => role.value === memberRole)?.label}
         defaultSelectedIndex={assignableRoles.findIndex((role) => role.value === memberRole)}
-        renderOtherItems={() => (
-          <div className='flex flex-col px-4 py-2 text-sm text-red-600 hover:bg-gray-100'>
-            <span className='font-semibold'>Leave board</span>
-          </div>
-        )}
+        renderOtherItems={() => <DropdownOtherActions />}
+        disabled={isRoleDropdownDisabled()}
         contentClassName='min-w-[290px]'
       />
     </div>
