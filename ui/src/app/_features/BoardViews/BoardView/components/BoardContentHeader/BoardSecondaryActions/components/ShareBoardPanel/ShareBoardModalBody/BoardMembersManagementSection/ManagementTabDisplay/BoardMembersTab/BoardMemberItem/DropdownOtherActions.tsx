@@ -1,14 +1,31 @@
 import React from 'react'
+import { useBoardMemberOtherActions } from '../hooks/useBoardMemberOtherActions'
+import { useQuery } from '@tanstack/react-query'
 
-function DropdownOtherActions() {
+type Props = {
+  boardId: string
+  memberId: string
+}
+
+function DropdownOtherActions({ boardId, memberId }: Props) {
+  const { getAvailableOtherMemberActions } = useBoardMemberOtherActions(boardId, memberId)
+
+  const { data: otherActions, isLoading } = useQuery({
+    queryKey: ['board-member-other-actions', boardId, memberId],
+    queryFn: getAvailableOtherMemberActions,
+    staleTime: 5000 // Cache 5 seconds
+  })
+
+  console.log('Other Actions:', otherActions)
+
   return (
     <>
-      <div className='flex flex-col px-4 py-2 text-sm text-red-600 hover:bg-gray-100'>
-        <span className='font-semibold'>Leave board</span>
-      </div>
-      <div className='flex flex-col px-4 py-2 text-sm text-red-600 hover:bg-gray-100'>
-        <span className='font-semibold'>Remove from board</span>
-      </div>
+      {otherActions?.map((action) => (
+        <div className='flex flex-col px-4 py-2 text-sm text-red-600 hover:bg-gray-100' key={action.action}>
+          <span className='font-semibold'>{action.label}</span>
+          <span className='text-xs'>{action.reason}</span>
+        </div>
+      ))}
     </>
   )
 }

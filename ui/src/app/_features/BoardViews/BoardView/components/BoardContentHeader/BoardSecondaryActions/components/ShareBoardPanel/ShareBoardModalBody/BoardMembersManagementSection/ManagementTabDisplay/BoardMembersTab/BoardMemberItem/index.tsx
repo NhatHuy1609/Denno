@@ -6,6 +6,8 @@ import DropdownMenuPrimary from '@/app/_components/DropdownMenuPrimary'
 import { useBoardAssignMemberRole } from '../hooks/useBoardAssignMemberRole'
 import { useAssignableBoardRoles } from '../hooks/useAssignableBoardRoles'
 import DropdownOtherActions from './DropdownOtherActions'
+import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
+import { PersistedStateKey } from '@/data/persisted-keys'
 
 interface BoardMemberItemProps {
   member: userTypes.User
@@ -13,6 +15,8 @@ interface BoardMemberItemProps {
 }
 
 function BoardMemberItem({ member, memberRole }: BoardMemberItemProps) {
+  const [boardId] = useSyncedLocalStorage<string>(PersistedStateKey.RecentAccessBoard, '')
+
   // Get dynamic assignable roles for the target member
   // This will return the roles that the current user can assign to the target member
   const { roles: assignableRoles } = useAssignableBoardRoles({
@@ -69,7 +73,7 @@ function BoardMemberItem({ member, memberRole }: BoardMemberItemProps) {
         items={assignableRoles}
         triggerTitle={assignableRoles.find((role) => role.value === memberRole)?.label}
         defaultSelectedIndex={assignableRoles.findIndex((role) => role.value === memberRole)}
-        renderOtherItems={() => <DropdownOtherActions />}
+        renderOtherItems={() => <DropdownOtherActions boardId={boardId} memberId={member.id} />}
         disabled={isRoleDropdownDisabled()}
         contentClassName='min-w-[290px]'
       />

@@ -22,18 +22,6 @@ const baseActions: Array<BaseActionDefinition> = [
   }
 ]
 
-export function getBoardMemberOtherActions(
-  context: PolicyContext,
-  resourceData?: any
-) {
-  return evaluateDynamicDropdownItems<
-    typeof baseActions[number],
-    DynamicProperties
-  >
-  (
-    baseActions,
-    [],
-    context,
-    resourceData
-  )
+export function getBoardMemberOtherActions() {
+  return baseActions
 }
