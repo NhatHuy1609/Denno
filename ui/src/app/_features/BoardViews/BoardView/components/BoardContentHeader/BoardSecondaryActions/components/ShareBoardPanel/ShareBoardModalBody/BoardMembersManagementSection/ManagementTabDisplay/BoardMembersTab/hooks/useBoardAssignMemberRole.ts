@@ -1,12 +1,12 @@
 import { useMemo } from "react"
 import { PolicyEngine } from "@/permissions/core/policy-engine"
+import type { userTypes } from "@/entities/user"
+import type { boardTypes } from "@/entities/board"
 import { useMe } from "@/app/_hooks/query/user/useMe"
 import { useBoardQuery, useWorkspaceQuery } from "@/app/_hooks/query"
 import { useSyncedLocalStorage } from "@/app/_hooks/useSyncedLocalStorage"
-import type { boardTypes } from "@/entities/board"
 import { PersistedStateKey } from "@/data/persisted-keys"
 import { BoardAssignMemberRolePolicyContext, BoardAssignMemberRolePolicyResource } from "@/permissions/policies/board/board-assign-member-role.policy"
-import { userTypes } from "@/entities/user"
 
 type UseBoardAssignMemberRoleProps = {
   targetMemberId: string
