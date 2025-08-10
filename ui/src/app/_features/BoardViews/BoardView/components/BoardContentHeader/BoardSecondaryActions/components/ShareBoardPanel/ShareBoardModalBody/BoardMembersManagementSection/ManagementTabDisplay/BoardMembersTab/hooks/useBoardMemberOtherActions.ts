@@ -12,6 +12,8 @@ import {
 import { useBoardQuery, useWorkspaceQuery } from '@/app/_hooks/query'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 import { PersistedStateKey } from '@/data/persisted-keys'
+import { PolicyReasonCode } from '@/permissions/result-reasons'
+import { PolicyResult } from '@/permissions/types/policy-result'
 
 type MemberOtherActions = 'leaveBoard' | 'removeFromBoard'
 
@@ -69,12 +71,21 @@ export const useBoardMemberOtherActions = (boardId: string, memberId: string) =>
   }, [boardQuery, workspaceQuery])
 
   // Action configuration with lazy data preparation
-  const actionConfig = useMemo(
+  const actionConfig: Record<
+    MemberOtherActions,
+    {
+      label: string
+      action: PolicyAction
+      resource: PolicyResource
+      prepare: () => Promise<[PolicyResourceData, PolicyContextData]>
+      mapResultToDescription?: (result: PolicyResult) => string
+    }
+  > = useMemo(
     () => ({
       leaveBoard: {
+        label: 'Leave Board',
         action: 'board_leave' as PolicyAction,
         resource: 'board' as PolicyResource,
-        label: 'Leave Board',
         prepare: async (): Promise<[PolicyResourceData, PolicyContextData]> => {
           const { boardMembers, workspaceOwnerId } = await fetchRequiredData()
 
@@ -85,12 +96,20 @@ export const useBoardMemberOtherActions = (boardId: string, memberId: string) =>
             } as Partial<BoardLeavePolicyResource>,
             undefined
           ]
+        },
+        mapResultToDescription: (result: PolicyResult) => {
+          switch (result.reason?.code) {
+            case 'POLICY::ALLOWED':
+              return ''
+            default:
+              return result.reason?.message || ''
+          }
         }
       },
       removeFromBoard: {
+        label: 'Remove from Board',
         action: 'board_remove_member' as PolicyAction,
         resource: 'board' as PolicyResource,
-        label: 'Remove from Board',
         prepare: async (): Promise<[PolicyResourceData, PolicyContextData]> => {
           const { boardMembers, workspaceOwnerId } = await fetchRequiredData()
 
@@ -103,6 +122,16 @@ export const useBoardMemberOtherActions = (boardId: string, memberId: string) =>
               targetMemberId: memberId
             } as BoardRemoveMemberPolicyContext
           ]
+        },
+        mapResultToDescription: (result: PolicyResult) => {
+          switch (result.reason?.code) {
+            case 'BOARD_MEMBER_REMOVAL::ALLOWED_ADMIN_REMOVAL':
+              return ''
+            case 'BOARD_MEMBER_REMOVAL::ALLOWED_REMOVAL':
+              return ''
+            default:
+              return result.reason?.message || ''
+          }
         }
       }
     }),
@@ -112,7 +141,13 @@ export const useBoardMemberOtherActions = (boardId: string, memberId: string) =>
   const getAvailableActions = useCallback(async () => {
     const promises = availableActions.map(async (action) => {
       try {
-        const { action: policyAction, resource: policyResource, prepare, label } = actionConfig[action]
+        const {
+          action: policyAction,
+          resource: policyResource,
+          prepare,
+          label,
+          mapResultToDescription
+        } = actionConfig[action]
         const [resourceData, contextData] = await prepare()
 
         const result = canWithReason(policyAction, policyResource, resourceData, contextData)
@@ -121,14 +156,14 @@ export const useBoardMemberOtherActions = (boardId: string, memberId: string) =>
           label,
           action,
           available: result.allowed,
-          reason: result.reason?.message
+          description: mapResultToDescription ? mapResultToDescription(result) : result.reason?.message
         }
       } catch (error) {
         console.error(`Error checking permission for action ${action}:`, error)
         return {
           action,
           available: false,
-          reason: error instanceof Error ? error.message : 'Permission check failed'
+          description: error instanceof Error ? error.message : 'Permission check failed'
         }
       }
     })

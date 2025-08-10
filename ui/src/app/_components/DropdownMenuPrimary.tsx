@@ -57,11 +57,7 @@ export default function DropdownMenuPrimary<T>({
 
   return (
     <DropdownMenu onOpenChange={setIsOpen} open={isOpen}>
-      <DropdownMenuTrigger
-        asChild
-        disabled={disabled}
-        className={cn('min-w-32 justify-center', triggerClassName)}
-      >
+      <DropdownMenuTrigger asChild disabled={disabled} className={cn('min-w-32 justify-center', triggerClassName)}>
         <CustomizableButton
           autoFocus={isOpen}
           size='medium'
@@ -74,23 +70,17 @@ export default function DropdownMenuPrimary<T>({
         />
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className={cn('w-78 z-[999] rounded-md bg-white py-2 shadow-lg', contentClassName)}
+        className={cn('min-w-78 z-[999] max-w-[320px] rounded-md bg-white py-2 shadow-lg', contentClassName)}
       >
         {contentTitle && <DropdownMenuLabel title={contentTitle} />}
         {items.map((item, index) => (
-          <DropdownMenuItem
-            key={index}
-            className='hover:outline-none'
-            onSelect={() => handleSelectItem(index)}
-          >
+          <DropdownMenuItem key={index} className='hover:outline-none' onSelect={() => handleSelectItem(index)}>
             {/* Render value and description if value is not empty */}
             {item.label && (
               <div
                 className={cn(
                   'flex cursor-pointer flex-col px-4 py-2 hover:bg-gray-100 hover:outline-none',
-                  selectedIndex === index
-                    ? 'border-l-2 border-blue-500 bg-blue-100 hover:bg-blue-200'
-                    : '',
+                  selectedIndex === index ? 'border-l-2 border-blue-500 bg-blue-100 hover:bg-blue-200' : '',
                   item.available === false ? 'cursor-not-allowed opacity-50' : ''
                 )}
               >
@@ -101,7 +91,7 @@ export default function DropdownMenuPrimary<T>({
                 >
                   {String(item.label)}
                 </span>
-                <span className='text-sm text-gray-500'>{item.description}</span>
+                <span className='text-xs text-gray-500'>{item.description}</span>
               </div>
             )}
           </DropdownMenuItem>
