@@ -1,4 +1,4 @@
-import type { boardTypes } from "@/entities/board"
+import type { boardTypes } from '@/entities/board'
 
 type BoardMemberRole = boardTypes.BoardMemberRole
 
@@ -13,21 +13,21 @@ export interface StaticBoardMemberPermissionsSet {
 // Those are the permissions that a board member has based on their role
 // and they are static permissions, if a permission is dynamic, complex logic -> use policy
 export const StaticBoardMemberPermissions: Record<BoardMemberRole, StaticBoardMemberPermissionsSet> = {
-  'Admin': {
+  Admin: {
     canEditBoard: true,
     canShareBoard: true,
     canLeaveBoard: true,
     canAssignBoardMemberRole: true,
     canManageBoardJoinRequests: true
   },
-  'Member': {
+  Member: {
     canEditBoard: false,
     canShareBoard: true,
     canLeaveBoard: true,
     canAssignBoardMemberRole: false,
     canManageBoardJoinRequests: false
   },
-  'Observer': {
+  Observer: {
     canEditBoard: false,
     canShareBoard: false,
     canLeaveBoard: false,

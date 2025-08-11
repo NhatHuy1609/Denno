@@ -12,7 +12,6 @@ import {
 import { useBoardQuery, useWorkspaceQuery } from '@/app/_hooks/query'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 import { PersistedStateKey } from '@/data/persisted-keys'
-import { PolicyReasonCode } from '@/permissions/result-reasons'
 import { PolicyResult } from '@/permissions/types/policy-result'
 
 type MemberOtherActions = 'leaveBoard' | 'removeFromBoard'
