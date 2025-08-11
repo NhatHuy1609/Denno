@@ -6,7 +6,11 @@ import { useOnClickOutSide } from '@/app/_hooks/useOnClickOutSide'
 import PrimaryInputText from '@/app/_components/PrimaryInputText'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 
-function BoardNameField() {
+type Props = {
+  enabledEdit?: boolean
+}
+
+function BoardNameField({ enabledEdit = false }: Props) {
   const [boardId] = useSyncedLocalStorage<string>(PersistedStateKey.RecentAccessBoard, '')
   const { data: board } = useBoardQuery(boardId)
 
@@ -36,6 +40,8 @@ function BoardNameField() {
   }
 
   const handleClickBoardField = () => {
+    // If the board is not editable, do not show the input
+    if (!enabledEdit) return
     setIsShowInput(!isShowInput)
   }
 

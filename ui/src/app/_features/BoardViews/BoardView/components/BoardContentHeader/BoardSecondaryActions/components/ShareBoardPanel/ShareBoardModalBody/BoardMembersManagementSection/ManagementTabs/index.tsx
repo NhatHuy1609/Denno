@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import TabButton from './TabButton'
 import type { ManagementTabs, TabKey } from '../types'
 import { PersistedStateKey } from '@/data/persisted-keys'
 import { useBoardQuery } from '@/app/_hooks/query'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
+import { boardTypes } from '@/entities/board'
+import { useCurrentUserBoardMemberRole } from '@/store/features/board'
 
 interface ManagementTabsProps {
   tabs: ManagementTabs
@@ -11,11 +13,18 @@ interface ManagementTabsProps {
   handleSelectTab: (tabKey: TabKey) => void
 }
 
+const ACCESSIBLE_TABS: {
+  [key in boardTypes.BoardMemberRole]: TabKey[]
+} = {
+  Admin: ['members', 'requests'],
+  Member: ['members'],
+  Observer: []
+}
+
 export default function ManagementTabs({ tabs, activeTab, handleSelectTab }: ManagementTabsProps) {
-  const [boardId, setRecentAccessBoardId] = useSyncedLocalStorage<string>(
-    PersistedStateKey.RecentAccessBoard,
-    ''
-  )
+  const currentUserRole = useCurrentUserBoardMemberRole()
+
+  const [boardId] = useSyncedLocalStorage<string>(PersistedStateKey.RecentAccessBoard, '')
   const { data: boardData } = useBoardQuery(boardId, {
     includeBoardMembers: true,
     includeJoinRequests: true
@@ -34,10 +43,17 @@ export default function ManagementTabs({ tabs, activeTab, handleSelectTab }: Man
   }
 
   const managementTabs = Object.entries(tabs).map(([tabKey, tabVal]) => tabVal)
+  const availableTabTypes = useMemo(() => {
+    if (!currentUserRole) return []
+
+    return ACCESSIBLE_TABS[currentUserRole]
+  }, [currentUserRole])
+  // Filter tabs based on the current user's role
+  const filteredTabs = managementTabs.filter((tab) => availableTabTypes.includes(tab.key as TabKey))
 
   return (
     <div className='flex w-full gap-4 border-b-2 border-gray-300'>
-      {managementTabs.map((tab) => (
+      {filteredTabs.map((tab) => (
         <TabButton
           key={tab.key}
           title={tab.title}

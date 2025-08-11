@@ -1,6 +1,10 @@
 import { useAppSelector } from '@/store/hooks'
-import { selectCurrentUserBoardPermissions } from './board.selectors'
+import { selectCurrentUserBoardMemberRole, selectCurrentUserBoardPermissions } from './board.selectors'
 
-export const useCurrentUserBoardPermissions = () => {
+export const useSelectCurrentUserBoardPermissions = () => {
   return useAppSelector(selectCurrentUserBoardPermissions)
+}
+
+export const useCurrentUserBoardMemberRole = () => {
+  return useAppSelector(selectCurrentUserBoardMemberRole)
 }
