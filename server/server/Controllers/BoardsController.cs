@@ -440,6 +440,41 @@ namespace server.Controllers
 
             return Ok();
         }
+
+        [HttpPut("[controller]/{boardId}/members/{memberId}/role")]
+        public async Task<IActionResult> UpdateBoardMemberRoleAsync(
+            [FromRoute] Guid boardId,
+            [FromRoute] string memberId,
+            [FromBody] UpdateBoardMemberRoleRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ApiErrorResponse()
+                {
+                    StatusMessage = "Bad Request",
+                });
+            }
+
+            var userId = _authService.GetCurrentUserId();
+
+            var actionContext = new UpdateBoardMemberRoleActionContext()
+            {
+                MemberCreatorId = userId,
+                BoardId = boardId,
+                TargetUserId = memberId,
+                TargetMemberRole = request.MemberRole,
+                IsBoardActivity = true
+            };
+
+            var action = await _actionService.CreateActionAsync(ActionTypes.UpdateBoardMemberRole, actionContext);
+
+            if (action != null)
+            {
+                //await _emailService.SendBoardActionEmailsAsync(action, isRunInBackground: true);
+            }
+
+            return Ok();
+        }
     }
 }
 

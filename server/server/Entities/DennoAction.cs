@@ -10,6 +10,7 @@ namespace server.Entities
         public string ActionType { get; set; }
         public DateTime Date { get; set; } = DateTime.Now;
         public bool IsBoardActivity { get; set; } = false;
+        public string? MetaData { get; set; } // metadata json
 
         public string? MemberCreatorId { get; set; }
         [JsonIgnore]
