@@ -15,7 +15,6 @@ using server.Interfaces;
 using server.Models;
 using server.Services.QueueHostedService;
 using server.Services.QueueHostedService.Extensions;
-using System.Security.Cryptography.Pkcs;
 
 namespace server.Services.Email
 {
