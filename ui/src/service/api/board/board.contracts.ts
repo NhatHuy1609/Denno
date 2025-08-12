@@ -10,23 +10,27 @@ const BoardDto = z.object({
   starredStatus: z.boolean(),
   workspaceId: z.string(),
   visibility: enumContracts.BoardVisibilityEnumSchema,
-  
-  members: z.array(z.object({
-    memberId: z.string(),
-    member: userContracts.UserSchema,
-    boardMemberRole: enumContracts.BoardMemberRoleEnumSchema
-  })),
-  joinRequests: z.array(z.object({
-    id: z.number().int(),
-    boardId: z.string(),
-    requestedAt: z.string(),
-    requester: z.object({
-      id: z.string(),
-      name: z.string(),
-      email: z.string().email(),
-      avatar: z.string()
+
+  members: z.array(
+    z.object({
+      memberId: z.string(),
+      member: userContracts.UserSchema,
+      boardMemberRole: enumContracts.BoardMemberRoleEnumSchema
     })
-  })),
+  ),
+  joinRequests: z.array(
+    z.object({
+      id: z.number().int(),
+      boardId: z.string(),
+      requestedAt: z.string(),
+      requester: z.object({
+        id: z.string(),
+        name: z.string(),
+        email: z.string().email(),
+        avatar: z.string()
+      })
+    })
+  ),
   workspace: z.object({
     id: z.string().uuid(),
     ownerId: z.string(),
@@ -38,59 +42,85 @@ const BoardDto = z.object({
 })
 
 // Request
-export const CreateBoardDtoSchema = z.object({
-  name: z.string().min(1),
-  workspaceId: z.string(),
-  background: z.string(),
-  visibility: z.string()
-}).describe("CreateBoardDtoSchema")
+export const CreateBoardDtoSchema = z
+  .object({
+    name: z.string().min(1),
+    workspaceId: z.string(),
+    background: z.string(),
+    visibility: z.string()
+  })
+  .describe('CreateBoardDtoSchema')
 
-export const AddBoardMemberDtoSchema = z.object({
-  email: z.string().email(),
-  description: z.string(),
-  role: enumContracts.BoardMemberRoleEnumSchema
-}).describe("AddBoardMemberDtoSchema")
+export const AddBoardMemberDtoSchema = z
+  .object({
+    email: z.string().email(),
+    description: z.string(),
+    role: enumContracts.BoardMemberRoleEnumSchema
+  })
+  .describe('AddBoardMemberDtoSchema')
 
-export const CreateBoardInvitationSecretDtoSchema = z.object({
-  boardRole: enumContracts.BoardMemberRoleEnumSchema
-}).describe('CreateBoardInvitationSecretDtoSchema')
+export const CreateBoardInvitationSecretDtoSchema = z
+  .object({
+    boardRole: enumContracts.BoardMemberRoleEnumSchema
+  })
+  .describe('CreateBoardInvitationSecretDtoSchema')
 
-export const VerifyBoardInvitationSecretRequestDtoSchema = z.object({
-  secretCode: z.string()
-}).describe("VerifyBoardInvitationSecretRequestDtoSchema")
+export const VerifyBoardInvitationSecretRequestDtoSchema = z
+  .object({
+    secretCode: z.string()
+  })
+  .describe('VerifyBoardInvitationSecretRequestDtoSchema')
 
-export const CreateBoardJoinRequestDtoSchema = z.object({
-  requesterId: z.string()
-}).describe("CreateBoardJoinRequestDtoSchema")
+export const CreateBoardJoinRequestDtoSchema = z
+  .object({
+    requesterId: z.string()
+  })
+  .describe('CreateBoardJoinRequestDtoSchema')
 
-export const ApproveBoardJoinRequestDtoSchema = z.object({
-  memberRole: enumContracts.BoardMemberRoleEnumSchema
-}).describe("ApproveBoardJoinRequestDtoSchema")
+export const ApproveBoardJoinRequestDtoSchema = z
+  .object({
+    memberRole: enumContracts.BoardMemberRoleEnumSchema
+  })
+  .describe('ApproveBoardJoinRequestDtoSchema')
+
+export const UpdateBoardMemberRoleRequestDtoSchema = z
+  .object({
+    memberRole: enumContracts.BoardMemberRoleEnumSchema
+  })
+  .describe('UpdateBoardMemberRoleRequestDtoSchema')
 
 // Response
-export const BoardResponseDtoSchema = BoardDto.describe("BoardResponseDtoSchema")
+export const BoardResponseDtoSchema = BoardDto.describe('BoardResponseDtoSchema')
 
-export const BoardsResponseDtoSchema = z.array(BoardDto).describe("BoardsResponseDtoSchema")
+export const BoardsResponseDtoSchema = z.array(BoardDto).describe('BoardsResponseDtoSchema')
 
-export const BoardInvitationSecretResponseDtoSchema = z.object({
-  secretCode: z.string()
-}).describe("BoardInvitationSecretResponseDtoSchema")
-
-export const BoardJoinRequestResponseDtoSchema = z.object({
-  id: z.number(),
-  boardId: z.string(),
-  requestedAt: z.string().datetime(),
-  requester: z.object({
-    id: z.string(),
-    name: z.string(),
-    email: z.string(),
-    avatar: z.string()
+export const BoardInvitationSecretResponseDtoSchema = z
+  .object({
+    secretCode: z.string()
   })
-}).describe('BoardJoinRequestResponseDtoSchema')
+  .describe('BoardInvitationSecretResponseDtoSchema')
 
-export const BoardJoinRequestsResponseDtoSchema = z.array(BoardJoinRequestResponseDtoSchema).describe('BoardJoinRequestsResponseDtoSchema')
+export const BoardJoinRequestResponseDtoSchema = z
+  .object({
+    id: z.number(),
+    boardId: z.string(),
+    requestedAt: z.string().datetime(),
+    requester: z.object({
+      id: z.string(),
+      name: z.string(),
+      email: z.string(),
+      avatar: z.string()
+    })
+  })
+  .describe('BoardJoinRequestResponseDtoSchema')
 
-export const DetailedBoardInvitationSecretResponseDtoSchema = z.object({
-  inviter: userContractsDto.GetUserResponseDtoSchema,
-  board: BoardResponseDtoSchema
-}).describe('DetailedBoardInvitationSecretResponseDtoSchema')
+export const BoardJoinRequestsResponseDtoSchema = z
+  .array(BoardJoinRequestResponseDtoSchema)
+  .describe('BoardJoinRequestsResponseDtoSchema')
+
+export const DetailedBoardInvitationSecretResponseDtoSchema = z
+  .object({
+    inviter: userContractsDto.GetUserResponseDtoSchema,
+    board: BoardResponseDtoSchema
+  })
+  .describe('DetailedBoardInvitationSecretResponseDtoSchema')

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { 
+import {
   CreateBoardDtoSchema,
   BoardResponseDtoSchema,
   BoardsResponseDtoSchema,
@@ -11,7 +11,8 @@ import {
   BoardJoinRequestResponseDtoSchema,
   BoardJoinRequestsResponseDtoSchema,
   CreateBoardJoinRequestDtoSchema,
-  ApproveBoardJoinRequestDtoSchema
+  ApproveBoardJoinRequestDtoSchema,
+  UpdateBoardMemberRoleRequestDtoSchema
 } from './board.contracts'
 
 export type CreateBoardDto = z.infer<typeof CreateBoardDtoSchema>
@@ -26,3 +27,4 @@ export type BoardJoinRequestResponseDto = z.infer<typeof BoardJoinRequestRespons
 export type BoardJoinRequestsResponseDto = z.infer<typeof BoardJoinRequestsResponseDtoSchema>
 export type CreateBoardJoinRequestDto = z.infer<typeof CreateBoardJoinRequestDtoSchema>
 export type ApproveBoardJoinRequestDto = z.infer<typeof ApproveBoardJoinRequestDtoSchema>
+export type UpdateBoardMemberRoleRequestDto = z.infer<typeof UpdateBoardMemberRoleRequestDtoSchema>
