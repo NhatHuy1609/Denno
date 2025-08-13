@@ -444,7 +444,7 @@ namespace server.Controllers
         public async Task<IActionResult> UpdateBoardMemberRoleAsync(
             [FromRoute] Guid boardId,
             [FromRoute] string memberId,
-            [FromBody] UpdateBoardMemberRoleRequest request)
+            UpdateBoardMemberRoleRequest request)
         {
             if (!ModelState.IsValid)
             {
