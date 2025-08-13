@@ -14,12 +14,11 @@ using server.Strategies.ActionStrategy.Contexts;
 using Microsoft.AspNetCore.Authorization;
 using server.Authorization.Constants;
 using server.Services.QueueHostedService;
-using server.Dtos.Response.Workspace;
 using server.Helpers;
 using server.Dtos.Response.InvitationSecret;
-using server.Dtos.Requests.Workspace;
-using server.Services.Realtime;
 using server.Models.Query;
+using Microsoft.AspNetCore.SignalR;
+using server.Hubs.BoardHub;
 
 namespace server.Controllers
 {
@@ -470,6 +469,7 @@ namespace server.Controllers
 
             if (action != null)
             {
+                await _boardService.NotifyMemberRoleChanged(boardId);
                 //await _emailService.SendBoardActionEmailsAsync(action, isRunInBackground: true);
             }
 

@@ -10,6 +10,7 @@ using server.Entities;
 using server.Enums;
 using server.Factories;
 using server.Factories.NotificationResponseFactory;
+using server.Hubs.BoardHub;
 using server.Hubs.NotificationHub;
 using server.Infrastructure.Configurations;
 using server.Infrastructure.Providers;
@@ -190,6 +191,7 @@ namespace server.Infrastructure
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapHub<NotificationHub>("hubs/notification");
+                endpoints.MapHub<BoardHub>("hubs/board");
             });
 
             return app;

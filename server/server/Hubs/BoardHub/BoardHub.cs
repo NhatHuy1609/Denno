@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using server.Helpers;
 using server.Interfaces;
+using server.Services.Realtime;
 using System.Security.Claims;
 
 namespace server.Hubs.BoardHub
@@ -7,10 +9,17 @@ namespace server.Hubs.BoardHub
     public class BoardHub : Hub<IBoardHubClient>
     {
         private readonly IBoardService _boardService;
+        private readonly IConnectionManager _connectionManagerService;
+        private readonly ILogger<BoardHub> _logger;
 
-        public BoardHub(IBoardService boardService)
+        public BoardHub(
+            IBoardService boardService,
+            IConnectionManager connectionManagerService,
+            ILogger<BoardHub> logger)
         {
             _boardService = boardService;
+            _connectionManagerService = connectionManagerService;
+            _logger = logger;
         }
 
         public async Task JoinBoard(Guid boardId)
@@ -26,12 +35,21 @@ namespace server.Hubs.BoardHub
                     return;
                 }
 
-                await Groups.AddToGroupAsync(Context.ConnectionId, $"board_{boardId}");
+                // Add current connection to team group
+                await Groups.AddToGroupAsync(Context.ConnectionId, SignalRGroupNames.GetBoardGroupName(boardId));
+
+                // Add All user's connections to team group (If user has multiple tabs/devices)
+                var userConnections = await _connectionManagerService.GetUserConnectionsAsync(userId);
+                foreach (var connection in userConnections.Where(conn => conn != Context.ConnectionId))
+                {
+                    await Groups.AddToGroupAsync(Context.ConnectionId, SignalRGroupNames.GetBoardGroupName(boardId));
+                }
 
                 await Clients.Caller.Success($"Successfully joined board {boardId}");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error joining board {boardId}", boardId);
                 await Clients.Caller.Error($"Failed to join board");
             }
         }

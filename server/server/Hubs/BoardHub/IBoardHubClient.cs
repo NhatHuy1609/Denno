@@ -2,5 +2,6 @@
 {
     public interface IBoardHubClient : IBaseHubClient
     {
+        Task ReceiveMemberRoleChanged();
     }
 }

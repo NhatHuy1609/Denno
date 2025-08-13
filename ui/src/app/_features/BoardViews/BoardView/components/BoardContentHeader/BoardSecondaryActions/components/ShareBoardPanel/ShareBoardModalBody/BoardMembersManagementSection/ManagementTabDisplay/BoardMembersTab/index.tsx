@@ -1,18 +1,35 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useBoardQuery } from '@/app/_hooks/query'
 import { PersistedStateKey } from '@/data/persisted-keys'
 import WaterFallLoading from '@/app/_components/Loadings/WaterFallLoading'
 import BoardMemberItem from './BoardMemberItem'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
+import { useSignalR } from '@/app/_providers/SignalRProvider/useSignalR'
 
 export default function BoardMembersTab() {
   const [boardId] = useSyncedLocalStorage<string>(PersistedStateKey.RecentAccessBoard, '')
-  const { data: boardData, isPending } = useBoardQuery(boardId, {
+  const {
+    data: boardData,
+    isPending,
+    refetch
+  } = useBoardQuery(boardId, {
     includeBoardMembers: true,
     includeJoinRequests: true
   })
 
   const { members } = boardData || {}
+
+  const { signalRService } = useSignalR()
+
+  useEffect(() => {
+    if (!signalRService) return
+
+    // Sync board members data when member role changed
+    signalRService.on('board', 'ReceiveMemberRoleChanged', () => {
+      refetch()
+      console.log('ReceiveMemberRoleChanged')
+    })
+  }, [signalRService])
 
   if (isPending) {
     return (

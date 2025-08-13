@@ -2,12 +2,13 @@ import React from 'react'
 import type { userTypes } from '@/entities/user'
 import type { boardTypes } from '@/entities/board'
 import Avatar from '@/ui/components/Avatar'
-import DropdownMenuPrimary from '@/app/_components/DropdownMenuPrimary'
+import DropdownMenuPrimary, { DropdownMenuPrimaryItemProps } from '@/app/_components/DropdownMenuPrimary'
 import { useBoardAssignMemberRole } from '../hooks/useBoardAssignMemberRole'
 import { useAssignableBoardRoles } from '../hooks/useAssignableBoardRoles'
 import DropdownOtherActions from './DropdownOtherActions'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 import { PersistedStateKey } from '@/data/persisted-keys'
+import useUpdateBoardMemberRole from '@/app/_hooks/mutation/board/useUpdateBoardMemberRole'
 
 interface BoardMemberItemProps {
   member: userTypes.User
@@ -16,6 +17,10 @@ interface BoardMemberItemProps {
 
 function BoardMemberItem({ member, memberRole }: BoardMemberItemProps) {
   const [boardId] = useSyncedLocalStorage<string>(PersistedStateKey.RecentAccessBoard, '')
+
+  const { mutateAsync: updateBoardMemberRoleAsync } = useUpdateBoardMemberRole({
+    onSuccess: () => {}
+  })
 
   // Get dynamic assignable roles for the target member
   // This will return the roles that the current user can assign to the target member
@@ -59,6 +64,18 @@ function BoardMemberItem({ member, memberRole }: BoardMemberItemProps) {
     return !canAssignMemberRole
   }
 
+  const handleUpdateBoardMemberRole = async (newRole: DropdownMenuPrimaryItemProps<boardTypes.BoardMemberRole>) => {
+    if (!boardId) return
+
+    await updateBoardMemberRoleAsync({
+      boardId,
+      memberId: member.id,
+      updateBoardMemberRoleRequestDto: {
+        memberRole: newRole.value
+      }
+    })
+  }
+
   return (
     <div className='flex w-full items-center justify-between gap-3'>
       <Avatar src={member.avatar} size='base' name={member.fullName} />
@@ -75,6 +92,7 @@ function BoardMemberItem({ member, memberRole }: BoardMemberItemProps) {
         defaultSelectedIndex={assignableRoles.findIndex((role) => role.value === memberRole)}
         renderOtherItems={() => <DropdownOtherActions boardId={boardId} memberId={member.id} />}
         disabled={isRoleDropdownDisabled()}
+        onSelect={handleUpdateBoardMemberRole}
         contentClassName='min-w-[290px]'
       />
     </div>

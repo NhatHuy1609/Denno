@@ -32,7 +32,8 @@ namespace server.Services.Realtime
             try
             {
                 // Thêm connection vào user's connection list
-                _userConnections.AddOrUpdate(userId,
+                _userConnections.AddOrUpdate(
+                    userId,
                     new HashSet<string> { connectionId },
                     (key, existingConnections) =>
                     {
