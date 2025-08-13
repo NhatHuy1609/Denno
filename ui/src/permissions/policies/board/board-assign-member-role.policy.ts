@@ -1,8 +1,8 @@
-import type { boardTypes } from "@/entities/board";
-import type { workspaceTypes } from "@/entities/workspace";
-import { BasePolicy } from "@/permissions/policies/base-policy";
-import { PolicyContext } from "@/permissions/types/policy-context";
-import { PolicyResult } from "@/permissions/types/policy-result";
+import type { boardTypes } from '@/entities/board'
+import type { workspaceTypes } from '@/entities/workspace'
+import { BasePolicy } from '@/permissions/policies/base-policy'
+import { PolicyContext } from '@/permissions/types/policy-context'
+import { PolicyResult } from '@/permissions/types/policy-result'
 
 export interface BoardAssignMemberRolePolicyContext extends PolicyContext {
   targetRole: boardTypes.BoardMemberRole
@@ -18,10 +18,7 @@ export interface BoardAssignMemberRolePolicyResource {
  * This policy is used for checking if the user (assigner) can assign a role to a target board member.
  */
 export class BoardAssignMemberRolePolicy extends BasePolicy {
-  evaluate(
-    context: BoardAssignMemberRolePolicyContext, 
-    resource: BoardAssignMemberRolePolicyResource
-  ): PolicyResult {
+  evaluate(context: BoardAssignMemberRolePolicyContext, resource: BoardAssignMemberRolePolicyResource): PolicyResult {
     const { targetRole, targetMemberId } = context || {}
 
     // Check permission: must be Admin or Workspace Owner
@@ -60,7 +57,7 @@ export class BoardAssignMemberRolePolicy extends BasePolicy {
     targetRole: boardTypes.BoardMemberRole
   ): PolicyResult {
     const currentRole = targetMember.boardMemberRole
-    
+
     // Admin cannot demote themselves if they are the only admin
     if (currentRole === 'Admin' && targetRole !== 'Admin') {
       const adminCount = this.getAdminCount(resource.boardMembers)
@@ -85,8 +82,9 @@ export class BoardAssignMemberRolePolicy extends BasePolicy {
   ): PolicyResult {
     const currentUserRole = this.getCurrentUserRole(context, resource)
     const targetCurrentRole = targetMember.boardMemberRole
-    
-    const currentUserHierarchy = this.getRoleHierarchy(currentUserRole)
+
+    const isWorkspaceOwner = this.isWorkspaceOwner(context, resource)
+    const currentUserHierarchy = this.getRoleHierarchy(currentUserRole, isWorkspaceOwner)
     const targetCurrentHierarchy = this.getRoleHierarchy(targetCurrentRole)
 
     // Cannot modify roles of members with equal or higher role
@@ -110,54 +108,68 @@ export class BoardAssignMemberRolePolicy extends BasePolicy {
     return this.allow('BOARD_MEMBER_ROLE::ROLE_CHANGE_ALLOWED')
   }
 
-/**
+  /**
    * Check if the current user has permission to assign roles
    * (must be Admin or Workspace Owner)
    */
-  private canAssignRole(context: BoardAssignMemberRolePolicyContext, resource: BoardAssignMemberRolePolicyResource): boolean {
+  private canAssignRole(
+    context: BoardAssignMemberRolePolicyContext,
+    resource: BoardAssignMemberRolePolicyResource
+  ): boolean {
     return this.isAdminMember(context, resource) || this.isWorkspaceOwner(context, resource)
   }
 
   /**
    * Check if the current user is the workspace owner
    */
-  private isWorkspaceOwner(context: BoardAssignMemberRolePolicyContext, resource: BoardAssignMemberRolePolicyResource): boolean {
+  private isWorkspaceOwner(
+    context: BoardAssignMemberRolePolicyContext,
+    resource: BoardAssignMemberRolePolicyResource
+  ): boolean {
     return context.user.id === resource.workspaceOwnerId
   }
 
   /**
    * Check if the current user is an admin member
    */
-  private isAdminMember(context: BoardAssignMemberRolePolicyContext, resource: BoardAssignMemberRolePolicyResource): boolean {
+  private isAdminMember(
+    context: BoardAssignMemberRolePolicyContext,
+    resource: BoardAssignMemberRolePolicyResource
+  ): boolean {
     const { user } = context
     const { boardMembers } = resource
-    return boardMembers.some(
-      member => member.boardMemberRole === 'Admin' && member.memberId === user.id
-    )
+    return boardMembers.some((member) => member.boardMemberRole === 'Admin' && member.memberId === user.id)
   }
 
-  private getCurrentUserRole(context: BoardAssignMemberRolePolicyContext, resource: BoardAssignMemberRolePolicyResource): boardTypes.BoardMemberRole | undefined {
-    return resource.boardMembers.find(member => member.memberId === context.user.id)?.boardMemberRole
+  private getCurrentUserRole(
+    context: BoardAssignMemberRolePolicyContext,
+    resource: BoardAssignMemberRolePolicyResource
+  ): boardTypes.BoardMemberRole | undefined {
+    return resource.boardMembers.find((member) => member.memberId === context.user.id)?.boardMemberRole
   }
 
   private getAdminCount(boardMembers: boardTypes.Board['members']): number {
-    return boardMembers.filter(member => member.boardMemberRole === 'Admin').length
+    return boardMembers.filter((member) => member.boardMemberRole === 'Admin').length
   }
 
   private getTargetMember(
-    resource: BoardAssignMemberRolePolicyResource, 
+    resource: BoardAssignMemberRolePolicyResource,
     targetMemberId: string
   ): boardTypes.Board['members'][0] | undefined {
-    return resource.boardMembers.find(member => member.memberId === targetMemberId)
+    return resource.boardMembers.find((member) => member.memberId === targetMemberId)
   }
 
   private isValidRole(role: string): role is boardTypes.BoardMemberRole {
     return ['Observer', 'Member', 'Admin'].includes(role)
   }
-  
-  private getRoleHierarchy(role?: boardTypes.BoardMemberRole): number {
+
+  private getRoleHierarchy(role?: boardTypes.BoardMemberRole, isWorkspaceOwner: boolean = false): number {
     if (!role) {
       return 0
+    }
+
+    if (isWorkspaceOwner) {
+      return 4
     }
 
     const hierarchy = {
@@ -165,7 +177,7 @@ export class BoardAssignMemberRolePolicy extends BasePolicy {
       Member: 2,
       Admin: 3
     }
-  
+
     return hierarchy[role] || 0
   }
 }
