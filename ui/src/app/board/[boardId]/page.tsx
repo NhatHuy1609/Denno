@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { useRequireAuth } from '@/app/_hooks/useRequireAuth'
 import useBoardViewPolicy from '@/permissions/hooks/useBoardViewPolicy'
@@ -10,6 +10,7 @@ import WaterFallLoading from '@/app/_components/Loadings/WaterFallLoading'
 import BoardView from '@/app/_features/BoardViews/BoardView'
 import PrivateBoardAccessRequest from './PrivateBoardAccessRequest'
 import PrimarySidebar from '@/layouts/shared/PrimarySidebar'
+import { useSignalR } from '@/app/_providers/SignalRProvider/useSignalR'
 
 function BoardHomePage() {
   // Apply auth guard
@@ -28,6 +29,15 @@ function BoardHomePage() {
 
   // Sync recent access to localstorage for the board
   useRecentAccessSync(boardId, workspaceId)
+
+  const { signalRService } = useSignalR()
+
+  // This effect is used to join the board when the user has access to  the board
+  useEffect(() => {
+    if (!boardId || !signalRService) return
+
+    signalRService.invoke('board', 'JoinBoard', boardId)
+  }, [signalRService, boardId])
 
   if (isCheckingAuth || isCheckingBoardViewPolicyAccess) {
     return (

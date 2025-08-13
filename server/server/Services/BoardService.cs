@@ -1,21 +1,27 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using server.Data;
 using server.Dtos.Response.Board.BoardActivityRespones.Interfaces;
 using server.Factories.BoardActivityResponseFactory.Helpers;
+using server.Helpers;
+using server.Hubs.BoardHub;
 using server.Interfaces;
 
 namespace server.Services
 {
     public class BoardService : IBoardService
     {
-        private readonly BoardActivityResponseFactoryResolver _boardActivityResponseFactoryResolver;
         private readonly ApplicationDBContext _dbContext;
+        private readonly IHubContext<BoardHub, IBoardHubClient> _hubContext;
+        private readonly BoardActivityResponseFactoryResolver _boardActivityResponseFactoryResolver;
 
         public BoardService(
-            BoardActivityResponseFactoryResolver boardActivityResponseFactoryResolver,
-            ApplicationDBContext dbContext)
+            ApplicationDBContext dbContext,
+            IHubContext<BoardHub, IBoardHubClient> hubContext,
+            BoardActivityResponseFactoryResolver boardActivityResponseFactoryResolver)
         {
             _boardActivityResponseFactoryResolver = boardActivityResponseFactoryResolver;
+            _hubContext = hubContext;
             _dbContext = dbContext;
         }
 
@@ -48,6 +54,14 @@ namespace server.Services
             }
 
             return board.BoardMembers.Any(bm => bm.AppUserId == userId);
+        }
+
+        public async Task NotifyMemberRoleChanged(Guid boardId)
+        {
+            await _hubContext
+                .Clients
+                .Group(SignalRGroupNames.GetBoardGroupName(boardId))
+                .ReceiveMemberRoleChanged();
         }
     }
 }
