@@ -5,9 +5,14 @@ import WaterFallLoading from '@/app/_components/Loadings/WaterFallLoading'
 import BoardMemberItem from './BoardMemberItem'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 import { useSignalR } from '@/app/_providers/SignalRProvider/useSignalR'
+import { useWorkspaceMembersWithGuests } from './hooks/useWorkspaceMembersWithGuests'
 
 export default function BoardMembersTab() {
   const [boardId] = useSyncedLocalStorage<string>(PersistedStateKey.RecentAccessBoard, '')
+  const [workspaceId] = useSyncedLocalStorage<string>(PersistedStateKey.RecentAccessWorkspace, '')
+
+  const { participantTypeMapById } = useWorkspaceMembersWithGuests(workspaceId)
+
   const {
     data: boardData,
     isPending,
@@ -27,7 +32,6 @@ export default function BoardMembersTab() {
     // Sync board members data when member role changed
     signalRService.on('board', 'ReceiveMemberRoleChanged', () => {
       refetch()
-      console.log('ReceiveMemberRoleChanged')
     })
   }, [signalRService])
 
@@ -46,7 +50,12 @@ export default function BoardMembersTab() {
   return (
     <div className='flex w-full flex-col gap-4'>
       {members.map((member) => (
-        <BoardMemberItem key={member.memberId} member={member.member} memberRole={member.boardMemberRole} />
+        <BoardMemberItem
+          key={member.memberId}
+          member={member.member}
+          memberRole={member.boardMemberRole}
+          workspaceParticipantType={participantTypeMapById.get(member.memberId)}
+        />
       ))}
     </div>
   )

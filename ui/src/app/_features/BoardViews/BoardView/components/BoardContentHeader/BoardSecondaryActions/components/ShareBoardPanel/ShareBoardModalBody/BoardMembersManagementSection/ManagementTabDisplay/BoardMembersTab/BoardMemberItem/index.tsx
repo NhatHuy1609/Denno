@@ -9,13 +9,15 @@ import DropdownOtherActions from './DropdownOtherActions'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 import { PersistedStateKey } from '@/data/persisted-keys'
 import useUpdateBoardMemberRole from '@/app/_hooks/mutation/board/useUpdateBoardMemberRole'
+import { WorkspaceParticipant } from '../hooks/useWorkspaceMembersWithGuests'
 
 interface BoardMemberItemProps {
   member: userTypes.User
   memberRole: string
+  workspaceParticipantType?: WorkspaceParticipant['participantType']
 }
 
-function BoardMemberItem({ member, memberRole }: BoardMemberItemProps) {
+function BoardMemberItem({ member, memberRole, workspaceParticipantType }: BoardMemberItemProps) {
   const [boardId] = useSyncedLocalStorage<string>(PersistedStateKey.RecentAccessBoard, '')
 
   const { mutateAsync: updateBoardMemberRoleAsync } = useUpdateBoardMemberRole({
@@ -76,6 +78,19 @@ function BoardMemberItem({ member, memberRole }: BoardMemberItemProps) {
     })
   }
 
+  const displayWorkspaceParticipantType = (type: WorkspaceParticipant['participantType']): string => {
+    switch (type) {
+      case 'member':
+        return 'Workspace member'
+      case 'guest':
+        return 'Workspace guest'
+      case 'admin':
+        return 'Workspace admin'
+      default:
+        return 'Unknown'
+    }
+  }
+
   return (
     <div className='flex w-full items-center justify-between gap-3'>
       <Avatar src={member.avatar} size='base' name={member.fullName} />
@@ -83,7 +98,7 @@ function BoardMemberItem({ member, memberRole }: BoardMemberItemProps) {
         <span className='text-base text-gray-600'>{member.fullName}</span>
         <div className='flex gap-2 text-xs text-gray-500'>
           <span>{member.email}</span>
-          <span>{memberRole}</span>
+          {workspaceParticipantType && <span>{displayWorkspaceParticipantType(workspaceParticipantType)}</span>}
         </div>
       </div>
       <DropdownMenuPrimary

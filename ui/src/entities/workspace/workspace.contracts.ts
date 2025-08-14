@@ -74,7 +74,8 @@ export const WorkspaceFilterQuerySchema = z
     boardCounts: z.coerce.boolean().default(false).optional(),
     members: z.coerce.boolean().default(false).optional(),
     joinRequests: z.coerce.boolean().default(false).optional(),
-    memberFields: z.string().optional()
+    memberFields: z.string().optional(),
+    includeGuests: z.coerce.boolean().default(false).optional()
   })
   .optional()
   .describe('WorkspaceFilterQuerySchema')
