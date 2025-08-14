@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { 
+import {
   AddWorkspaceMemberDtoSchema,
   AddWorkspaceMemberResponseDtoSchema,
   CreateWorkspaceDtoSchema,
@@ -8,10 +8,11 @@ import {
   UpdateWorkspaceDtoSchema,
   UpdateWorkspaceLogoDtoSchema,
   VerifyWorkspaceInvitationSecretRequestDtoSchema,
+  WorkspaceGuestResponseDtoSchema,
   WorkspaceInvitationSecretResponseDtoSchema,
   WorkspaceJoinRequestResponseDtoSchema,
   WorkspaceJoinRequestsResponseDtoSchema,
-  WorkspaceResponseDtoSchema ,
+  WorkspaceResponseDtoSchema,
   WorkspacesResponseDtoSchema
 } from './workspace.contracts'
 
@@ -30,3 +31,4 @@ export type WorkspaceInvitationSecretResponseDto = z.infer<typeof WorkspaceInvit
 export type DetailedWorkspaceInvitationSecretResponseDto = z.infer<typeof DetailedWorkspaceInvitationResponseDtoSchema>
 export type WorkspaceJoinRequestResponseDto = z.infer<typeof WorkspaceJoinRequestResponseDtoSchema>
 export type WorkspaceJoinRequestsResponseDto = z.infer<typeof WorkspaceJoinRequestsResponseDtoSchema>
+export type WorkspaceGuestResponseDto = z.infer<typeof WorkspaceGuestResponseDtoSchema>

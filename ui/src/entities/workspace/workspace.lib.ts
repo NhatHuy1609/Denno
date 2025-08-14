@@ -1,27 +1,42 @@
 import { workspaceTypesDto } from '@/service/api/workspace'
-import { DetailedWorkspaceInvitation, Workspace, WorkspaceJoinRequest, WorkspaceJoinRequests, Workspaces } from './workspace.types'
+import {
+  DetailedWorkspaceInvitation,
+  Workspace,
+  WorkspaceJoinRequest,
+  WorkspaceJoinRequests,
+  Workspaces
+} from './workspace.types'
 import { InvitationSecret } from '../invitationSecret/invitationSecret.types'
 
-export function transformWorkspaceDtoToWorkspace(
-  workspaceDto: workspaceTypesDto.WorkspaceResponseDto
-): Workspace {
+export function transformWorkspaceDtoToWorkspace(workspaceDto: workspaceTypesDto.WorkspaceResponseDto): Workspace {
+  const { guests = [] } = workspaceDto
+
   return {
-    ...workspaceDto
+    ...workspaceDto,
+    guests: guests?.map((guest) => ({
+      user: {
+        id: guest.user.id,
+        fullName: guest.user.fullName,
+        email: guest.user.email,
+        avatar: guest.user.avatar
+      },
+      joinedBoards: guest.joinedBoards.map((board) => ({
+        id: board.id,
+        name: board.name,
+        background: board.background
+      }))
+    }))
   }
 }
 
-export function transformWorkspacesDtoToWorkspaces(
-  workspacesDto: workspaceTypesDto.WorkspacesResponseDto
-): Workspaces {
-  return workspacesDto.map(workspace => transformWorkspaceDtoToWorkspace(workspace))
+export function transformWorkspacesDtoToWorkspaces(workspacesDto: workspaceTypesDto.WorkspacesResponseDto): Workspaces {
+  return workspacesDto.map((workspace) => transformWorkspaceDtoToWorkspace(workspace))
 }
 
-export function mapToInvitationSecret(
-  dto: workspaceTypesDto.WorkspaceInvitationSecretResponseDto
-): InvitationSecret {
+export function mapToInvitationSecret(dto: workspaceTypesDto.WorkspaceInvitationSecretResponseDto): InvitationSecret {
   return {
     ...dto
-  };
+  }
 }
 
 export function mapToDetailedWorkspaceInvitation(
@@ -55,5 +70,5 @@ export function transformWorkspaceJoinRequestDtoToWorkspaceJoinRequest(
 export function transformWorkspaceJoinRequestsDtoToWorkspaceJoinRequests(
   dto: workspaceTypesDto.WorkspaceJoinRequestsResponseDto
 ): WorkspaceJoinRequests {
-  return dto.map(workspaceJoinRequest => transformWorkspaceJoinRequestDtoToWorkspaceJoinRequest(workspaceJoinRequest))
+  return dto.map((workspaceJoinRequest) => transformWorkspaceJoinRequestDtoToWorkspaceJoinRequest(workspaceJoinRequest))
 }

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using server.Entities;
 using server.Enums;
 
 namespace server.Dtos.Response.Workspace.WorkspaceResponseDto2
@@ -20,6 +21,9 @@ namespace server.Dtos.Response.Workspace.WorkspaceResponseDto2
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public List<WorkspaceJoinRequestResponse> JoinRequests { get; set; }
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public List<WorkspaceGuestResponse> Guests { get; set; }
     }
 
     public class BoardCountDto
@@ -34,6 +38,6 @@ namespace server.Dtos.Response.Workspace.WorkspaceResponseDto2
         public string Email { get; set; }
         public string Avatar { get; set; }
         public string FullName { get; set; }
-        public MemberRole MemberType { get; set; }
+        public WorkspaceMemberRole MemberType { get; set; }
     }
 }

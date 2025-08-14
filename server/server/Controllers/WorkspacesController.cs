@@ -1,6 +1,5 @@
 ﻿using Asp.Versioning;
 using AutoMapper;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using server.Constants;
@@ -14,7 +13,6 @@ using server.Helpers;
 using server.Hubs.NotificationHub;
 using server.Interfaces;
 using server.Models.Query;
-using server.Services.QueueHostedService;
 using server.Strategies.ActionStrategy.Contexts;
 using System;
 using System.Security.Claims;
@@ -117,7 +115,7 @@ namespace server.Controllers
                 {
                     AppUserId = ownerId,
                     WorkspaceId = workspace.Id,
-                    Role = Enums.MemberRole.Admin
+                    Role = WorkspaceMemberRole.Admin
                 }
             };
 
@@ -258,18 +256,6 @@ namespace server.Controllers
 
             return Ok(_mapper.Map<AddWorkspaceMemberActionResponse>(action));
         }
-
-        //[HttpGet("[controller]/{id}/members")]
-        //[ProducesResponseType(StatusCodes.Status404NotFound)]
-        //public async Task<IActionResult> GetWorkspaceMembersAsync(Guid id)
-        //{
-        //    var workspace = await _unitOfWork.Workspaces.GetByIdAsync(id);
-
-        //    if (workspace == null)
-        //        return NotFound(new ApiErrorResponse() { StatusMessage = "Workspace not found" });
-
-        //    return Ok();
-        //}
 
         [HttpPost("[controller]/{id}/invitationSecret")]
         public async Task<IActionResult> CreateInvitationSecretAsync(Guid id)

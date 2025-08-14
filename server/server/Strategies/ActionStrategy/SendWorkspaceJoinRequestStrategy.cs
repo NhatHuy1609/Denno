@@ -47,7 +47,7 @@ namespace server.Strategies.ActionStrategy
             };
 
             var recipients = workspace.WorkspaceMembers
-                .Where(wm => wm.Role == Enums.MemberRole.Admin)
+                .Where(wm => wm.Role == WorkspaceMemberRole.Admin)
                 .Select(wm => new NotificationRecipient()
                 {
                     Notification = notification,
