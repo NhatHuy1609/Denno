@@ -80,7 +80,7 @@ function BoardMemberItem({ member, memberRole, workspaceParticipantType }: Board
 
   const displayWorkspaceParticipantType = (type: WorkspaceParticipant['participantType']): string => {
     switch (type) {
-      case 'member':
+      case 'normal':
         return 'Workspace member'
       case 'guest':
         return 'Workspace guest'

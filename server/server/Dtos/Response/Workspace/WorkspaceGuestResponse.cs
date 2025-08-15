@@ -6,6 +6,6 @@ namespace server.Dtos.Response.Workspace
     public class WorkspaceGuestResponse
     {
         public GetUserResponseDto User { get; set; }
-        public BoardResponseDto JoinedBoards { get; set; }
+        public IList<BoardResponseDto> JoinedBoards { get; set; }
     }
 }

@@ -142,7 +142,7 @@ namespace server.Services
                     equals new { wm.WorkspaceId, wm.AppUserId }
                     into wmGroup // IEnumerable<WorkspaceMember>
                 from wm in wmGroup.DefaultIfEmpty()
-                where b.WorkspaceId == wm.WorkspaceId && wm == null
+                where wm == null
                 group b by bm.AppUser into bGroup
                 select new 
                 {
@@ -155,7 +155,7 @@ namespace server.Services
             response.Guests = workspaceGuests
                 .Select(wg => new WorkspaceGuestResponse() {
                     User = _mapper.Map<GetUserResponseDto>(wg.Guest),
-                    JoinedBoards = _mapper.Map<BoardResponseDto>(wg.Boards)
+                    JoinedBoards = _mapper.Map<List<BoardResponseDto>>(wg.Boards)
                 })
                 .ToList();
         }
