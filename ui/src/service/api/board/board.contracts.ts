@@ -1,6 +1,5 @@
 import { z } from 'zod'
 import { enumContracts } from '../_enums'
-import { userContracts } from '@/entities/user'
 import { userContractsDto } from '../user'
 
 const BoardDto = z.object({
@@ -14,7 +13,7 @@ const BoardDto = z.object({
   members: z.array(
     z.object({
       memberId: z.string(),
-      member: userContracts.UserSchema,
+      member: userContractsDto.GetUserResponseDtoSchema,
       boardMemberRole: enumContracts.BoardMemberRoleEnumSchema
     })
   ),

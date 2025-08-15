@@ -6,8 +6,8 @@ import {
   transformWorkspaceDtoToWorkspace,
   transformWorkspaceJoinRequestsDtoToWorkspaceJoinRequests
 } from './workspace.lib'
-import { WorkspaceFilterQuery } from './workspace.types'
 import { WorkspaceQueryParamsDto } from '@/service/api/_models/query-models/workspace/workspace.types'
+import { WorkspaceFilterQuery } from './workspace.schemas'
 
 export class WorkspaceQueries {
   static readonly keys = {

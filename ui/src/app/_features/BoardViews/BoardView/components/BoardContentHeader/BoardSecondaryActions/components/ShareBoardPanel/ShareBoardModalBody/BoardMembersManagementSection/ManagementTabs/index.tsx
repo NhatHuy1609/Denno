@@ -4,7 +4,7 @@ import type { ManagementTabs, TabKey } from '../types'
 import { PersistedStateKey } from '@/data/persisted-keys'
 import { useBoardQuery } from '@/app/_hooks/query'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
-import { boardTypes } from '@/entities/board'
+import { boardSchemas } from '@/entities/board'
 import { useCurrentUserBoardMemberRole } from '@/store/features/board'
 
 interface ManagementTabsProps {
@@ -14,7 +14,7 @@ interface ManagementTabsProps {
 }
 
 const ACCESSIBLE_TABS: {
-  [key in boardTypes.BoardMemberRole]: TabKey[]
+  [key in boardSchemas.BoardMemberRole]: TabKey[]
 } = {
   Admin: ['members', 'requests'],
   Member: ['members'],

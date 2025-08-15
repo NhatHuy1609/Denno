@@ -17,6 +17,8 @@ function page() {
     setShowWorkspaceUpdateForm(false)
   }
 
+  console.log('WORKSPACE BOARDS: ', boards)
+
   return (
     <div className='w-full'>
       <section className='border-b border-gray-300 p-8 pb-6'>

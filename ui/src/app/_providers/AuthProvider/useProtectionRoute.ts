@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import { userTypes } from '@/entities/user'
+import { userSchemas } from '@/entities/user'
 
 const publicRoutes = [
   '/general',
@@ -11,7 +11,7 @@ const publicRoutes = [
   '/sign-up/complete-signup'
 ]
 
-const useProtectionRoute = ({ user }: { user: userTypes.User | null }) => {
+const useProtectionRoute = ({ user }: { user: userSchemas.User | null }) => {
   const router = useRouter()
   const path = usePathname()
 

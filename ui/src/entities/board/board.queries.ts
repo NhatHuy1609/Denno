@@ -6,7 +6,7 @@ import {
   transformBoardDtoToBoard,
   transformBoardsDtoToBoards
 } from './board.lib'
-import { boardLib, boardTypes } from '.'
+import { boardLib, boardSchemas } from '.'
 
 export class BoardQueries {
   static readonly keys = {
@@ -25,7 +25,7 @@ export class BoardQueries {
     })
   }
 
-  static boardQuery(boardId: string, filter?: boardTypes.BoardQueryFilter) {
+  static boardQuery(boardId: string, filter?: boardSchemas.BoardQueryFilter) {
     return queryOptions({
       queryKey: [...this.keys.detail(), filter, boardId] as unknown[],
       queryFn: async ({ signal }) => {

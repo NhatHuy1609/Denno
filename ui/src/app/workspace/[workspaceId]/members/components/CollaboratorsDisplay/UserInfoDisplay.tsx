@@ -1,9 +1,9 @@
 import { Props } from '@dnd-kit/core/dist/components/DragOverlay'
 import React from 'react'
-import type { userTypes } from '@/entities/user'
+import type { userSchemas } from '@/entities/user'
 
 type UserInfoDisplayProps = {
-  user?: userTypes.User
+  user?: userSchemas.User
 }
 
 function UserInfoDisplay({ user }: UserInfoDisplayProps) {

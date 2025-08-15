@@ -28,20 +28,20 @@ import {
   arrayMove,
   verticalListSortingStrategy
 } from '@dnd-kit/sortable'
-import type { CardLists } from '@/entities/cardList/cardList.types'
 import CardList from './CardList'
 import SortableCardList from './SortableCardList'
 import CardListAddButton from './CardListAddButton'
 import { cardListTypesDto } from '@/service/api/cardList'
 import { useQueryClient } from '@tanstack/react-query'
-import { CardListQueries, cardListTypes } from '@/entities/cardList'
+import { CardListQueries, cardListSchemas } from '@/entities/cardList'
 import { useParams } from 'next/navigation'
 import { toastError } from '@/ui'
-import { CardQueries, cardTypes } from '@/entities/card'
+import { CardQueries, cardSchemas } from '@/entities/card'
 import SortableCardItem from './CardList/SortableCardItem'
 import CardItem from './CardList/CardItem'
 import useUpdateCardRankMutation from '@/app/_hooks/mutation/card/useUpdateCardRankMutation'
 import { cardTypesDto } from '@/service/api/card'
+import { CardLists } from '@/entities/cardList/cardList.schemas'
 
 const dropAnimation: DropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
@@ -62,12 +62,12 @@ type TransformedItems = Record<UniqueIdentifier, UniqueIdentifier[]>
 /**
  * Transforms the card lists array into a structure optimized for dnd-kit operations.
  *
- * @param {cardListTypes.CardLists} data - The original array of card list objects
+ * @param {cardListSchemas.CardLists} data - The original array of card list objects
  * @returns {TransformedItems} An object where:
  *   - Keys are card list IDs
  *   - Values are arrays of card IDs that belong to each card list
  */
-const transformCardListsToItems = (data: cardListTypes.CardLists): TransformedItems => {
+const transformCardListsToItems = (data: cardListSchemas.CardLists): TransformedItems => {
   return data.reduce<TransformedItems>((acc, cardList) => {
     const cardListKey = cardList.id as UniqueIdentifier
     acc[cardListKey] = cardList.cards.map((c) => c.id as UniqueIdentifier)
@@ -78,12 +78,12 @@ const transformCardListsToItems = (data: cardListTypes.CardLists): TransformedIt
 /**
  * Transforms an array of card lists into two separate lookup maps for efficient access.
  *
- * @param {cardListTypes.CardLists} data - Array of card list objects
+ * @param {cardListSchemas.CardLists} data - Array of card list objects
  * @returns {Object} Object containing two maps: cardListsMap and cardsMap
  */
-const transformCardListsToMap = (data: cardListTypes.CardLists) => {
-  const cardListsMap: Record<string, cardListTypes.CardList> = {}
-  const cardsMap: Record<string, cardTypes.Card> = {}
+const transformCardListsToMap = (data: cardListSchemas.CardLists) => {
+  const cardListsMap: Record<string, cardListSchemas.CardList> = {}
+  const cardsMap: Record<string, cardSchemas.Card> = {}
 
   data.forEach((cardList) => {
     const cardListId = cardList.id
@@ -140,24 +140,19 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
 
   const { mutate: updateCardListRank } = useUpdateCardListRankMutation({
     onMutate() {
-      const previousData = queryClient.getQueryData(
-        CardListQueries.cardListsByBoardQuery(boardId as string).queryKey
-      )
-      const previousLists = transformCardListsToItems(previousData as cardListTypes.CardLists)
+      const previousData = queryClient.getQueryData(CardListQueries.cardListsByBoardQuery(boardId as string).queryKey)
+      const previousLists = transformCardListsToItems(previousData as cardListSchemas.CardLists)
       const previousContainers = Object.keys(previousLists)
 
       return { previousData, previousLists, previousContainers }
     },
     onSuccess(data, variables, context) {
       const { id: updatedCardListId } = data
-      queryClient.setQueryData(
-        CardListQueries.cardListsByBoardQuery(boardId as string).queryKey,
-        (oldData) => {
-          return oldData
-            ?.map((cardList) => (cardList.id === updatedCardListId ? data : cardList))
-            .sort((a, b) => a.rank.localeCompare(b.rank))
-        }
-      )
+      queryClient.setQueryData(CardListQueries.cardListsByBoardQuery(boardId as string).queryKey, (oldData) => {
+        return oldData
+          ?.map((cardList) => (cardList.id === updatedCardListId ? data : cardList))
+          .sort((a, b) => a.rank.localeCompare(b.rank))
+      })
     },
     onError(error, variables, context) {
       console.error(error)
@@ -170,10 +165,8 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
 
   const { mutate: updateCardRank } = useUpdateCardRankMutation({
     onMutate() {
-      const previousData = queryClient.getQueryData(
-        CardListQueries.cardListsByBoardQuery(boardId as string).queryKey
-      )
-      const previousLists = transformCardListsToItems(previousData as cardListTypes.CardLists)
+      const previousData = queryClient.getQueryData(CardListQueries.cardListsByBoardQuery(boardId as string).queryKey)
+      const previousLists = transformCardListsToItems(previousData as cardListSchemas.CardLists)
 
       return { previousLists }
     },
@@ -184,61 +177,56 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
       } = variables
       const { id: updatedCardId } = data
 
-      queryClient.setQueryData(
-        CardListQueries.cardListsByBoardQuery(boardId as string).queryKey,
-        (oldData) => {
-          if (!oldData) {
-            return []
-          }
-
-          // Clone the data to avoid direct mutations
-          const newData = [...oldData]
-
-          // Takes cardlist container contains the updated card and container's indices
-          const oldContainer = oldData?.find((cardList) => cardList.id === oldCardListId)
-          const oldContainerIndex = oldData?.findIndex((c) => c.id === oldCardListId) as number
-
-          if (oldContainerIndex === -1 || !oldContainer) return newData
-
-          // Creates new cardlist container because of changes in cards of old cardlist
-          if (newCardListId) {
-            const newContainer = oldData?.find((cardList) => cardList.id === newCardListId)
-            const newContainerIndex = oldData?.findIndex((c) => c.id === newCardListId) as number
-
-            if (newContainerIndex === -1 || !newContainer) return newData
-
-            newData[oldContainerIndex] = {
-              ...oldContainer,
-              cards: oldContainer?.cards
-                .filter((card) => card.id !== updatedCardId)
-                .sort((a, b) => a.rank.localeCompare(b.rank))
-            }
-
-            console.log('OLD CONTAINER: ', newData[oldContainerIndex])
-            newData[newContainerIndex] = {
-              ...newContainer,
-              cards: [...(newContainer?.cards as cardTypes.Cards), data].sort((a, b) =>
-                a.rank.localeCompare(b.rank)
-              )
-            }
-
-            return newData
-          } else {
-            const updatedContainer = {
-              ...oldContainer,
-              cards: oldContainer?.cards
-                .map((card) => (card.id === updatedCardId ? data : card))
-                .sort((a, b) => a.rank.localeCompare(b.rank))
-            } as cardListTypes.CardList
-
-            return [
-              ...(oldData?.slice(0, oldContainerIndex) || []),
-              updatedContainer,
-              ...(oldData?.slice(oldContainerIndex + 1) || [])
-            ]
-          }
+      queryClient.setQueryData(CardListQueries.cardListsByBoardQuery(boardId as string).queryKey, (oldData) => {
+        if (!oldData) {
+          return []
         }
-      )
+
+        // Clone the data to avoid direct mutations
+        const newData = [...oldData]
+
+        // Takes cardlist container contains the updated card and container's indices
+        const oldContainer = oldData?.find((cardList) => cardList.id === oldCardListId)
+        const oldContainerIndex = oldData?.findIndex((c) => c.id === oldCardListId) as number
+
+        if (oldContainerIndex === -1 || !oldContainer) return newData
+
+        // Creates new cardlist container because of changes in cards of old cardlist
+        if (newCardListId) {
+          const newContainer = oldData?.find((cardList) => cardList.id === newCardListId)
+          const newContainerIndex = oldData?.findIndex((c) => c.id === newCardListId) as number
+
+          if (newContainerIndex === -1 || !newContainer) return newData
+
+          newData[oldContainerIndex] = {
+            ...oldContainer,
+            cards: oldContainer?.cards
+              .filter((card) => card.id !== updatedCardId)
+              .sort((a, b) => a.rank.localeCompare(b.rank))
+          }
+
+          console.log('OLD CONTAINER: ', newData[oldContainerIndex])
+          newData[newContainerIndex] = {
+            ...newContainer,
+            cards: [...(newContainer?.cards as cardSchemas.Cards), data].sort((a, b) => a.rank.localeCompare(b.rank))
+          }
+
+          return newData
+        } else {
+          const updatedContainer = {
+            ...oldContainer,
+            cards: oldContainer?.cards
+              .map((card) => (card.id === updatedCardId ? data : card))
+              .sort((a, b) => a.rank.localeCompare(b.rank))
+          } as cardListSchemas.CardList
+
+          return [
+            ...(oldData?.slice(0, oldContainerIndex) || []),
+            updatedContainer,
+            ...(oldData?.slice(oldContainerIndex + 1) || [])
+          ]
+        }
+      })
     },
     onError(error, variables, context) {
       console.log(error)
@@ -570,10 +558,7 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
           <div className='flex max-w-fit list-none gap-2 p-2'>
             {containers?.map((containerId) => (
               <SortableCardList key={containerId} cardListData={cardListsMap[containerId]}>
-                <SortableContext
-                  items={[...lists[containerId]]}
-                  strategy={verticalListSortingStrategy}
-                >
+                <SortableContext items={[...lists[containerId]]} strategy={verticalListSortingStrategy}>
                   {lists[containerId].map((cardId) => (
                     <SortableCardItem key={cardId} cardData={cardsMap[cardId]} />
                   ))}

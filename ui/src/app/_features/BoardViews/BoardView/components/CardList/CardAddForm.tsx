@@ -1,7 +1,6 @@
 import { z } from 'zod'
 import React, { useEffect, useRef } from 'react'
 import type { cardTypesDto } from '@/service/api/card'
-import { CardQueries, cardTypes } from '@/entities/card'
 import { useQueryClient } from '@tanstack/react-query'
 import { useOnClickOutSide } from '@/app/_hooks/useOnClickOutSide'
 import { useForm, Controller } from 'react-hook-form'
@@ -12,7 +11,7 @@ import { toastError } from '@/ui'
 import PrimaryInputText from '@/app/_components/PrimaryInputText'
 import CustomizableButton from '@/ui/components/CustomizableButton'
 import { useParams } from 'next/navigation'
-import { CardListQueries, cardListTypes } from '@/entities/cardList'
+import { CardListQueries, cardListSchemas } from '@/entities/cardList'
 
 interface Props {
   hideFormFn: () => void
@@ -37,26 +36,21 @@ function CardAddForm({ hideFormFn }: Props) {
     onMutate() {},
     onSuccess(data, variables) {
       const { cardListId, id: cardId } = data
-      queryClient.setQueryData(
-        CardListQueries.cardListsByBoardQuery(boardId as string).queryKey,
-        (oldCardLists) => {
-          // Takes container which contains created card
-          const oldCardListContainer = oldCardLists?.find((cardList) => cardList.id === cardListId)
-          const oldCardListContainerIndex = oldCardLists?.findIndex(
-            (cardList) => cardList.id === cardListId
-          ) as number
-          const newCardListContainer = {
-            ...oldCardListContainer,
-            cards: [...(oldCardListContainer?.cards || []), data]
-          } as cardListTypes.CardList
+      queryClient.setQueryData(CardListQueries.cardListsByBoardQuery(boardId as string).queryKey, (oldCardLists) => {
+        // Takes container which contains created card
+        const oldCardListContainer = oldCardLists?.find((cardList) => cardList.id === cardListId)
+        const oldCardListContainerIndex = oldCardLists?.findIndex((cardList) => cardList.id === cardListId) as number
+        const newCardListContainer = {
+          ...oldCardListContainer,
+          cards: [...(oldCardListContainer?.cards || []), data]
+        } as cardListSchemas.CardList
 
-          return [
-            ...(oldCardLists?.slice(0, oldCardListContainerIndex) || []),
-            newCardListContainer,
-            ...(oldCardLists?.slice(oldCardListContainerIndex + 1) || [])
-          ]
-        }
-      )
+        return [
+          ...(oldCardLists?.slice(0, oldCardListContainerIndex) || []),
+          newCardListContainer,
+          ...(oldCardLists?.slice(oldCardListContainerIndex + 1) || [])
+        ]
+      })
     },
     onError() {
       toastError('Failed to create new card')
@@ -109,13 +103,7 @@ function CardAddForm({ hideFormFn }: Props) {
         )}
       />
       <div className='flex items-center gap-2'>
-        <CustomizableButton
-          type='submit'
-          intent='primary'
-          size='small'
-          value='Add card'
-          className='font-medium'
-        />
+        <CustomizableButton type='submit' intent='primary' size='small' value='Add card' className='font-medium' />
         <CustomizableButton
           intent='icon'
           size='icon'

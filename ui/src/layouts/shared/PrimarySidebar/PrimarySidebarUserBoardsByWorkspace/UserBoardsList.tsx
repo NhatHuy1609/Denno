@@ -4,14 +4,14 @@ import React, { useEffect, useState } from 'react'
 import { useBoardsByWorkspace } from '@/app/_hooks/query'
 import { PersistedStateKey } from '@/data/persisted-keys'
 import { getLocalStorageItem } from '@/utils/local-storage'
-import { boardTypes } from '@/entities/board'
+import { boardSchemas } from '@/entities/board'
 import { FaAngleDown, FaAngleUp } from 'react-icons/fa6'
 import BoardLinkNavigation from '@/app/_components/BoardLinkNavigation'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 
 const MAX_QUANTITY_CAN_BE_DISPLAYED = 4
 
-function UserBoardItem({ boardItem }: { boardItem: boardTypes.Board }) {
+function UserBoardItem({ boardItem }: { boardItem: boardSchemas.Board }) {
   const { name, background, id } = boardItem
 
   return (
@@ -31,10 +31,7 @@ function UserBoardItem({ boardItem }: { boardItem: boardTypes.Board }) {
 }
 
 function UserBoardsList() {
-  const [workspaceId, setRecentAccessWorkspaceId] = useSyncedLocalStorage(
-    PersistedStateKey.RecentAccessWorkspace,
-    ''
-  )
+  const [workspaceId, setRecentAccessWorkspaceId] = useSyncedLocalStorage(PersistedStateKey.RecentAccessWorkspace, '')
   const { data: boards = [] } = useBoardsByWorkspace(workspaceId)
 
   const [boardQuantityToDisplay, setBoardQuantityToDisplay] = useState<number>(() =>
@@ -43,9 +40,7 @@ function UserBoardsList() {
   // Update boardQuantityToDisplay when boards change
   useEffect(() => {
     setBoardQuantityToDisplay((prev) =>
-      prev > MAX_QUANTITY_CAN_BE_DISPLAYED
-        ? boards.length
-        : Math.min(boards.length, MAX_QUANTITY_CAN_BE_DISPLAYED)
+      prev > MAX_QUANTITY_CAN_BE_DISPLAYED ? boards.length : Math.min(boards.length, MAX_QUANTITY_CAN_BE_DISPLAYED)
     )
   }, [boards])
 

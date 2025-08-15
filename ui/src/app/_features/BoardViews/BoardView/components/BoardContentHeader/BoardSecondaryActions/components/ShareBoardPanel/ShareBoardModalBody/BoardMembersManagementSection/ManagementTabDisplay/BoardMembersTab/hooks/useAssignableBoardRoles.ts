@@ -1,27 +1,27 @@
-import { useMemo } from "react"
-import { getAssignableBoardMemberRoles } from "../utils/getAssignableBoardMemberRoles"
-import { DropdownMenuPrimaryItemProps } from "@/app/_components/DropdownMenuPrimary"
-import { boardTypes } from "@/entities/board"
-import { useSyncedLocalStorage } from "@/app/_hooks/useSyncedLocalStorage"
-import { PersistedStateKey } from "@/data/persisted-keys"
-import { useBoardQuery, useWorkspaceQuery } from "@/app/_hooks/query"
-import { BoardAssignMemberRolePolicyContext } from "@/permissions/policies/board/board-assign-member-role.policy"
-import { useMe } from "@/app/_hooks/query/user/useMe"
-import { PolicyContext } from "@/permissions/types/policy-context"
+import { useMemo } from 'react'
+import { getAssignableBoardMemberRoles } from '../utils/getAssignableBoardMemberRoles'
+import { DropdownMenuPrimaryItemProps } from '@/app/_components/DropdownMenuPrimary'
+import { boardSchemas } from '@/entities/board'
+import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
+import { PersistedStateKey } from '@/data/persisted-keys'
+import { useBoardQuery, useWorkspaceQuery } from '@/app/_hooks/query'
+import { BoardAssignMemberRolePolicyContext } from '@/permissions/policies/board/board-assign-member-role.policy'
+import { useMe } from '@/app/_hooks/query/user/useMe'
+import { PolicyContext } from '@/permissions/types/policy-context'
 
 type UseAssignableBoardRolesProps = {
   targetMemberId: string
 }
 
 type UseAssignableBoardRolesResult = {
-  roles: DropdownMenuPrimaryItemProps<boardTypes.BoardMemberRole>[]
-  currentUserBoardMemberRole: boardTypes.BoardMemberRole
+  roles: DropdownMenuPrimaryItemProps<boardSchemas.BoardMemberRole>[]
+  currentUserBoardMemberRole: boardSchemas.BoardMemberRole
 }
 
 // This hook is used for getting dynamic assignable board member roles
 // with context is the assigner is current logged in user and assignee is the target member
 export function useAssignableBoardRoles({
-  targetMemberId,
+  targetMemberId
 }: UseAssignableBoardRolesProps): UseAssignableBoardRolesResult {
   const { data: currentUser } = useMe()
   const [boardId] = useSyncedLocalStorage(PersistedStateKey.RecentAccessBoard, '')
@@ -34,20 +34,22 @@ export function useAssignableBoardRoles({
   const { members: boardMembers } = boardData || {}
   const workspaceOwnerId = workspaceData?.idOwner
 
-  const context: Omit<BoardAssignMemberRolePolicyContext, 'targetRole'> & PolicyContext | null = useMemo(() => {
+  const context: (Omit<BoardAssignMemberRolePolicyContext, 'targetRole'> & PolicyContext) | null = useMemo(() => {
     if (!currentUser) return null
 
     return {
       user: currentUser,
-      targetMemberId,
+      targetMemberId
     }
   }, [boardMembers, workspaceOwnerId, currentUser])
 
   const roles = useMemo(() => {
-    return context ? getAssignableBoardMemberRoles(context, {
-      boardMembers: boardMembers ?? [],
-      workspaceOwnerId: workspaceOwnerId || '',
-    }) : []
+    return context
+      ? getAssignableBoardMemberRoles(context, {
+          boardMembers: boardMembers ?? [],
+          workspaceOwnerId: workspaceOwnerId || ''
+        })
+      : []
   }, [context, targetMemberId])
 
   const currentUserBoardMemberRole = useMemo(() => {

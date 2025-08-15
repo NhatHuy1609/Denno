@@ -1,34 +1,28 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import PrimaryInputText from '@/app/_components/PrimaryInputText'
 import CustomizableButton from '@/ui/components/CustomizableButton'
-import DropdownMenuPrimary, {
-  DropdownMenuPrimaryItemProps
-} from '@/app/_components/DropdownMenuPrimary'
+import DropdownMenuPrimary, { DropdownMenuPrimaryItemProps } from '@/app/_components/DropdownMenuPrimary'
 import { useDebounce } from '@/app/_hooks/useDebounce'
-import { userTypes } from '@/entities/user'
+import { userSchemas } from '@/entities/user'
 import { useUsersQuery } from '@/app/_hooks/query/user/useUsersQuery'
 import SearchedUsersResult from './SearchedUsersResult'
 import SelectedUsersDisplay from './SelectedUsersDisplay'
 import { cn } from '@/lib/styles/utils'
 import useAddMultipleBoardMemberMutation from '@/app/_hooks/mutation/board/useAddMutipleBoardMember'
-import { BoardQueries, boardTypes } from '@/entities/board'
-import { getLocalStorageItem } from '@/utils/local-storage'
+import { BoardQueries, boardSchemas } from '@/entities/board'
 import { PersistedStateKey } from '@/data/persisted-keys'
 import { toastError, toastSuccess } from '@/ui'
 import { useQueryClient } from '@tanstack/react-query'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 
-type SearchedUserFilter = Pick<userTypes.UsersFilterQuery, 'email'>
+type SearchedUserFilter = Pick<userSchemas.UsersFilterQuery, 'email'>
 
 function ShareBoardForm() {
-  const [boardId, setRecentAccessBoardId] = useSyncedLocalStorage<string>(
-    PersistedStateKey.RecentAccessBoard,
-    ''
-  )
+  const [boardId, setRecentAccessBoardId] = useSyncedLocalStorage<string>(PersistedStateKey.RecentAccessBoard, '')
   const queryClient = useQueryClient()
 
   // State to manage selected users for sharing the board
-  const [selectedUsers, setSelectedUsers] = useState<Array<userTypes.User>>([])
+  const [selectedUsers, setSelectedUsers] = useState<Array<userSchemas.User>>([])
 
   // These states are used to control the behavior of the search results
   const [showSearchedUsersResult, setShowSearchedUsersResult] = useState(false)
@@ -43,7 +37,7 @@ function ShareBoardForm() {
   const { data: searchedUsers } = useUsersQuery(searchedUserFilter)
 
   // Array of dropdown items for selecting board member roles
-  const dropdownItems: Array<DropdownMenuPrimaryItemProps<boardTypes.BoardMemberRole>> = [
+  const dropdownItems: Array<DropdownMenuPrimaryItemProps<boardSchemas.BoardMemberRole>> = [
     {
       value: 'Member',
       label: 'Member',
@@ -59,9 +53,7 @@ function ShareBoardForm() {
   ]
 
   // Refs to capture the selected role, search term
-  const selectedRole = useRef<boardTypes.BoardMemberRole>(
-    dropdownItems[0].value as boardTypes.BoardMemberRole
-  )
+  const selectedRole = useRef<boardSchemas.BoardMemberRole>(dropdownItems[0].value as boardSchemas.BoardMemberRole)
   const inputRef = useRef<HTMLInputElement>(null)
   const descriptionInputRef = useRef<HTMLInputElement>(null)
 
@@ -93,7 +85,7 @@ function ShareBoardForm() {
     setShowSearchedUsersResult(Boolean(searchTerm))
   }, [searchTerm])
 
-  const handleSelectBoardMemberRoleToShare = (item: { value: boardTypes.BoardMemberRole }) => {
+  const handleSelectBoardMemberRoleToShare = (item: { value: boardSchemas.BoardMemberRole }) => {
     // Update the selected role
     selectedRole.current = item.value
   }
@@ -121,7 +113,7 @@ function ShareBoardForm() {
   }
 
   const handleSelectUser = useCallback(
-    (selectedUser: userTypes.User) => {
+    (selectedUser: userSchemas.User) => {
       const isValidToSelect = !selectedUsers.find((user) => user.email === selectedUser.email)
       if (isValidToSelect) {
         setSelectedUsers((prev) => [...prev, selectedUser])
@@ -137,10 +129,8 @@ function ShareBoardForm() {
   )
 
   const handleRemoveSelectedUser = useCallback(
-    (user: userTypes.User) => {
-      const removedUserIndex = selectedUsers.findIndex(
-        (selectedUser) => selectedUser.email === user.email
-      )
+    (user: userSchemas.User) => {
+      const removedUserIndex = selectedUsers.findIndex((selectedUser) => selectedUser.email === user.email)
 
       if (removedUserIndex !== -1) {
         setSelectedUsers((prev) => {
@@ -169,10 +159,7 @@ function ShareBoardForm() {
           {/* Selected users */}
           {selectedUsers.length > 0 && (
             <div className='h-full w-auto pl-2'>
-              <SelectedUsersDisplay
-                selectedUsers={selectedUsers}
-                removeSelectedUserFn={handleRemoveSelectedUser}
-              />
+              <SelectedUsersDisplay selectedUsers={selectedUsers} removeSelectedUserFn={handleRemoveSelectedUser} />
             </div>
           )}
           <input

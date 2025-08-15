@@ -1,23 +1,26 @@
-import { useMemo } from "react"
-import { PolicyEngine } from "@/permissions/core/policy-engine"
-import type { userTypes } from "@/entities/user"
-import type { boardTypes } from "@/entities/board"
-import { useMe } from "@/app/_hooks/query/user/useMe"
-import { useBoardQuery, useWorkspaceQuery } from "@/app/_hooks/query"
-import { useSyncedLocalStorage } from "@/app/_hooks/useSyncedLocalStorage"
-import { PersistedStateKey } from "@/data/persisted-keys"
-import { BoardAssignMemberRolePolicyContext, BoardAssignMemberRolePolicyResource } from "@/permissions/policies/board/board-assign-member-role.policy"
+import { useMemo } from 'react'
+import { PolicyEngine } from '@/permissions/core/policy-engine'
+import type { userSchemas } from '@/entities/user'
+import type { boardSchemas } from '@/entities/board'
+import { useMe } from '@/app/_hooks/query/user/useMe'
+import { useBoardQuery, useWorkspaceQuery } from '@/app/_hooks/query'
+import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
+import { PersistedStateKey } from '@/data/persisted-keys'
+import {
+  BoardAssignMemberRolePolicyContext,
+  BoardAssignMemberRolePolicyResource
+} from '@/permissions/policies/board/board-assign-member-role.policy'
 
 type UseBoardAssignMemberRoleProps = {
   targetMemberId: string
-  targetMemberRole: boardTypes.BoardMemberRole
+  targetMemberRole: boardSchemas.BoardMemberRole
 }
 
 type UseBoardAssignMemberRoleResult = {
   canAssign: boolean
   canAssignReason: string
   workspaceOwnerId?: string
-  currentAssigner?: userTypes.User
+  currentAssigner?: userSchemas.User
 }
 
 // This hook is used for checking whether the current user can assign a role to a board member
@@ -60,17 +63,13 @@ export function useBoardAssignMemberRole({
     }
   }, [boardMembers, workspaceOwnerId])
 
-  if (!context || !resourceData) return {
-    canAssign: false,
-    canAssignReason: 'Context or resource data for policy check is null'
-  }
+  if (!context || !resourceData)
+    return {
+      canAssign: false,
+      canAssignReason: 'Context or resource data for policy check is null'
+    }
 
-  const assignResult = policyEngine.canWithReason(
-    'board_assign_member_role',
-    'board',
-    context,
-    resourceData
-  )
+  const assignResult = policyEngine.canWithReason('board_assign_member_role', 'board', context, resourceData)
 
   return {
     canAssign: assignResult.allowed,

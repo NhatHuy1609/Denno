@@ -1,11 +1,11 @@
-import { BoardQueries, boardTypes } from '@/entities/board'
+import { BoardQueries, boardSchemas } from '@/entities/board'
 import { ApiQueryOptionsParams } from '../types'
 import { useApiQueryWrapper } from '../useApiQueryWrapper'
 
 export const useBoardQuery = (
   boardId: string,
-  filter?: boardTypes.BoardQueryFilter,
-  options?: ApiQueryOptionsParams<boardTypes.Board>
+  filter?: boardSchemas.BoardQueryFilter,
+  options?: ApiQueryOptionsParams<boardSchemas.Board>
 ) => {
   const queryOptions = BoardQueries.boardQuery(boardId, filter)
 

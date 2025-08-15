@@ -1,28 +1,35 @@
-import { boardTypes } from ".";
-import { boardTypesDto } from "@/service/api/board";
-import { InvitationSecret } from "../invitationSecret/invitationSecret.types";
-import { Board, BoardJoinRequest, BoardJoinRequests, Boards, DetailedBoardInvitation } from "./board.types";
+import { boardTypesDto } from '@/service/api/board'
+import {
+  Board,
+  BoardJoinRequest,
+  BoardJoinRequests,
+  BoardMemberRole,
+  Boards,
+  DetailedBoardInvitation
+} from './board.schemas'
+import { InvitationSecret } from '../invitationSecret/invitationSecret.schemas'
 
-export function transformBoardDtoToBoard(
-  boardDto: boardTypesDto.BoardResponseDto
-): Board {
+export function transformBoardDtoToBoard(boardDto: boardTypesDto.BoardResponseDto): Board {
+  const { workspace } = boardDto
+
   return {
-    ...boardDto
+    ...boardDto,
+    workspace: {
+      ...workspace,
+      idOwner: workspace.ownerId,
+      logo: workspace.logoUrl || null
+    }
   }
 }
 
-export function transformBoardsDtoToBoards(
-  boardsDto: boardTypesDto.BoardsResponseDto
-): Boards {
-  return boardsDto.map(boardDto => transformBoardDtoToBoard(boardDto))
+export function transformBoardsDtoToBoards(boardsDto: boardTypesDto.BoardsResponseDto): Boards {
+  return boardsDto.map((boardDto) => transformBoardDtoToBoard(boardDto))
 }
 
-export function mapToInvitationSecret(
-  dto: boardTypesDto.BoardInvitationSecretResponseDto
-): InvitationSecret {
+export function mapToInvitationSecret(dto: boardTypesDto.BoardInvitationSecretResponseDto): InvitationSecret {
   return {
     ...dto
-  };
+  }
 }
 
 export function mapToDetailedBoardInvitation(
@@ -41,9 +48,7 @@ export function mapToDetailedBoardInvitation(
   }
 }
 
-export function mapToBoardJoinRequest(
-  dto: boardTypesDto.BoardJoinRequestResponseDto
-): BoardJoinRequest {
+export function mapToBoardJoinRequest(dto: boardTypesDto.BoardJoinRequestResponseDto): BoardJoinRequest {
   return {
     ...dto,
     requester: {
@@ -53,13 +58,11 @@ export function mapToBoardJoinRequest(
   }
 }
 
-export function mapToBoardJoinRequests(
-  dto: boardTypesDto.BoardJoinRequestsResponseDto
-): BoardJoinRequests {
-  return dto.map(boardJoinRequest => mapToBoardJoinRequest(boardJoinRequest))
+export function mapToBoardJoinRequests(dto: boardTypesDto.BoardJoinRequestsResponseDto): BoardJoinRequests {
+  return dto.map((boardJoinRequest) => mapToBoardJoinRequest(boardJoinRequest))
 }
 
-export function getRoleHierarchy(role?: boardTypes.BoardMemberRole): number {
+export function getRoleHierarchy(role?: BoardMemberRole): number {
   if (!role) {
     return 0
   }

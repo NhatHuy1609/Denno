@@ -5,8 +5,8 @@ import {
   WorkspaceJoinRequest,
   WorkspaceJoinRequests,
   Workspaces
-} from './workspace.types'
-import { InvitationSecret } from '../invitationSecret/invitationSecret.types'
+} from './workspace.schemas'
+import { InvitationSecret } from '../invitationSecret/invitationSecret.schemas'
 
 export function transformWorkspaceDtoToWorkspace(workspaceDto: workspaceTypesDto.WorkspaceResponseDto): Workspace {
   const { guests = [] } = workspaceDto
@@ -62,7 +62,7 @@ export function transformWorkspaceJoinRequestDtoToWorkspaceJoinRequest(
     ...dto,
     requester: {
       ...dto.requester,
-      fullName: dto.requester.name
+      name: dto.requester.name
     }
   }
 }

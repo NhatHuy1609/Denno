@@ -1,10 +1,10 @@
 import React, { createContext } from 'react'
 import { useAppSelector } from '@/store/hooks'
-import { userTypes } from '@/entities/user'
+import { userSchemas } from '@/entities/user'
 import useProtectionRoute from './useProtectionRoute'
 
 interface IAuthContext {
-  user: userTypes.User | null
+  user: userSchemas.User | null
 }
 
 export const AuthContext = createContext<IAuthContext>({
@@ -17,9 +17,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   // Handle protected route
   // useProtectionRoute({ user })
 
-  return (
-    <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>
-  )
+  return <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>
 }
 
 export default AuthProvider

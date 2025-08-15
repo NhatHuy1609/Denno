@@ -2,13 +2,13 @@ import React from 'react'
 import CardListHeader from './CardListHeader'
 import { CSS, Transform } from '@dnd-kit/utilities'
 import type { DraggableSyntheticListeners } from '@dnd-kit/core'
-import { cardListTypes } from '@/entities/cardList'
+import { cardListSchemas } from '@/entities/cardList'
 import CardListFooter from './CardListFooter'
 import { CardListProvider } from './context'
 
 interface Props {
   children: React.ReactNode
-  cardListData?: cardListTypes.CardList
+  cardListData?: cardListSchemas.CardList
   dragging?: boolean
   transform?: Transform | null
   transition?: string | null
@@ -18,19 +18,7 @@ interface Props {
 
 export const CardList = React.memo(
   React.forwardRef<HTMLDivElement, Props>(
-    (
-      {
-        children,
-        cardListData,
-        dragging,
-        transform,
-        transition,
-        listeners,
-        setActivatorNodeRef,
-        ...props
-      },
-      ref
-    ) => {
+    ({ children, cardListData, dragging, transform, transition, listeners, setActivatorNodeRef, ...props }, ref) => {
       const style: React.CSSProperties = {
         transform: transform ? CSS.Translate.toString(transform) : undefined,
         transition: transition ?? undefined,
