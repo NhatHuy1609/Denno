@@ -1,14 +1,12 @@
-import { UserQueries } from "@/entities/user"
-import { useQuery } from "@tanstack/react-query"
-import { userTypes } from "@/entities/user"
+import { UserQueries } from '@/entities/user'
+import { useQuery } from '@tanstack/react-query'
+import { userSchemas } from '@/entities/user'
 
-export const useUsersQuery = (filter: userTypes.UsersFilterQuery) => {
+export const useUsersQuery = (filter: userSchemas.UsersFilterQuery) => {
   const { email } = filter
 
-  return useQuery(
-    {
-      ...UserQueries.usersQuery(filter),
-      enabled: !!email      
-    }
-  )
+  return useQuery({
+    ...UserQueries.usersQuery(filter),
+    enabled: !!email
+  })
 }

@@ -1,6 +1,13 @@
-import { BoardQueries } from "@/entities/board"
-import { useQuery } from "@tanstack/react-query"
+import { BoardQueries, boardSchemas } from '@/entities/board'
+import { ApiQueryOptionsParams } from '../types'
+import { useApiQueryWrapper } from '../useApiQueryWrapper'
 
-export const useBoardQuery = (boardId: string) => {
-  return useQuery(BoardQueries.boardQuery(boardId))
+export const useBoardQuery = (
+  boardId: string,
+  filter?: boardSchemas.BoardQueryFilter,
+  options?: ApiQueryOptionsParams<boardSchemas.Board>
+) => {
+  const queryOptions = BoardQueries.boardQuery(boardId, filter)
+
+  return useApiQueryWrapper(queryOptions, options)
 }

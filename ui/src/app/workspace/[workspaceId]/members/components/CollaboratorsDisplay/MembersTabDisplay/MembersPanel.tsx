@@ -1,6 +1,6 @@
 import React from 'react'
-import { Workspace } from '@/entities/workspace/workspace.types'
 import MembersDisplay from './MembersDisplay'
+import { Workspace } from '@/entities/workspace/workspace.schemas'
 
 type MembersPanelProps = {
   workspace: Workspace

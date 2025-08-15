@@ -1,10 +1,10 @@
 import React from 'react'
 import { cn } from '@/lib/styles/utils'
-import { userTypes } from '@/entities/user'
 import { useBoardCreateForm } from './context'
 import useCurrentUserWorkspacesQuery from '@/app/_hooks/query/user/useCurrentUserWorkspacesQuery'
 import { FaAngleDown } from 'react-icons/fa'
 import { DropdownMenu } from '@/ui'
+import { userSchemas } from '@/entities/user'
 
 export default function WorkspaceDropdown() {
   const { selectedWorkspace } = useBoardCreateForm()
@@ -29,7 +29,7 @@ export default function WorkspaceDropdown() {
   )
 }
 
-function WorkspaceDropdownItem({ workspace }: { workspace: userTypes.UserWorkspace }) {
+function WorkspaceDropdownItem({ workspace }: { workspace: userSchemas.UserWorkspace }) {
   const { setFormValue, workspaceId } = useBoardCreateForm()
   const { name, id } = workspace
 

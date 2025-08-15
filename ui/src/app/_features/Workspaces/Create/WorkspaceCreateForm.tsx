@@ -14,9 +14,7 @@ import { ScrollArea, Form, Button, toastSuccess, toastError } from '@/ui'
 const FormSchema = z
   .object({
     name: z.string({ required_error: 'Name required!' }).min(1, { message: 'Name required!' }),
-    description: z
-      .string({ required_error: 'Description required!' })
-      .min(1, { message: 'Description required!' })
+    description: z.string({ required_error: 'Description required!' }).min(1, { message: 'Description required!' })
   })
   .describe('CreateWorkspaceDtoSchema')
 
@@ -43,9 +41,6 @@ function WorkspaceCreateForm() {
     },
     onSuccess: () => {
       toastSuccess('Workspace created successfully')
-      queryClient.invalidateQueries({
-        queryKey: WorkspaceQueries.currentUserWorkspacesQuery().queryKey
-      })
     },
     onSettled: () => {
       reset()
@@ -92,15 +87,7 @@ function WorkspaceCreateForm() {
           )}
         />
 
-        <Button
-          size='base'
-          type='submit'
-          primary
-          block
-          title='Create'
-          loading={isPending}
-          disabled={isPending}
-        />
+        <Button size='base' type='submit' primary block title='Create' loading={isPending} disabled={isPending} />
       </form>
     </ScrollArea>
   )

@@ -1,5 +1,6 @@
 import './globals.css'
 import './themes.css'
+import './board-page-themes.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import Favicon from '../../public/favicon.ico'

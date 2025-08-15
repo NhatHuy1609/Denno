@@ -1,10 +1,13 @@
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using Serilog;
+using server.Authorization.Extensions;
 using server.Exceptions;
+using server.Extensions;
+using server.Factories.BoardActivityResponseFactory.Helpers;
 using server.Infrastructure;
 using server.Infrastructure.Configurations;
-using System.Text.Json;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +29,13 @@ builder.Services.AddApplicationIdentity();
 builder.Services.AddApplicationJwtAuth(builder.Configuration.GetSection("Jwt").Get<JwtConfiguration>());
 builder.Services.AddApplicationApiVersioning();
 
+// Add http client for external services
+builder.Services.AddHttpContextAccessor();
+
+// Add custom factories
+builder.Services.AddBoardActivityResponseFactories(Assembly.GetExecutingAssembly());
+builder.Services.AddScoped<BoardActivityResponseFactoryResolver>();
+
 // Configure Serilog
 builder.Host.UseSerilog((context, loggerConfiguration) =>
 {
@@ -46,6 +56,9 @@ builder.Services.AddSignalR().AddNewtonsoftJsonProtocol(options =>
 {
     options.PayloadSerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
 });
+
+// Add custom authorization policies
+builder.Services.AddCustomAuthorization();
 
 var app = builder.Build();
 

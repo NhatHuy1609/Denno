@@ -1,8 +1,8 @@
 import React from 'react'
 import BoardAdjustButton from './BoardAdjustButton'
-import { Workspace } from '@/entities/workspace/workspace.types'
 import RoleAdjustButton from './RoleAdjustButton'
 import UserRemoveButton from './UserRemoveButton'
+import { Workspace } from '@/entities/workspace/workspace.schemas'
 
 export default function MemberControls({
   member,

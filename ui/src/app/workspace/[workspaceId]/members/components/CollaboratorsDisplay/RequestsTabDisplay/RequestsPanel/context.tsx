@@ -1,4 +1,4 @@
-import { WorkspaceJoinRequests } from '@/entities/workspace/workspace.types'
+import { WorkspaceJoinRequests } from '@/entities/workspace/workspace.schemas'
 import { createContext } from 'react'
 import { useContext } from 'react'
 

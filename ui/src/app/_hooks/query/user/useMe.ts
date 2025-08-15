@@ -1,6 +1,9 @@
-import { useQuery } from "@tanstack/react-query"
-import { UserQueries } from "@/entities/user"
+import { UserQueries, userSchemas } from '@/entities/user'
+import { ApiQueryOptionsParams } from '../types'
+import { useApiQueryWrapper } from '../useApiQueryWrapper'
 
-export const useMe = () => {
-  return useQuery(UserQueries.loggedInUserQuery())
+export const useMe = (options?: ApiQueryOptionsParams<userSchemas.User>) => {
+  const queryOptions = UserQueries.loggedInUserQuery()
+
+  return useApiQueryWrapper(queryOptions, options)
 }

@@ -1,29 +1,20 @@
 import React from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
-import { boardTypes } from '@/entities/board'
+import { boardSchemas } from '@/entities/board'
 import { FaRegStar } from 'react-icons/fa'
+import BoardLinkNavigation from '@/app/_components/BoardLinkNavigation'
 
 interface Props {
-  item: boardTypes.Board
+  item: boardSchemas.Board
 }
 
 function BoardItem({ item }: Props) {
   const { background: backgroundSource, name, id } = item
 
   return (
-    <Link
-      href={`/board/${id}`}
-      className='group relative block min-h-24 w-full overflow-hidden rounded-md'
-    >
+    <BoardLinkNavigation boardId={id} className='group relative block min-h-24 w-full overflow-hidden rounded-md'>
       <div className='absolute inset-0 group-hover:brightness-90'>
-        <Image
-          width={120}
-          height={80}
-          alt='board image'
-          src={backgroundSource}
-          className='size-full object-cover'
-        />
+        <Image width={120} height={80} alt='board image' src={backgroundSource} className='size-full object-cover' />
       </div>
       <span className='absolute left-2 top-1 block font-bold text-white'>{name}</span>
       <button
@@ -32,7 +23,7 @@ function BoardItem({ item }: Props) {
       >
         <FaRegStar className='text-base text-amber-400' />
       </button>
-    </Link>
+    </BoardLinkNavigation>
   )
 }
 

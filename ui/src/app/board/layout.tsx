@@ -1,19 +1,13 @@
 'use client'
 
-import '@/app/board-page-themes.css'
-import React, { useEffect } from 'react'
+import React from 'react'
 import BoardLayoutComp from '@/layouts/BoardLayout'
+import { usePageTypeAttribute } from '@/app/_hooks/dom/usePageTypeAttribute '
 
-function MainBoardLayout({ children }: { children: React.ReactNode }) {
-  useEffect(() => {
-    document.documentElement.setAttribute('data-page', 'board')
-
-    return () => {
-      document.documentElement.setAttribute('data-page', 'default')
-    }
-  })
+function DetailedBoardLayout({ children }: { children: React.ReactNode }) {
+  usePageTypeAttribute('board')
 
   return <BoardLayoutComp>{children}</BoardLayoutComp>
 }
 
-export default MainBoardLayout
+export default DetailedBoardLayout

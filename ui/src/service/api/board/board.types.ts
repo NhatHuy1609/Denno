@@ -1,10 +1,30 @@
 import { z } from 'zod'
-import { 
+import {
   CreateBoardDtoSchema,
   BoardResponseDtoSchema,
-  BoardsResponseDtoSchema
+  BoardsResponseDtoSchema,
+  AddBoardMemberDtoSchema,
+  BoardInvitationSecretResponseDtoSchema,
+  CreateBoardInvitationSecretDtoSchema,
+  VerifyBoardInvitationSecretRequestDtoSchema,
+  DetailedBoardInvitationSecretResponseDtoSchema,
+  BoardJoinRequestResponseDtoSchema,
+  BoardJoinRequestsResponseDtoSchema,
+  CreateBoardJoinRequestDtoSchema,
+  ApproveBoardJoinRequestDtoSchema,
+  UpdateBoardMemberRoleRequestDtoSchema
 } from './board.contracts'
 
 export type CreateBoardDto = z.infer<typeof CreateBoardDtoSchema>
 export type BoardResponseDto = z.infer<typeof BoardResponseDtoSchema>
 export type BoardsResponseDto = z.infer<typeof BoardsResponseDtoSchema>
+export type AddBoardMemberDto = z.infer<typeof AddBoardMemberDtoSchema>
+export type CreateBoardInvitationSecretDto = z.infer<typeof CreateBoardInvitationSecretDtoSchema>
+export type BoardInvitationSecretResponseDto = z.infer<typeof BoardInvitationSecretResponseDtoSchema>
+export type VerifyBoardInvitationSecretRequestDto = z.infer<typeof VerifyBoardInvitationSecretRequestDtoSchema>
+export type DetailedBoardInvitationSecretResponseDto = z.infer<typeof DetailedBoardInvitationSecretResponseDtoSchema>
+export type BoardJoinRequestResponseDto = z.infer<typeof BoardJoinRequestResponseDtoSchema>
+export type BoardJoinRequestsResponseDto = z.infer<typeof BoardJoinRequestsResponseDtoSchema>
+export type CreateBoardJoinRequestDto = z.infer<typeof CreateBoardJoinRequestDtoSchema>
+export type ApproveBoardJoinRequestDto = z.infer<typeof ApproveBoardJoinRequestDtoSchema>
+export type UpdateBoardMemberRoleRequestDto = z.infer<typeof UpdateBoardMemberRoleRequestDtoSchema>

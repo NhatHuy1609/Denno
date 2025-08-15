@@ -2,6 +2,8 @@
 using server.Constants;
 using server.Data;
 using server.Entities;
+using server.Strategies.ActionStrategy.Contexts;
+using server.Strategies.ActionStrategy.Interfaces;
 
 namespace server.Strategies.ActionStrategy
 {
@@ -45,7 +47,7 @@ namespace server.Strategies.ActionStrategy
             };
 
             var recipients = workspace.WorkspaceMembers
-                .Where(wm => wm.Role == Enums.MemberRole.Admin)
+                .Where(wm => wm.Role == WorkspaceMemberRole.Admin)
                 .Select(wm => new NotificationRecipient()
                 {
                     Notification = notification,

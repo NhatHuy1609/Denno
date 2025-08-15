@@ -1,5 +1,5 @@
 import { DefaultError, useMutation, UseMutationOptions } from "@tanstack/react-query"
-import { JoinRequestService } from "@/service/api/joinRequest"
+import { WorkspaceService } from "@/service/api/workspace"
 
 type RejectMultipleWorkspaceJoinRequestParams = {
   requestIds: number[]
@@ -29,7 +29,7 @@ function useRejectMultipleWorkspaceJoinRequest(
     onMutate,
     mutationFn: async ({ requestIds }) => {
       const responses = await Promise.all(
-        requestIds.map((requestId) => JoinRequestService.rejectWorkspaceJoinRequest(requestId))
+        requestIds.map((requestId) => WorkspaceService.rejectWorkspaceJoinRequest(requestId))
       )
       return responses.map((response) => response.data)
     },

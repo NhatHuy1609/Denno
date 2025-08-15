@@ -19,7 +19,7 @@ const buttonVariants = cva(
       },
       disabled: {
         false: null,
-        true: ['opacity-50', 'cursor-not-allowed', 'bg-gray-200', 'text-black']
+        true: ['opacity-50', 'cursor-not-allowed', 'text-black']
       }
     },
     compoundVariants: [
@@ -42,7 +42,9 @@ type ButtonProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'disabled
     value?: string
     startIcon?: ReactNode
     endIcon?: ReactNode
+    loading?: boolean
     className?: string
+    renderOtherItems?: () => React.ReactNode
   }
 
 const CustomizableButton = ({
@@ -52,7 +54,9 @@ const CustomizableButton = ({
   intent,
   size,
   disabled,
+  loading = false,
   className,
+  renderOtherItems,
   ...props
 }: ButtonProps) => {
   return (
@@ -62,8 +66,17 @@ const CustomizableButton = ({
       {...props}
     >
       {startIcon}
-      {value && <span className='text-sm'>{value}</span>}
+      {value && !loading && <span className='text-sm'>{value}</span>}
       {endIcon}
+      {renderOtherItems && renderOtherItems()}
+      {loading && (
+        <div
+          style={{
+            scale: 0.55
+          }}
+          className='aspect-square h-fit animate-spin rounded-full border-2 border-gray-300 border-t-transparent p-4'
+        ></div>
+      )}
     </button>
   )
 }

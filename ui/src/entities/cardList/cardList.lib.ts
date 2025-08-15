@@ -1,9 +1,7 @@
-import { cardListTypesDto } from "@/service/api/cardList";
-import { CardList, CardLists } from "./cardList.types";
+import { cardListTypesDto } from '@/service/api/cardList'
+import { CardList, CardLists } from './cardList.schemas'
 
-export function transformCardListDtoToCardList(
-  cardListDto: cardListTypesDto.CardListResponseDto
-): CardList {
+export function transformCardListDtoToCardList(cardListDto: cardListTypesDto.CardListResponseDto): CardList {
   return {
     ...cardListDto
   }
@@ -12,5 +10,5 @@ export function transformCardListDtoToCardList(
 export function transformCardListsDtoToCardLists(
   cardListsDto: cardListTypesDto.CardListsByBoardResponseDto
 ): CardLists {
-  return cardListsDto.map(c => transformCardListDtoToCardList(c))
+  return cardListsDto.map((c) => transformCardListDtoToCardList(c))
 }

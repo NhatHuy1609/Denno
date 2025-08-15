@@ -2,9 +2,9 @@
 
 import React, { useState } from 'react'
 import { useParams } from 'next/navigation'
+import { useBoardsByWorkspace } from '@/app/_hooks/query'
 import WorkspaceBoardList from '@/app/_features/Board/List/WorkspaceBoardList'
 import WorkspaceInfoCard from '@/app/_features/Workspaces/Info'
-import { useBoardsByWorkspace } from '@/app/_hooks/query'
 import DefaultEmptyBoardSection from './components/DefaultEmptyBoardSection'
 import WorkspaceUpdateForm from '@/app/_features/Workspaces/Update/WorkspaceUpdateForm'
 

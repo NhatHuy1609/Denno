@@ -313,6 +313,9 @@ namespace server.Migrations
                     b.Property<string>("AppUserId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
+
                     b.HasKey("BoardId", "AppUserId");
 
                     b.HasIndex("AppUserId");
@@ -336,6 +339,27 @@ namespace server.Migrations
                     b.HasIndex("RestrictionId");
 
                     b.ToTable("BoardRestrictions");
+                });
+
+            modelBuilder.Entity("server.Entities.BoardUserSettings", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid>("BoardId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsWatching")
+                        .HasColumnType("bit");
+
+                    b.HasKey("UserId", "BoardId");
+
+                    b.HasIndex("BoardId");
+
+                    b.HasIndex("UserId", "BoardId")
+                        .IsUnique();
+
+                    b.ToTable("BoardUserSettings");
                 });
 
             modelBuilder.Entity("server.Entities.Card", b =>
@@ -589,11 +613,17 @@ namespace server.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsBoardActivity")
+                        .HasColumnType("bit");
+
                     b.Property<Guid?>("ListId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("MemberCreatorId")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("MetaData")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("TargetBoardId")
                         .HasColumnType("uniqueidentifier");
@@ -714,6 +744,9 @@ namespace server.Migrations
                     b.Property<Guid?>("BoardId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int?>("BoardRole")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -727,6 +760,9 @@ namespace server.Migrations
                     b.Property<string>("SecretCode")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Target")
+                        .HasColumnType("int");
 
                     b.Property<Guid?>("WorkspaceId")
                         .HasColumnType("uniqueidentifier");
@@ -758,7 +794,7 @@ namespace server.Migrations
 
                     b.Property<string>("RequesterId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<Guid?>("WorkspaceId")
                         .HasColumnType("uniqueidentifier");
@@ -766,6 +802,8 @@ namespace server.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BoardId");
+
+                    b.HasIndex("RequesterId");
 
                     b.HasIndex("WorkspaceId");
 
@@ -1026,6 +1064,25 @@ namespace server.Migrations
                     b.Navigation("Restriction");
                 });
 
+            modelBuilder.Entity("server.Entities.BoardUserSettings", b =>
+                {
+                    b.HasOne("server.Entities.Board", "Board")
+                        .WithMany("BoardUserSettings")
+                        .HasForeignKey("BoardId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
+                    b.HasOne("server.Entities.AppUser", "User")
+                        .WithMany("BoardUserSettings")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
+                    b.Navigation("Board");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("server.Entities.Card", b =>
                 {
                     b.HasOne("server.Entities.CardList", "CardList")
@@ -1260,12 +1317,20 @@ namespace server.Migrations
                         .HasForeignKey("BoardId")
                         .OnDelete(DeleteBehavior.ClientCascade);
 
+                    b.HasOne("server.Entities.AppUser", "Requester")
+                        .WithMany()
+                        .HasForeignKey("RequesterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("server.Entities.Workspace", "Workspace")
                         .WithMany("JoinRequests")
                         .HasForeignKey("WorkspaceId")
                         .OnDelete(DeleteBehavior.ClientCascade);
 
                     b.Navigation("Board");
+
+                    b.Navigation("Requester");
 
                     b.Navigation("Workspace");
                 });
@@ -1345,6 +1410,8 @@ namespace server.Migrations
 
                     b.Navigation("BoardMembers");
 
+                    b.Navigation("BoardUserSettings");
+
                     b.Navigation("CardCheckListItems");
 
                     b.Navigation("CardComments");
@@ -1370,6 +1437,8 @@ namespace server.Migrations
                     b.Navigation("BoardMembers");
 
                     b.Navigation("BoardRestrictions");
+
+                    b.Navigation("BoardUserSettings");
 
                     b.Navigation("CardLists");
 

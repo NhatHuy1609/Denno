@@ -1,5 +1,5 @@
+import { Workspace } from '@/entities/workspace/workspace.schemas'
 import { createContext, useContext } from 'react'
-import { Workspace } from '@/entities/workspace/workspace.types'
 
 type Member = NonNullable<Workspace['members']>[number]
 

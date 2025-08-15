@@ -21,6 +21,7 @@ namespace server.Factories.NotificationResponseFactory
                 ActionTypes.ApproveWorkspaceJoinRequest => _serviceProvider.GetRequiredService<ApproveWorkspaceJoinRequestNotificationResponseFactory>(),
                 ActionTypes.RejectWorkspaceJoinRequest => _serviceProvider.GetRequiredService<RejectWorkspaceJoinRequestNotificationResponseFactory>(),
                 ActionTypes.SendWorkspaceJoinRequest => _serviceProvider.GetRequiredService<SendWorkspaceJoinRequestNotificationResponseFactory>(),
+                ActionTypes.AddMemberToBoard => _serviceProvider.GetRequiredService<AddMemberToBoardNotificationResponseFactory>(),
                 // Add more action types as needed
                 _ => throw new ArgumentException($"No factory found for action type: {actionType}")
             };

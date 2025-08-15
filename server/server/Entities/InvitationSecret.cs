@@ -6,9 +6,11 @@ namespace server.Entities
     {
         [Key]
         public int Id { get; set; }
-        public string SecretCode { get; set; }
+        public string SecretCode { get; set; } = string.Empty;
+        public InvitationTarget Target { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime ExpiresAt { get; set; }
+        public BoardMemberRole? BoardRole { get; set; }
 
         public string InviterId { get; set; }
         public AppUser Inviter { get; set; }
@@ -18,5 +20,11 @@ namespace server.Entities
 
         public Guid? WorkspaceId { get; set; }
         public virtual Workspace? Workspace { get; set; }
+    }
+
+    public enum InvitationTarget
+    {
+        Board,
+        Workspace
     }
 }

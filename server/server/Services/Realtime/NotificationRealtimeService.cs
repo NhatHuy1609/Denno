@@ -30,22 +30,7 @@ namespace server.Services.Realtime
 
         public async Task SendActionNotificationToUsersAsync(DennoAction action)
         {
-            await SendActionNotificationToUsersInternalAsync(action, _dbContext);
-        }
-
-        public void SendActionNotificationToUsersInBackground(DennoAction action)
-        {
-            _taskQueue.QueueBackgroundWorkItem(async (cancellationToken, serviceProvider) =>
-            {
-                var dbContext = serviceProvider.GetRequiredService<ApplicationDBContext>();
-
-                await SendActionNotificationToUsersInternalAsync(action, dbContext);
-            });
-        }
-
-        private async Task SendActionNotificationToUsersInternalAsync(DennoAction action, ApplicationDBContext dbContext)
-        {
-            var notification = await dbContext.Notifications
+            var notification = await _dbContext.Notifications
                 .Include(n => n.NotificationRecipients)
                 .FirstOrDefaultAsync(n => n.ActionId == action.Id);
 

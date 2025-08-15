@@ -4,9 +4,9 @@ import { useQueryParamState } from '@/app/_hooks/next-ui/useQueryParamState'
 import CollaboratorTabs from './CollaboratorsTabs'
 import MembersTabDisplay from './MembersTabDisplay'
 import RequestsTabDisplay from './RequestsTabDisplay'
-import GuestsTabDisplay from './RequestsTabDisplay'
 import { useParams } from 'next/navigation'
 import { useWorkspaceQuery } from '@/app/_hooks/query'
+import GuestsTabDisplay from './GuestsTabDisplay'
 
 function CollaboratorsDisplay() {
   const { workspaceId } = useParams<{ workspaceId: string }>()
@@ -25,9 +25,9 @@ function CollaboratorsDisplay() {
     if (tab === 'members') {
       return <MembersTabDisplay />
     } else if (tab === 'guests') {
-      return <RequestsTabDisplay />
-    } else if (tab === 'requests') {
       return <GuestsTabDisplay />
+    } else if (tab === 'requests') {
+      return <RequestsTabDisplay />
     }
   }
 

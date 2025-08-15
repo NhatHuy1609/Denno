@@ -1,3 +1,4 @@
+import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 import { PersistedStateKey } from '@/data/persisted-keys'
 import { getLocalStorageItem } from '@/utils/local-storage'
 import Link from 'next/link'
@@ -16,7 +17,10 @@ function AddMemberButton() {
 }
 
 function MembersNavLink() {
-  const workspaceId = getLocalStorageItem(PersistedStateKey.RecentAccessWorkspace)
+  const [workspaceId, setRecentAccessWorkspaceId] = useSyncedLocalStorage(
+    PersistedStateKey.RecentAccessWorkspace,
+    ''
+  )
 
   return (
     <Link href={`/workspace/${workspaceId}/members`} className='relative flex items-center gap-2'>

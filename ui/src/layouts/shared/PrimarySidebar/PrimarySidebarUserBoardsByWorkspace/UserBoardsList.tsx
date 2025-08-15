@@ -1,19 +1,21 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useBoardsByWorkspace } from '@/app/_hooks/query'
 import { PersistedStateKey } from '@/data/persisted-keys'
 import { getLocalStorageItem } from '@/utils/local-storage'
-import { boardTypes } from '@/entities/board'
+import { boardSchemas } from '@/entities/board'
 import { FaAngleDown, FaAngleUp } from 'react-icons/fa6'
+import BoardLinkNavigation from '@/app/_components/BoardLinkNavigation'
+import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 
 const MAX_QUANTITY_CAN_BE_DISPLAYED = 4
 
-function UserBoardItem({ boardItem }: { boardItem: boardTypes.Board }) {
+function UserBoardItem({ boardItem }: { boardItem: boardSchemas.Board }) {
   const { name, background, id } = boardItem
 
   return (
-    <Link href={`/board/${id}`} className='block px-3 py-[6px] hover:bg-white/30'>
+    <BoardLinkNavigation boardId={id} className='block px-3 py-[6px] hover:bg-white/30'>
       <div className='flex items-center gap-2'>
         <Image
           src={background}
@@ -24,21 +26,27 @@ function UserBoardItem({ boardItem }: { boardItem: boardTypes.Board }) {
         />
         <span className='text-[13px] text-white'>{name}</span>
       </div>
-    </Link>
+    </BoardLinkNavigation>
   )
 }
 
 function UserBoardsList() {
-  const workspaceId = getLocalStorageItem(PersistedStateKey.RecentAccessWorkspace) as string
+  const [workspaceId, setRecentAccessWorkspaceId] = useSyncedLocalStorage(PersistedStateKey.RecentAccessWorkspace, '')
   const { data: boards = [] } = useBoardsByWorkspace(workspaceId)
 
   const [boardQuantityToDisplay, setBoardQuantityToDisplay] = useState<number>(() =>
     Math.min(boards.length, MAX_QUANTITY_CAN_BE_DISPLAYED)
   )
+  // Update boardQuantityToDisplay when boards change
+  useEffect(() => {
+    setBoardQuantityToDisplay((prev) =>
+      prev > MAX_QUANTITY_CAN_BE_DISPLAYED ? boards.length : Math.min(boards.length, MAX_QUANTITY_CAN_BE_DISPLAYED)
+    )
+  }, [boards])
 
-  const isShowMoreButton =
-    boardQuantityToDisplay < Math.max(MAX_QUANTITY_CAN_BE_DISPLAYED, boards.length)
-  const isShowLessButton = !isShowMoreButton
+  const isShowingMore = boardQuantityToDisplay > MAX_QUANTITY_CAN_BE_DISPLAYED
+  const isShowMoreButton = boards.length > MAX_QUANTITY_CAN_BE_DISPLAYED && !isShowingMore
+  const isShowLessButton = isShowingMore
 
   const handleShowMoreBoard = () => {
     setBoardQuantityToDisplay(boards.length)

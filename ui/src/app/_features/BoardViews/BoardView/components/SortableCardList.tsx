@@ -1,25 +1,17 @@
 import React from 'react'
 import CardList from './CardList'
 import { useSortable } from '@dnd-kit/sortable'
-import { cardListTypes } from '@/entities/cardList'
+import { cardListSchemas } from '@/entities/cardList'
 
 interface Props {
-  cardListData: cardListTypes.CardList
+  cardListData: cardListSchemas.CardList
   children: React.ReactNode
 }
 
 function SortableCardList({ cardListData, children }: Props) {
   const { id } = cardListData
 
-  const {
-    isDragging,
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    setActivatorNodeRef
-  } = useSortable({
+  const { isDragging, attributes, listeners, setNodeRef, transform, transition, setActivatorNodeRef } = useSortable({
     id,
     data: {
       cardListData

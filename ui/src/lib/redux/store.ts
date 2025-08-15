@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { sessionReducer } from '@/store/features/session'
+import { boardReducer } from '@/store/features/board'
 
 export const store = configureStore({
   reducer: {
-    session: sessionReducer
+    session: sessionReducer,
+    board: boardReducer
   }
 })
 

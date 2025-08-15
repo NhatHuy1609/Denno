@@ -4,14 +4,14 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useOnClickOutSide } from '@/app/_hooks/useOnClickOutSide'
 import useUpdateCardListMutation from '../../mutations/updateCardList.mutation'
 import { cardListTypesDto } from '@/service/api/cardList'
-import { CardListQueries, cardListTypes } from '@/entities/cardList'
+import { CardListQueries, cardListSchemas } from '@/entities/cardList'
 import { toastError } from '@/ui'
 import { DraggableSyntheticListeners } from '@dnd-kit/core'
 import { HiOutlineDotsHorizontal } from 'react-icons/hi'
 import PrimaryInputText from '@/app/_components/PrimaryInputText'
 
 interface IProps {
-  cardListData?: cardListTypes.CardList
+  cardListData?: cardListSchemas.CardList
   listeners?: DraggableSyntheticListeners
   setActivatorNodeRef?: (element: HTMLElement | null) => void
 }
@@ -20,11 +20,7 @@ export default function CardListHeader({ cardListData, setActivatorNodeRef, list
   return (
     <div className='w-full cursor-grab'>
       <div className='flex w-full items-center justify-between'>
-        <HeaderName
-          cardListData={cardListData}
-          listeners={listeners}
-          setActivatorNodeRef={setActivatorNodeRef}
-        />
+        <HeaderName cardListData={cardListData} listeners={listeners} setActivatorNodeRef={setActivatorNodeRef} />
         <button
           type='button'
           className='flex size-8 items-center justify-center rounded-md hover:bg-[var(--ds-accent-background-hovered)]'
@@ -41,7 +37,7 @@ function HeaderName({
   listeners,
   setActivatorNodeRef
 }: {
-  cardListData?: cardListTypes.CardList
+  cardListData?: cardListSchemas.CardList
   listeners?: DraggableSyntheticListeners
   setActivatorNodeRef?: (element: HTMLElement | null) => void
 }) {
@@ -112,11 +108,7 @@ function HeaderName({
 
   return (
     <div onClick={handleShowInput} className='relative w-full flex-1 py-1 pl-3'>
-      <h3
-        {...listeners}
-        ref={setActivatorNodeRef}
-        className='text-sm font-medium text-[var(--ds-accent-text)]'
-      >
+      <h3 {...listeners} ref={setActivatorNodeRef} className='text-sm font-medium text-[var(--ds-accent-text)]'>
         {cardListName}
       </h3>
       {isShowingInput && (
