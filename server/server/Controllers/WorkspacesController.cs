@@ -1,9 +1,7 @@
 ﻿using Asp.Versioning;
 using AutoMapper;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
 using server.Constants;
 using server.Dtos.Requests.Workspace;
 using server.Dtos.Response;
@@ -15,8 +13,7 @@ using server.Helpers;
 using server.Hubs.NotificationHub;
 using server.Interfaces;
 using server.Models.Query;
-using server.Services.QueueHostedService;
-using server.Strategies.ActionStrategy;
+using server.Strategies.ActionStrategy.Contexts;
 using System;
 using System.Security.Claims;
 
@@ -30,38 +27,35 @@ namespace server.Controllers
     {
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly UserManager<AppUser> _userManager;
         private readonly IFileUploadService _uploadService;
+        private readonly IAuthService _authService;
         private readonly IActionService _actionService;
         private readonly ILogger<WorkspacesController> _logger;
         private readonly IEmailService _emailService;
         private readonly IWorkspaceService _workspaceService;
         private readonly INotificationRealtimeService _notificationRealtimeService;
-        private readonly IBackgroundTaskQueue _backgroundTask;
         private readonly IHubContext<NotificationHub, INotificationHubClient> _hubContext;
 
         public WorkspacesController(
             IMapper mapper,
             IUnitOfWork unitOfWork,
-            UserManager<AppUser> userManager,
             IFileUploadService uploadService,
+            IAuthService authService,
             IActionService actionService,
             ILogger<WorkspacesController> logger,
             IEmailService emailService,
             IWorkspaceService workspaceService,
             INotificationRealtimeService notificationRealtimeService,
-            IBackgroundTaskQueue backgroundTask,
             IHubContext<NotificationHub, INotificationHubClient> hubContext)
         {
             _unitOfWork = unitOfWork;
-            _userManager = userManager;
             _uploadService = uploadService;
+            _authService = authService;
             _actionService = actionService;
             _logger = logger;
             _emailService = emailService;
             _workspaceService = workspaceService;
             _notificationRealtimeService = notificationRealtimeService;
-            _backgroundTask = backgroundTask;
             _mapper = mapper;
             _hubContext = hubContext;
         }
@@ -121,7 +115,7 @@ namespace server.Controllers
                 {
                     AppUserId = ownerId,
                     WorkspaceId = workspace.Id,
-                    Role = Enums.MemberRole.Admin
+                    Role = WorkspaceMemberRole.Admin
                 }
             };
 
@@ -254,33 +248,13 @@ namespace server.Controllers
             // Send email after creating new action successfully
             if (action != null)
             {
-                _ = Task.Run(async () =>
-                {
-                    try
-                    {
-                        await _emailService.SendActionEmailAsync(action);
-                        _logger.LogInformation("Successfully sent email to notify that user was added to new workspace");
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError($"Failed to send action notification email after retries: {ex.Message}");
-                    }
-                });
+                _emailService.SendActionEmailInBackgroundAsync(action);
+                _logger.LogInformation("Successfully sent email to notify that user was added to new workspace");
+
+                await _notificationRealtimeService.SendActionNotificationToUsersAsync(action);
             }
 
             return Ok(_mapper.Map<AddWorkspaceMemberActionResponse>(action));
-        }
-
-        [HttpGet("[controller]/{id}/members")]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetWorkspaceMembersAsync(Guid id)
-        {
-            var workspace = await _unitOfWork.Workspaces.GetByIdAsync(id);
-
-            if (workspace == null)
-                return NotFound(new ApiErrorResponse() { StatusMessage = "Workspace not found" });
-
-            return Ok();
         }
 
         [HttpPost("[controller]/{id}/invitationSecret")]
@@ -292,11 +266,12 @@ namespace server.Controllers
             {
                 var newInvitationSecret = new InvitationSecret()
                 {
+                    Target = InvitationTarget.Workspace,
+                    WorkspaceId = id,
                     SecretCode = SecretCodeGenerator.GenerateHexCode(),
-                    InviterId = User.FindFirstValue(ClaimTypes.NameIdentifier),
+                    InviterId = _authService.GetCurrentUserId(),
                     CreatedAt = DateTime.Now,
-                    ExpiresAt = DateTime.Now.AddDays(3),
-                    WorkspaceId = id
+                    ExpiresAt = DateTime.Now.AddDays(3)
                 };
 
                 await _unitOfWork.InvitationSecrets.CreateAsync(newInvitationSecret);
@@ -414,6 +389,7 @@ namespace server.Controllers
             if (action != null)
             {
                 _emailService.SendActionEmailInBackgroundAsync(action);
+                await _notificationRealtimeService.SendActionNotificationToUsersAsync(action);
             }
 
             return Ok(_mapper.Map<JoinWorkspaceByLinkActionResponse>(action));
@@ -448,8 +424,65 @@ namespace server.Controllers
                 _emailService.SendActionEmailInBackgroundAsync(action);
                 _logger.LogInformation("Successfully sent email to notify that user sent a join request to workspace");
 
-                //_notificationRealtimeService.SendActionNotificationToUsersInBackground(action);
                 await _notificationRealtimeService.SendActionNotificationToUsersAsync(action);
+            }
+
+            return Ok();
+        }
+
+        [HttpPost("[controller]/joinRequests/{requestId}/approval")]
+        public async Task<IActionResult> AppoveWorkspaceJoinRequestAsync(int requestId)
+        {
+            var joinRequest = await _unitOfWork.JoinRequests.GetJoinRequestByIdAsync(requestId);
+
+            if (joinRequest == null)
+            {
+                return NotFound();
+            }
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var actionContext = new DennoActionContext()
+            {
+                MemberCreatorId = userId,
+                WorkspaceId = joinRequest.WorkspaceId,
+                TargetUserId = joinRequest.RequesterId
+            };
+
+            var action = await _actionService.CreateActionAsync(ActionTypes.ApproveWorkspaceJoinRequest, actionContext);
+
+            if (action != null)
+            {
+                await _emailService.SendActionEmailAsync(action);
+            }
+
+            return Ok();
+        }
+
+        [HttpDelete("[controller]/joinRequests/{requestId}/rejection")]
+        public async Task<IActionResult> RejectWorkpsaceJoinRequestAsync(int requestId)
+        {
+            var joinRequest = await _unitOfWork.JoinRequests.GetJoinRequestByIdAsync(requestId);
+
+            if (joinRequest == null)
+            {
+                return NotFound();
+            }
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var actionContext = new DennoActionContext()
+            {
+                MemberCreatorId = userId,
+                WorkspaceId = joinRequest.WorkspaceId,
+                TargetUserId = joinRequest.RequesterId
+            };
+
+            var action = await _actionService.CreateActionAsync(ActionTypes.RejectWorkspaceJoinRequest, actionContext);
+
+            if (action != null)
+            {
+                await _emailService.SendActionEmailAsync(action);
             }
 
             return Ok();

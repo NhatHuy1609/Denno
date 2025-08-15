@@ -22,5 +22,6 @@ namespace server.Entities
         public virtual ICollection<BoardLabel> BoardLabels { get; set; } = new List<BoardLabel>();
         public virtual ICollection<DennoAction> Actions { get; set; } = new List<DennoAction>();
         public virtual ICollection<JoinRequest> JoinRequests { get; set; } = new List<JoinRequest>();
+        public virtual ICollection<BoardUserSettings> BoardUserSettings { get; set; } = new List<BoardUserSettings>();
     }
 }

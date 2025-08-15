@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using server.Data;
+using server.Dtos.Response.Board;
+using server.Dtos.Response.Users;
 using server.Dtos.Response.Workspace;
 using server.Dtos.Response.Workspace.WorkspaceResponseDto2;
 using server.Entities;
@@ -15,28 +17,49 @@ namespace server.Services
         private readonly IMapper _mapper;
         private readonly ApplicationDBContext _dbContext;
 
-        public WorkspaceService(
-            IMapper mapper,
-            ApplicationDBContext dbContext)
+        public WorkspaceService(IMapper mapper, ApplicationDBContext dbContext)
         {
-            _mapper = mapper;
-            _dbContext = dbContext;
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
+        /// <summary>
+        /// Retrieves workspace details based on the provided ID and query parameters.
+        /// </summary>
+        /// <param name="id">The workspace ID</param>
+        /// <param name="query">Query parameters specifying which fields to include</param>
+        /// <returns>Workspace response DTO or null if not found</returns>
         public async Task<WorkspaceResponseDto2?> GetWorkspaceResponseAsync(Guid id, WorkspaceQuery query)
         {
-            var workspace = await _dbContext.Workspaces
-                .Include(w => w.Logo)
-                .FirstOrDefaultAsync(w => w.Id == id);
-
-            if (workspace == null) return null;
+            var workspace = await GetWorkspaceAsync(id);
+            if (workspace == null)
+            {
+                return null;
+            }
 
             var response = new WorkspaceResponseDto2();
-
-            // Handle Fields field
             var requestedFields = query.Fields.ParseFields();
-            var getAllFields = requestedFields.Count() == 0;
+            var getAllFields = requestedFields.Count == 0;
 
+            MapBasicFields(workspace, response, requestedFields.ToList(), getAllFields);
+            await MapMembersAsync(workspace.Id, response, query.Members);
+            await MapBoardCountsAsync(workspace.Id, response, query.BoardCounts);
+            await MapJoinRequestsAsync(workspace.Id, response, query.JoinRequests);
+            await MapGuestsAsync(workspace.Id, response, query.IncludeGuests);
+
+            return response;
+        }
+
+        private async Task<Workspace?> GetWorkspaceAsync(Guid id)
+        {
+            return await _dbContext.Workspaces
+                .Include(w => w.Logo)
+                .FirstOrDefaultAsync(w => w.Id == id);
+        }
+
+        private void MapBasicFields(Workspace workspace, WorkspaceResponseDto2 response,
+            IReadOnlyCollection<string> requestedFields, bool getAllFields)
+        {
             if (getAllFields || requestedFields.Contains("id"))
                 response.Id = workspace.Id;
 
@@ -54,61 +77,87 @@ namespace server.Services
 
             if (getAllFields || requestedFields.Contains("visibility"))
                 response.Visibility = workspace.Visibility;
+        }
 
-            // Handle Members field
-            if (query.Members)
+        private async Task MapMembersAsync(Guid workspaceId, WorkspaceResponseDto2 response, bool includeMembers)
+        {
+            if (!includeMembers)
+                return;
+
+            var workspaceMembers = await _dbContext.WorkspaceMembers
+                .Include(wm => wm.AppUser)
+                .Where(wm => wm.WorkspaceId == workspaceId)
+                .ToListAsync();
+
+            response.Members = workspaceMembers.Select(wm => new MemberDto
             {
-                // Load workspacemembers
-                var workspaceMembers = await _dbContext.WorkspaceMembers
-                    .Include(wm => wm.AppUser)
-                    .Where(wm => wm.WorkspaceId == workspace.Id)
-                    .ToListAsync();
+                Id = wm.AppUserId,
+                Email = wm.AppUser.Email,
+                Avatar = wm.AppUser.Avatar,
+                FullName = wm.AppUser.FullName,
+                MemberType = wm.Role
+            }).ToList();
+        }
 
-                var members = workspaceMembers
-                    .Select(wm =>
-                    {
-                        return new MemberDto
-                        {
-                            Id = wm.AppUserId,
-                            Email = wm.AppUser.Email,
-                            Avatar = wm.AppUser.Avatar,
-                            FullName = wm.AppUser.FullName,
-                            MemberType = wm.Role
-                        };
-                    })
-                    .ToList();
+        private async Task MapBoardCountsAsync(Guid workspaceId, WorkspaceResponseDto2 response, bool includeBoardCounts)
+        {
+            if (!includeBoardCounts)
+                return;
 
-                response.Members = members;
-            }
+            response.BoardCounts = await _dbContext.WorkspaceMembers
+                .Include(wm => wm.AppUser)
+                .ThenInclude(u => u.BoardMembers)
+                .Where(wm => wm.WorkspaceId == workspaceId)
+                .Select(wm => new BoardCountDto
+                {
+                    IdMember = wm.AppUserId,
+                    BoardCount = wm.AppUser.BoardMembers.Count
+                })
+                .ToListAsync();
+        }
 
-            // Handle BoardCounts field in response
-            if (query.BoardCounts)
-            {
-                var boardCounts = _dbContext.WorkspaceMembers
-                    .Include(wm => wm.AppUser)
-                    .ThenInclude(u => u.BoardMembers)
-                    .Where(wm => wm.WorkspaceId == id)
-                    .Select(wm => new BoardCountDto
-                    {
-                        IdMember = wm.AppUserId,
-                        BoardCount = wm.AppUser.BoardMembers.Count
-                    })
-                    .ToList();
+        private async Task MapJoinRequestsAsync(Guid workspaceId, WorkspaceResponseDto2 response, bool includeJoinRequests)
+        {
+            if (!includeJoinRequests)
+                return;
 
-                response.BoardCounts = boardCounts;
-            }
+            var joinRequests = await _dbContext.JoinRequests
+                .Where(j => j.WorkspaceId == workspaceId)
+                .ToListAsync();
 
-            // Handle JoinRequests field in response
-            if (query.JoinRequests)
-            {
-                var joinRequests = await _dbContext.JoinRequests
-                    .Where(j => j.WorkspaceId == id)
-                    .ToListAsync();
+            response.JoinRequests = _mapper.Map<List<WorkspaceJoinRequestResponse>>(joinRequests);
+        }
 
-                response.JoinRequests = _mapper.Map<List<WorkspaceJoinRequestResponse>>(joinRequests);
-            }
+        private async Task MapGuestsAsync(Guid workspaceId, WorkspaceResponseDto2 response, bool includeGuests)
+        {
+            if (!includeGuests)
+                return;
 
-            return response;
+            // Use left join
+            var workspaceGuests = await (
+                from bm in _dbContext.BoardMembers
+                join b in _dbContext.Boards on bm.BoardId equals b.Id
+                join wm in _dbContext.WorkspaceMembers
+                    on new { b.WorkspaceId, bm.AppUserId }
+                    equals new { wm.WorkspaceId, wm.AppUserId }
+                    into wmGroup // IEnumerable<WorkspaceMember>
+                from wm in wmGroup.DefaultIfEmpty()
+                where wm == null
+                group b by bm.AppUser into bGroup
+                select new 
+                {
+                    Guest = bGroup.Key, // AppUser
+                    Boards = bGroup.ToList()
+                }
+            )
+            .ToListAsync();
+
+            response.Guests = workspaceGuests
+                .Select(wg => new WorkspaceGuestResponse() {
+                    User = _mapper.Map<GetUserResponseDto>(wg.Guest),
+                    JoinedBoards = _mapper.Map<List<BoardResponseDto>>(wg.Boards)
+                })
+                .ToList();
         }
     }
 }

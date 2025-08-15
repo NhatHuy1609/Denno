@@ -36,6 +36,15 @@ namespace server.Repositories
                 .FirstOrDefaultAsync(j => j.Id == id);
         }
 
+        public async Task<IEnumerable<JoinRequest>> GetJoinRequestsByBoardIdAsync(Guid boardId)
+        {
+            return await _dbContext.JoinRequests
+                .Include(j => j.Board)
+                .Include(j => j.Requester)
+                .Where(j => j.BoardId == boardId)
+                .ToListAsync();
+        }
+
         public async Task<IEnumerable<JoinRequest>> GetJoinRequestsByWorkspaceId(Guid workspaceId)
         {
             return await _dbContext.JoinRequests

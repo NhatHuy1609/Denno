@@ -12,5 +12,7 @@ namespace server.Models.Query
 
         [FromQuery(Name = "member_fields")]
         public string? MemberFields { get; set; }
+
+        public bool IncludeGuests { get; set; } = false;
     }
 }

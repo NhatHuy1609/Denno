@@ -1,8 +1,8 @@
 import { createContext, useContext } from 'react'
-import { cardListTypes } from '@/entities/cardList'
+import { cardListSchemas } from '@/entities/cardList'
 
 type CardListContextProps = {
-  cardListData?: cardListTypes.CardList
+  cardListData?: cardListSchemas.CardList
 }
 
 const CardListContext = createContext<CardListContextProps>({

@@ -3,7 +3,7 @@ import { AxiosContracts } from '@/lib/axios/AxiosContracts'
 import { 
   AddWorkspaceMemberDto, 
   CreateWorkspaceDto, 
-  CreateWorkspaceJoinRequestDto, 
+  CreateWorkspaceJoinRequestDto,
   DetailedWorkspaceInvitationSecretResponseDto, 
   UpdateWorkspaceDto, 
   UpdateWorkspaceLogoDto, 
@@ -120,5 +120,13 @@ export class WorkspaceService {
       `${this.basePath}/${workspaceId}/joinRequests`,
       createWorkspaceJoinRequestDto
     )
+  }
+
+  static approveWorkspaceJoinRequest(requestId: number) {
+    return httpPost(`${this.basePath}/joinRequests/${requestId}/approval`)
+  }
+
+  static rejectWorkspaceJoinRequest(requestId: number) {
+    return httpDel(`${this.basePath}/joinRequests//${requestId}/rejection`)
   }
 }

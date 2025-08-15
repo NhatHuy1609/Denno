@@ -10,6 +10,7 @@ using server.Entities;
 using server.Enums;
 using server.Factories;
 using server.Factories.NotificationResponseFactory;
+using server.Hubs.BoardHub;
 using server.Hubs.NotificationHub;
 using server.Infrastructure.Configurations;
 using server.Infrastructure.Providers;
@@ -41,7 +42,8 @@ namespace server.Infrastructure
             services.AddTransient<IEmailService, EmailService>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddTransient<IActionService, ActionService>();
-            services.AddTransient<ActionFactory, ActionFactory>();
+            services.AddScoped<IBoardService, BoardService>();
+            services.AddScoped<IConnectionManager, ConnectionManagerService>();
 
             services.AddDbContext<ApplicationDBContext>(options =>
             {
@@ -55,6 +57,7 @@ namespace server.Infrastructure
             services.AddScoped<ApproveWorkspaceJoinRequestNotificationResponseFactory>();
             services.AddScoped<RejectWorkspaceJoinRequestNotificationResponseFactory>();
             services.AddScoped<SendWorkspaceJoinRequestNotificationResponseFactory>();
+            services.AddScoped<AddMemberToBoardNotificationResponseFactory>();
 
             // Background services
             services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
@@ -188,6 +191,7 @@ namespace server.Infrastructure
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapHub<NotificationHub>("hubs/notification");
+                endpoints.MapHub<BoardHub>("hubs/board");
             });
 
             return app;

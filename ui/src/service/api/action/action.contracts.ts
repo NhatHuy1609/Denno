@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-const ActionDtoSchema = z.object({
+export const ActionDtoSchema = z.object({
   id: z.string().uuid(),
   actionType: z.string(),
   date: z.string(),
@@ -14,7 +14,6 @@ const ActionDtoSchema = z.object({
   targetBoardId: z.string().uuid(),
   targetListId: z.string().uuid(),
   commentId: z.string().uuid(),
-
 }).describe("ActionDtoSchema")
 
 export const AddWorkspaceMemberActionResponseDtoSchema = ActionDtoSchema.pick({
@@ -33,3 +32,11 @@ export const JoinWorkspaceByLinkActionResponseDtoSchema = ActionDtoSchema.pick({
   workspaceId: true,
   memberCreatorId: true
 }).describe("JoinWorkspaceByLinkActionResponseDtoSchema")
+
+export const JoinBoardByLinkActionResponseDtoSchema = ActionDtoSchema.pick({
+  id: true,
+  date: true,
+  actionType: true,
+  workspaceId: true,
+  memberCreatorId: true
+}).describe("JoinBoardByLinkActionResponseDtoSchema")

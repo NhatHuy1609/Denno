@@ -23,19 +23,33 @@ namespace server.Services
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IFileUploadService _fileUploadService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public AuthService(
             IMapper mapper,
             IConfiguration config,
             UserManager<AppUser> userManager,
             RoleManager<IdentityRole> roleManager,
-            IFileUploadService fileUploadService)
+            IFileUploadService fileUploadService,
+            IHttpContextAccessor httpContextAccessor)
         {
             _mapper = mapper;
             _config = config;
             _userManager = userManager;
             _roleManager = roleManager;
             _fileUploadService = fileUploadService;
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+        public string GetCurrentUserId()
+        {
+            var user = _httpContextAccessor.HttpContext?.User;
+            if (user == null || !user.Identity.IsAuthenticated)
+            {
+                return string.Empty;
+            }
+
+            return user.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
         }
 
         public async Task<GoogleSignInResponseDto> RegisterUserWithGoogleAccount(Userinfo userinfo)

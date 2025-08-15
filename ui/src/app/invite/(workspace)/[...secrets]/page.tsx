@@ -11,6 +11,7 @@ import useVerifyWorkspaceInvitationSecret from '@/app/_hooks/mutation/workspace/
 
 // This page is for checking the invite link to a workspace.
 // It will redirect to accept-team page if the link is valid
+// and will redirect to invalid-link page if the link is invalid
 function WorkspaceInvitePage() {
   const params = useParams()
   const router = useRouter()
@@ -48,6 +49,22 @@ function WorkspaceInvitePage() {
     }
   })
 
+  // Check if the current user is already a member of the invited workspace
+  useEffect(() => {
+    if (isLoadingCurrentUser || isLoadingWorkspaceMembers) return
+
+    if (workspaceMembers && workspaceMembers.members && currentUser) {
+      const isMember = workspaceMembers.members.some((member) => member.id === currentUser.id)
+
+      if (isMember) {
+        router.replace(`/workspace/${workspaceId}/members`)
+        setIsAlreadyMember(true)
+      }
+    }
+
+    setIsCheckingAlreadyMemberDone(true)
+  }, [workspaceMembers, currentUser, isLoadingCurrentUser, isLoadingWorkspaceMembers])
+
   // Check if the secrets are valid and redirect to the accept-team page
   useEffect(() => {
     const handleVerifyInvitationSecret = () => {
@@ -65,22 +82,6 @@ function WorkspaceInvitePage() {
       handleVerifyInvitationSecret()
     }
   }, [secrets, isAlreadyMember, isCheckingAlreadyMemberDone])
-
-  // Check if the current user is already a member of the invited workspace
-  useEffect(() => {
-    if (isLoadingCurrentUser || isLoadingWorkspaceMembers) return
-
-    if (workspaceMembers && workspaceMembers.members && currentUser) {
-      const isMember = workspaceMembers.members.some((member) => member.id === currentUser.id)
-
-      if (isMember) {
-        router.replace(`/workspace/${workspaceId}/members`)
-        setIsAlreadyMember(true)
-      }
-    }
-
-    setIsCheckingAlreadyMemberDone(true)
-  }, [workspaceMembers, currentUser, isLoadingCurrentUser, isLoadingWorkspaceMembers])
 
   return <></>
 }

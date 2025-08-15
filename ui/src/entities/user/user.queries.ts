@@ -1,9 +1,13 @@
-import { queryOptions } from "@tanstack/react-query"
-import { UserService } from "@/service/api/user/user.service"
-import { UsersFilterQuery, UserWorkspacesFilterQuery } from "./user.types"
-import { transformUserDtoToUser, transformUsersDtoToUsers, transformUserWorkspacesDtoToUserWorkspaces } from "./user.lib"
-import { UserWorkspacesQueryParamsDto } from "@/service/api/_models/query-models/user/user.types"
-import { mapToNotifications } from "../notification/notification.lib"
+import { queryOptions } from '@tanstack/react-query'
+import { UserService } from '@/service/api/user/user.service'
+import {
+  transformUserDtoToUser,
+  transformUsersDtoToUsers,
+  transformUserWorkspacesDtoToUserWorkspaces
+} from './user.lib'
+import { UserWorkspacesQueryParamsDto } from '@/service/api/_models/query-models/user/user.types'
+import { mapToNotifications } from '../notification/notification.lib'
+import { UsersFilterQuery, UserWorkspacesFilterQuery } from './user.schemas'
 
 export class UserQueries {
   static readonly keys = {
@@ -28,7 +32,7 @@ export class UserQueries {
 
   static loggedInUserQuery() {
     return queryOptions({
-      queryKey: [...this.keys.root, 'me'],
+      queryKey: [...this.keys.root, 'me'] as unknown[],
       queryFn: async ({ signal }) => {
         const response = await UserService.loggedInUserQuery()
         return transformUserDtoToUser(response.data)

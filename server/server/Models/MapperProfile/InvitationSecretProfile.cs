@@ -9,8 +9,10 @@ namespace server.Models.MapperProfile
     {
         public InvitationSecretProfile()
         {
+            CreateMap<InvitationSecret, BoardInvitationSecretResponse>();
             CreateMap<InvitationSecret, WorkspaceInvitationSecretResponseDto>();
             CreateMap<InvitationSecret, DetailedWorkspaceInvitationSecretResponse>();
+            CreateMap<InvitationSecret, DetailedBoardInvitationSecretResponse>();
         }
     }
 }

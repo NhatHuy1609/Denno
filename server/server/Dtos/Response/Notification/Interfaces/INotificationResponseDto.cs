@@ -1,6 +1,6 @@
 ﻿namespace server.Dtos.Response.Notification.Interfaces
 {
-    public class INotificationResponseDto
+    public interface INotificationResponseDto
     {
         int Id { get; set; }
         bool IsRead { get; set; }

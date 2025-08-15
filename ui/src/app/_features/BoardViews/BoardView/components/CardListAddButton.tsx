@@ -9,7 +9,7 @@ import { useForm, Controller } from 'react-hook-form'
 import { useQueryClient } from '@tanstack/react-query'
 import { useOnClickOutSide } from '@/app/_hooks/useOnClickOutSide'
 import useCreateCardListMutation from '../mutations/createCardList.mutation'
-import { CardListQueries, cardListTypes } from '@/entities/cardList'
+import { CardListQueries, cardListSchemas } from '@/entities/cardList'
 
 const CreateCardListFormSchema = z.object({
   name: z.string().min(1)
@@ -35,12 +35,9 @@ function CardListAddForm({ hideForm }: { hideForm: () => void }) {
 
   const { mutate: createCardList, isPending } = useCreateCardListMutation({
     onSuccess: (data) => {
-      queryClient.setQueryData(
-        CardListQueries.cardListsByBoardQuery(boardId as string).queryKey,
-        (old) => {
-          return [...(old as cardListTypes.CardLists), data]
-        }
-      )
+      queryClient.setQueryData(CardListQueries.cardListsByBoardQuery(boardId as string).queryKey, (old) => {
+        return [...(old as cardListSchemas.CardLists), data]
+      })
     },
     onSettled: () => {
       // Reset create form
@@ -88,13 +85,7 @@ function CardListAddForm({ hideForm }: { hideForm: () => void }) {
       />
 
       <div className='flex w-full items-center gap-2'>
-        <Button
-          type='submit'
-          primary
-          title='Add list'
-          disabled={isCreateBtnDisabled}
-          loading={isCreateBtnDisabled}
-        />
+        <Button type='submit' primary title='Add list' disabled={isCreateBtnDisabled} loading={isCreateBtnDisabled} />
         <button
           type='button'
           onClick={handleHideForm}

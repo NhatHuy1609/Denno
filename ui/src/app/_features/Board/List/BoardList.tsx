@@ -1,9 +1,9 @@
 import React from 'react'
 import BoardItem from './BoardItem'
-import { boardTypes } from '@/entities/board'
+import { boardSchemas } from '@/entities/board'
 
 interface Props {
-  boards: boardTypes.Boards
+  boards: boardSchemas.Boards
 }
 
 function BoardList({ boards }: Props) {
