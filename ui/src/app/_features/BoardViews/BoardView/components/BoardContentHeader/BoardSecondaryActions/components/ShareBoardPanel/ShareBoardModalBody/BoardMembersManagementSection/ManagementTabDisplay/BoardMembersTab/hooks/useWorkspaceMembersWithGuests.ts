@@ -5,7 +5,7 @@ export type WorkspaceParticipant = {
   name: string
   email: string
   avatarUrl: string
-  participantType: 'member' | 'guest' | 'admin'
+  participantType: 'normal' | 'guest' | 'admin'
 }
 
 type UseWorkspaceMembersWithGuestsResult = {
@@ -23,7 +23,7 @@ export const useWorkspaceMembersWithGuests = (workspaceId: string): UseWorkspace
 
   const participantTypeMap: Record<string, WorkspaceParticipant['participantType']> = {
     Admin: 'admin',
-    Member: 'member',
+    Normal: 'normal',
     Guest: 'guest'
   }
 
@@ -47,6 +47,10 @@ export const useWorkspaceMembersWithGuests = (workspaceId: string): UseWorkspace
   const participantTypeMapById = new Map<string, WorkspaceParticipant['participantType']>(
     participants.map((p) => [p.id, p.participantType])
   )
+
+  // console.log('PARTICIPANTS: ', participants)
+  console.log('MEMBERS: ', workspaceMembers)
+  console.log('GUESTS: ', workspaceGuests)
 
   return {
     workspaceParticipants: participants,

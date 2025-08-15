@@ -16,8 +16,8 @@ export function transformBoardDtoToBoard(boardDto: boardTypesDto.BoardResponseDt
     ...boardDto,
     workspace: {
       ...workspace,
-      idOwner: workspace.ownerId,
-      logo: workspace.logoUrl || null
+      idOwner: workspace?.ownerId,
+      logo: workspace?.logoUrl || null
     }
   }
 }
