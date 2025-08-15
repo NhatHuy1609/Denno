@@ -3,6 +3,7 @@ import { MemberRoleEnumSchema } from '../_enums/enums.contracts'
 import { GetUserResponseDtoSchema } from '../user/user.contracts'
 import { userContractsDto } from '../user'
 import { boardContractsDto } from '../board'
+import { enumContracts } from '../_enums'
 
 // Request
 export const CreateWorkspaceDtoSchema = z
@@ -58,7 +59,7 @@ export const WorkspaceResponseDtoSchema = z
     description: z.string(),
     idOwner: z.string(),
     logo: z.string().nullable(),
-    visibility: z.enum(['Private', 'Workspace', 'Public']),
+    visibility: enumContracts.WorkspaceVisibilityEnumSchema,
     boardCounts: z
       .array(
         z.object({
@@ -81,7 +82,8 @@ export const WorkspaceResponseDtoSchema = z
     joinRequests: z
       .array(
         z.object({
-          id: z.string(),
+          id: z.number(),
+          workspaceId: z.string(),
           requester: z.object({
             id: z.string(),
             avatar: z.string(),

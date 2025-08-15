@@ -1,18 +1,18 @@
-import { boardTypes } from "@/entities/board";
-import { filterBy } from "@/utils/filterBy";
-import { includesBy } from "@/utils/includesBy";
-import { workspaceTypes } from "@/entities/workspace";
-import { BoardBasePolicy } from "./board-base-policy";
-import { PolicyContext } from "@/permissions/types/policy-context";
-import { PolicyResult } from "@/permissions/types/policy-result";
+import { boardSchemas } from '@/entities/board'
+import { filterBy } from '@/utils/filterBy'
+import { includesBy } from '@/utils/includesBy'
+import { workspaceSchemas } from '@/entities/workspace'
+import { BoardBasePolicy } from './board-base-policy'
+import { PolicyContext } from '@/permissions/types/policy-context'
+import { PolicyResult } from '@/permissions/types/policy-result'
 
 export interface BoardViewAccessContext extends PolicyContext {
-  boardData?: boardTypes.Board
-  workspaceData?: workspaceTypes.Workspace
+  boardData?: boardSchemas.Board
+  workspaceData?: workspaceSchemas.Workspace
 }
 
 export class BoardViewPolicy extends BoardBasePolicy {
-  evaluate(context: BoardViewAccessContext, board?: boardTypes.Board): PolicyResult {
+  evaluate(context: BoardViewAccessContext, board?: boardSchemas.Board): PolicyResult {
     const { user, boardData } = context
     const targetBoard = board || boardData
 
@@ -35,31 +35,31 @@ export class BoardViewPolicy extends BoardBasePolicy {
     return this.deny('BOARD::INVALID_VISIBILITY')
   }
 
-  private isPublicBoard(board: boardTypes.Board): boolean {
+  private isPublicBoard(board: boardSchemas.Board): boolean {
     return this.hasVisibility(board, 'Public')
   }
 
-  private isWorkspaceBoard(board: boardTypes.Board): boolean {
+  private isWorkspaceBoard(board: boardSchemas.Board): boolean {
     return this.hasVisibility(board, 'Workspace')
   }
 
-  private isPrivateBoard(board: boardTypes.Board): boolean {
+  private isPrivateBoard(board: boardSchemas.Board): boolean {
     return this.hasVisibility(board, 'Private')
   }
 
-  private evaluateWorkspaceAccess(context: BoardViewAccessContext, board: boardTypes.Board): PolicyResult {
+  private evaluateWorkspaceAccess(context: BoardViewAccessContext, board: boardSchemas.Board): PolicyResult {
     const { user, workspaceData } = context
     const workspaceMembers = workspaceData?.members || []
 
     const isWorkspaceMember = includesBy(workspaceMembers, (m) => m.id === user.id)
     const isBoardMember = this.isBoardMember(context, board)
 
-    return (isWorkspaceMember || isBoardMember)
+    return isWorkspaceMember || isBoardMember
       ? this.allow('BOARD::ALLOWED_IS_WORKSPACE_LEVEL')
       : this.deny('BOARD::DENIED_USER_NOT_IN_BOARD_OR_WORKSPACE')
   }
 
-  private evaluatePrivateAccess(context: BoardViewAccessContext, board: boardTypes.Board): PolicyResult {
+  private evaluatePrivateAccess(context: BoardViewAccessContext, board: boardSchemas.Board): PolicyResult {
     const { workspaceData } = context
     const { members: workspaceMembers = [] } = workspaceData || {}
 
@@ -67,7 +67,7 @@ export class BoardViewPolicy extends BoardBasePolicy {
     const workspaceAdmins = filterBy(workspaceMembers, (m) => m.memberType === 'Admin')
     const isWorkspaceAdmin = includesBy(workspaceAdmins, (m) => m.id === context.user.id)
 
-    return (isBoardMember || isWorkspaceAdmin)
+    return isBoardMember || isWorkspaceAdmin
       ? this.allow('BOARD::ALLOWED_IS_PRIVATE')
       : this.deny('BOARD::DENIED_USER_NOT_IN_BOARD_OR_NOT_WORKSPACE_ADMIN')
   }

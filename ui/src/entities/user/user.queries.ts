@@ -1,6 +1,5 @@
 import { queryOptions } from '@tanstack/react-query'
 import { UserService } from '@/service/api/user/user.service'
-import { UsersFilterQuery, UserWorkspacesFilterQuery } from './user.types'
 import {
   transformUserDtoToUser,
   transformUsersDtoToUsers,
@@ -8,6 +7,7 @@ import {
 } from './user.lib'
 import { UserWorkspacesQueryParamsDto } from '@/service/api/_models/query-models/user/user.types'
 import { mapToNotifications } from '../notification/notification.lib'
+import { UsersFilterQuery, UserWorkspacesFilterQuery } from './user.schemas'
 
 export class UserQueries {
   static readonly keys = {

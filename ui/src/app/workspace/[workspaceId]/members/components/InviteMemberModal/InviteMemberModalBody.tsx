@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'next/navigation'
 import { useUsersQuery } from '@/app/_hooks/query/user/useUsersQuery'
-import { userTypes } from '@/entities/user'
+import { userSchemas } from '@/entities/user'
 import { useDebounce } from '@/app/_hooks/useDebounce'
 import { useCreateInvitationLink } from '@/app/_hooks/useCreateInvitationLink'
 import { useCopyToClipboard } from '@/app/_hooks/useCopyToClipboard'
@@ -19,7 +19,7 @@ import CustomizableButton from '@/ui/components/CustomizableButton'
 import InviteMemberDescriptionInput from './InviteMemberDescriptionInput'
 import { generateWorkspaceInvitationLink } from '@/utils/invitation-link'
 
-type SearchedUserFilter = Pick<userTypes.UsersFilterQuery, 'email'>
+type SearchedUserFilter = Pick<userSchemas.UsersFilterQuery, 'email'>
 
 type InviteMemberModalBodyProps = {
   closeModalFn: () => void
@@ -31,20 +31,19 @@ export default function InviteMemberModalBody({ closeModalFn }: InviteMemberModa
   const inputRef = useRef<HTMLInputElement>(null)
   const descriptionInputRef = useRef<HTMLInputElement>(null)
 
-  const [selectedUsers, setSelectedUsers] = useState<Array<userTypes.User>>([])
+  const [selectedUsers, setSelectedUsers] = useState<Array<userSchemas.User>>([])
 
   const { data: invitationSecret } = useInvitationSecretQuery(workspaceId, {
     retry: 1
   })
 
-  const { mutateAsync: disableLinkAsync, isPending: isDisablingLink } =
-    useDisableInvitationSecretMutation({
-      onSuccess: async () => {
-        queryClient.invalidateQueries({
-          queryKey: WorkspaceQueries.workspaceInvitationSecretQuery(workspaceId).queryKey
-        })
-      }
-    })
+  const { mutateAsync: disableLinkAsync, isPending: isDisablingLink } = useDisableInvitationSecretMutation({
+    onSuccess: async () => {
+      queryClient.invalidateQueries({
+        queryKey: WorkspaceQueries.workspaceInvitationSecretQuery(workspaceId).queryKey
+      })
+    }
+  })
 
   const { mutate: addWorkspaceMember } = useAddMultipleWorkspaceMemberMutation({
     mutationKey: [workspaceId],
@@ -75,8 +74,7 @@ export default function InviteMemberModalBody({ closeModalFn }: InviteMemberModa
   // Handle create invitation link on client and copy to clipboard
   const [_, copy] = useCopyToClipboard()
   const [isCopiedSuccess, setIsCopiedSuccess] = useState(false)
-  const { createInvitationLink: createInvitationLink, isCreatingLink } =
-    useCreateInvitationLink(workspaceId)
+  const { createInvitationLink: createInvitationLink, isCreatingLink } = useCreateInvitationLink(workspaceId)
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Check if there are any searched users
@@ -93,7 +91,7 @@ export default function InviteMemberModalBody({ closeModalFn }: InviteMemberModa
   }
 
   const handleSelectUser = useCallback(
-    (user: userTypes.User) => {
+    (user: userSchemas.User) => {
       const isValidToSelect = !selectedUsers.find((user) => user.email === searchTerm)
       if (isValidToSelect) {
         setSelectedUsers((prev) => [...prev, user])
@@ -109,10 +107,8 @@ export default function InviteMemberModalBody({ closeModalFn }: InviteMemberModa
   )
 
   const handleRemoveSelectedUser = useCallback(
-    (user: userTypes.User) => {
-      const removedUserIndex = selectedUsers.findIndex(
-        (selectedUser) => selectedUser.email === user.email
-      )
+    (user: userSchemas.User) => {
+      const removedUserIndex = selectedUsers.findIndex((selectedUser) => selectedUser.email === user.email)
 
       if (removedUserIndex !== -1) {
         setSelectedUsers((prev) => {
@@ -169,10 +165,7 @@ export default function InviteMemberModalBody({ closeModalFn }: InviteMemberModa
   const handleCopyExistingLink = () => {
     if (!invitationSecret?.secretCode) return
 
-    const invitationLink = generateWorkspaceInvitationLink(
-      workspaceId,
-      invitationSecret?.secretCode
-    )
+    const invitationLink = generateWorkspaceInvitationLink(workspaceId, invitationSecret?.secretCode)
 
     if (invitationLink) {
       copy(invitationLink)
@@ -194,10 +187,7 @@ export default function InviteMemberModalBody({ closeModalFn }: InviteMemberModa
     <div className='relative w-full'>
       {/* Selected users */}
       {selectedUsers.length > 0 && (
-        <SelectedUsersDisplay
-          selectedUsers={selectedUsers}
-          removeSelectedUserFn={handleRemoveSelectedUser}
-        />
+        <SelectedUsersDisplay selectedUsers={selectedUsers} removeSelectedUserFn={handleRemoveSelectedUser} />
       )}
 
       <div className='flex items-center justify-between gap-2'>
@@ -274,37 +264,28 @@ export default function InviteMemberModalBody({ closeModalFn }: InviteMemberModa
 }
 
 interface SelectedUsersDisplayProps {
-  selectedUsers: Array<userTypes.User>
-  removeSelectedUserFn: (user: userTypes.User) => void
+  selectedUsers: Array<userSchemas.User>
+  removeSelectedUserFn: (user: userSchemas.User) => void
 }
 
-const SelectedUsersDisplay = React.memo(
-  ({ selectedUsers, removeSelectedUserFn }: SelectedUsersDisplayProps) => {
-    const handleRemoveSelectedUser = (user: userTypes.User) => {
-      removeSelectedUserFn && removeSelectedUserFn(user)
-    }
-
-    return (
-      <div className='mb-3 border-l-2 border-blue-600 pl-2'>
-        <h4 className='mb-1 text-sm text-blue-600'>Selected users</h4>
-        <div className='flex w-full items-center gap-2'>
-          {selectedUsers.map((user) => (
-            <div
-              key={user.id}
-              className='flex max-w-fit items-center gap-2 rounded-sm bg-gray-200 p-1'
-            >
-              <span className='text-sm'>{user.fullName}</span>
-              <button
-                type='button'
-                className='group'
-                onClick={() => handleRemoveSelectedUser(user)}
-              >
-                <HiOutlineXMark className='text-lg group-hover:text-blue-600' />
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-    )
+const SelectedUsersDisplay = React.memo(({ selectedUsers, removeSelectedUserFn }: SelectedUsersDisplayProps) => {
+  const handleRemoveSelectedUser = (user: userSchemas.User) => {
+    removeSelectedUserFn && removeSelectedUserFn(user)
   }
-)
+
+  return (
+    <div className='mb-3 border-l-2 border-blue-600 pl-2'>
+      <h4 className='mb-1 text-sm text-blue-600'>Selected users</h4>
+      <div className='flex w-full items-center gap-2'>
+        {selectedUsers.map((user) => (
+          <div key={user.id} className='flex max-w-fit items-center gap-2 rounded-sm bg-gray-200 p-1'>
+            <span className='text-sm'>{user.fullName}</span>
+            <button type='button' className='group' onClick={() => handleRemoveSelectedUser(user)}>
+              <HiOutlineXMark className='text-lg group-hover:text-blue-600' />
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+})

@@ -1,9 +1,9 @@
 import React from 'react'
-import type { WorkspaceJoinRequest } from '@/entities/workspace/workspace.types'
 import SelectRequestCheckbox from './SelectRequestCheckbox'
 import RequesterInfo from './RequesterInfo'
 import RequestActions from './RequestActions'
 import { formatDateTime } from '@/utils/formatDateTime'
+import { WorkspaceJoinRequest } from '@/entities/workspace/workspace.schemas'
 
 type Props = {
   isSelected?: boolean
@@ -17,11 +17,7 @@ export default function RequestItem({ joinRequest, selectRequestFn, isSelected }
   return (
     <div className='flex w-full items-center justify-between p-2'>
       <div className='flex w-fit items-center gap-2'>
-        <SelectRequestCheckbox
-          requestId={id}
-          isSelected={isSelected}
-          selectRequestFn={selectRequestFn}
-        />
+        <SelectRequestCheckbox requestId={id} isSelected={isSelected} selectRequestFn={selectRequestFn} />
         <RequesterInfo requester={requester} />
       </div>
       <div className='flex w-fit items-center gap-6'>

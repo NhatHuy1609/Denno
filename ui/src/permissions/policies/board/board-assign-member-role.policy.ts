@@ -1,17 +1,17 @@
-import type { boardTypes } from '@/entities/board'
-import type { workspaceTypes } from '@/entities/workspace'
+import type { boardSchemas } from '@/entities/board'
+import type { workspaceSchemas } from '@/entities/workspace'
 import { BasePolicy } from '@/permissions/policies/base-policy'
 import { PolicyContext } from '@/permissions/types/policy-context'
 import { PolicyResult } from '@/permissions/types/policy-result'
 
 export interface BoardAssignMemberRolePolicyContext extends PolicyContext {
-  targetRole: boardTypes.BoardMemberRole
+  targetRole: boardSchemas.BoardMemberRole
   targetMemberId: string
 }
 
 export interface BoardAssignMemberRolePolicyResource {
-  workspaceOwnerId: workspaceTypes.Workspace['idOwner']
-  boardMembers: boardTypes.Board['members']
+  workspaceOwnerId: workspaceSchemas.Workspace['idOwner']
+  boardMembers: boardSchemas.Board['members']
 }
 
 /**
@@ -53,8 +53,8 @@ export class BoardAssignMemberRolePolicy extends BasePolicy {
   private evaluateSelfRoleChange(
     context: BoardAssignMemberRolePolicyContext,
     resource: BoardAssignMemberRolePolicyResource,
-    targetMember: boardTypes.Board['members'][0],
-    targetRole: boardTypes.BoardMemberRole
+    targetMember: boardSchemas.Board['members'][0],
+    targetRole: boardSchemas.BoardMemberRole
   ): PolicyResult {
     const currentRole = targetMember.boardMemberRole
 
@@ -77,8 +77,8 @@ export class BoardAssignMemberRolePolicy extends BasePolicy {
   private evaluateOtherMemberRoleChange(
     context: BoardAssignMemberRolePolicyContext,
     resource: BoardAssignMemberRolePolicyResource,
-    targetMember: boardTypes.Board['members'][0],
-    targetRole: boardTypes.BoardMemberRole
+    targetMember: boardSchemas.Board['members'][0],
+    targetRole: boardSchemas.BoardMemberRole
   ): PolicyResult {
     const currentUserRole = this.getCurrentUserRole(context, resource)
     const targetCurrentRole = targetMember.boardMemberRole
@@ -144,26 +144,26 @@ export class BoardAssignMemberRolePolicy extends BasePolicy {
   private getCurrentUserRole(
     context: BoardAssignMemberRolePolicyContext,
     resource: BoardAssignMemberRolePolicyResource
-  ): boardTypes.BoardMemberRole | undefined {
+  ): boardSchemas.BoardMemberRole | undefined {
     return resource.boardMembers.find((member) => member.memberId === context.user.id)?.boardMemberRole
   }
 
-  private getAdminCount(boardMembers: boardTypes.Board['members']): number {
+  private getAdminCount(boardMembers: boardSchemas.Board['members']): number {
     return boardMembers.filter((member) => member.boardMemberRole === 'Admin').length
   }
 
   private getTargetMember(
     resource: BoardAssignMemberRolePolicyResource,
     targetMemberId: string
-  ): boardTypes.Board['members'][0] | undefined {
+  ): boardSchemas.Board['members'][0] | undefined {
     return resource.boardMembers.find((member) => member.memberId === targetMemberId)
   }
 
-  private isValidRole(role: string): role is boardTypes.BoardMemberRole {
+  private isValidRole(role: string): role is boardSchemas.BoardMemberRole {
     return ['Observer', 'Member', 'Admin'].includes(role)
   }
 
-  private getRoleHierarchy(role?: boardTypes.BoardMemberRole, isWorkspaceOwner: boolean = false): number {
+  private getRoleHierarchy(role?: boardSchemas.BoardMemberRole, isWorkspaceOwner: boolean = false): number {
     if (!role) {
       return 0
     }

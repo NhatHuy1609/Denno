@@ -1,6 +1,6 @@
-import type { boardTypes } from '@/entities/board'
+import type { boardSchemas } from '@/entities/board'
 
-type BoardMemberRole = boardTypes.BoardMemberRole
+type BoardMemberRole = boardSchemas.BoardMemberRole
 
 export interface StaticBoardMemberPermissionsSet {
   canEditBoard: boolean

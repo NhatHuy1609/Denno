@@ -1,8 +1,8 @@
-import { Workspace } from '@/entities/workspace/workspace.types'
 import { Avatar } from '@/ui'
 import React from 'react'
 import MemberControls from './MemberControls'
 import { MemberDisplayItemProvider } from './context'
+import { Workspace } from '@/entities/workspace/workspace.schemas'
 
 type MemberDisplayItemProps = {
   member: NonNullable<Workspace['members']>[number]

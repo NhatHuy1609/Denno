@@ -1,6 +1,6 @@
 import React from 'react'
-import type { userTypes } from '@/entities/user'
-import type { boardTypes } from '@/entities/board'
+import type { userSchemas } from '@/entities/user'
+import type { boardSchemas } from '@/entities/board'
 import Avatar from '@/ui/components/Avatar'
 import DropdownMenuPrimary, { DropdownMenuPrimaryItemProps } from '@/app/_components/DropdownMenuPrimary'
 import { useBoardAssignMemberRole } from '../hooks/useBoardAssignMemberRole'
@@ -12,7 +12,7 @@ import useUpdateBoardMemberRole from '@/app/_hooks/mutation/board/useUpdateBoard
 import { WorkspaceParticipant } from '../hooks/useWorkspaceMembersWithGuests'
 
 interface BoardMemberItemProps {
-  member: userTypes.User
+  member: userSchemas.User
   memberRole: string
   workspaceParticipantType?: WorkspaceParticipant['participantType']
 }
@@ -36,7 +36,7 @@ function BoardMemberItem({ member, memberRole, workspaceParticipantType }: Board
     currentAssigner
   } = useBoardAssignMemberRole({
     targetMemberId: member.id,
-    targetMemberRole: memberRole as boardTypes.BoardMemberRole
+    targetMemberRole: memberRole as boardSchemas.BoardMemberRole
   })
 
   // Decide if the current user can select the dropdown
@@ -66,7 +66,7 @@ function BoardMemberItem({ member, memberRole, workspaceParticipantType }: Board
     return !canAssignMemberRole
   }
 
-  const handleUpdateBoardMemberRole = async (newRole: DropdownMenuPrimaryItemProps<boardTypes.BoardMemberRole>) => {
+  const handleUpdateBoardMemberRole = async (newRole: DropdownMenuPrimaryItemProps<boardSchemas.BoardMemberRole>) => {
     if (!boardId) return
 
     await updateBoardMemberRoleAsync({

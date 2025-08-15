@@ -1,16 +1,16 @@
-import type { boardTypes } from "@/entities/board";
-import type { workspaceTypes } from "@/entities/workspace";
-import { BasePolicy } from "@/permissions/policies/base-policy";
-import { PolicyContext } from "@/permissions/types/policy-context";
-import { PolicyResult } from "@/permissions/types/policy-result";
+import type { boardSchemas } from '@/entities/board'
+import type { workspaceSchemas } from '@/entities/workspace'
+import { BasePolicy } from '@/permissions/policies/base-policy'
+import { PolicyContext } from '@/permissions/types/policy-context'
+import { PolicyResult } from '@/permissions/types/policy-result'
 
 export interface BoardRemoveMemberPolicyContext extends PolicyContext {
   targetMemberId: string // The member to be removed
 }
 
 export interface BoardRemoveMemberPolicyResource {
-  workspaceOwnerId: workspaceTypes.Workspace['idOwner']
-  boardMembers: boardTypes.Board['members']
+  workspaceOwnerId: workspaceSchemas.Workspace['idOwner']
+  boardMembers: boardSchemas.Board['members']
 }
 
 /**
@@ -18,10 +18,7 @@ export interface BoardRemoveMemberPolicyResource {
  * For self-leave, use BoardLeavePolicy instead.
  */
 export class BoardRemoveMemberPolicy extends BasePolicy {
-  evaluate(
-    context: BoardRemoveMemberPolicyContext, 
-    resource: BoardRemoveMemberPolicyResource
-  ): PolicyResult {
+  evaluate(context: BoardRemoveMemberPolicyContext, resource: BoardRemoveMemberPolicyResource): PolicyResult {
     const { targetMemberId } = context
 
     // Cannot remove yourself - use BoardLeavePolicy instead
@@ -63,7 +60,7 @@ export class BoardRemoveMemberPolicy extends BasePolicy {
    */
   private evaluateAdminRemoval(resource: BoardRemoveMemberPolicyResource): PolicyResult {
     const adminCount = this.getAdminCount(resource.boardMembers)
-    
+
     // Cannot remove if they are the only admin
     if (adminCount <= 1) {
       return this.deny('BOARD_MEMBER_REMOVAL::REQUIRED_AT_LEAST_ONE_ADMIN')
@@ -76,10 +73,7 @@ export class BoardRemoveMemberPolicy extends BasePolicy {
    * Check if current user has permission to remove members
    * Must be Admin or Workspace Owner
    */
-  private canRemoveMember(
-    context: BoardRemoveMemberPolicyContext,
-    resource: BoardRemoveMemberPolicyResource
-  ): boolean {
+  private canRemoveMember(context: BoardRemoveMemberPolicyContext, resource: BoardRemoveMemberPolicyResource): boolean {
     return this.isAdminMember(context, resource) || this.isWorkspaceOwner(context, resource)
   }
 
@@ -89,7 +83,7 @@ export class BoardRemoveMemberPolicy extends BasePolicy {
   private canRemoveTargetRole(
     context: BoardRemoveMemberPolicyContext,
     resource: BoardRemoveMemberPolicyResource,
-    targetMember: boardTypes.Board['members'][0]
+    targetMember: boardSchemas.Board['members'][0]
   ): boolean {
     // Workspace owner can remove anyone (except themselves, checked earlier)
     if (this.isWorkspaceOwner(context, resource)) {
@@ -98,7 +92,7 @@ export class BoardRemoveMemberPolicy extends BasePolicy {
 
     const currentUserRole = this.getCurrentUserRole(context, resource)
     const targetRole = targetMember.boardMemberRole
-    
+
     const currentUserHierarchy = this.getRoleHierarchy(currentUserRole)
     const targetHierarchy = this.getRoleHierarchy(targetRole)
 
@@ -119,15 +113,10 @@ export class BoardRemoveMemberPolicy extends BasePolicy {
   /**
    * Check if the current user is an admin member
    */
-  private isAdminMember(
-    context: BoardRemoveMemberPolicyContext,
-    resource: BoardRemoveMemberPolicyResource
-  ): boolean {
+  private isAdminMember(context: BoardRemoveMemberPolicyContext, resource: BoardRemoveMemberPolicyResource): boolean {
     const { user } = context
     const { boardMembers } = resource
-    return boardMembers.some(
-      member => member.boardMemberRole === 'Admin' && member.memberId === user.id
-    )
+    return boardMembers.some((member) => member.boardMemberRole === 'Admin' && member.memberId === user.id)
   }
 
   /**
@@ -136,8 +125,8 @@ export class BoardRemoveMemberPolicy extends BasePolicy {
   private getTargetMember(
     resource: BoardRemoveMemberPolicyResource,
     targetMemberId: string
-  ): boardTypes.Board['members'][0] | undefined {
-    return resource.boardMembers.find(member => member.memberId === targetMemberId)
+  ): boardSchemas.Board['members'][0] | undefined {
+    return resource.boardMembers.find((member) => member.memberId === targetMemberId)
   }
 
   /**
@@ -146,21 +135,21 @@ export class BoardRemoveMemberPolicy extends BasePolicy {
   private getCurrentUserRole(
     context: BoardRemoveMemberPolicyContext,
     resource: BoardRemoveMemberPolicyResource
-  ): boardTypes.BoardMemberRole | undefined {
-    return resource.boardMembers.find(member => member.memberId === context.user.id)?.boardMemberRole
+  ): boardSchemas.BoardMemberRole | undefined {
+    return resource.boardMembers.find((member) => member.memberId === context.user.id)?.boardMemberRole
   }
 
   /**
    * Count total number of admins in the board
    */
-  private getAdminCount(boardMembers: boardTypes.Board['members']): number {
-    return boardMembers.filter(member => member.boardMemberRole === 'Admin').length
+  private getAdminCount(boardMembers: boardSchemas.Board['members']): number {
+    return boardMembers.filter((member) => member.boardMemberRole === 'Admin').length
   }
 
   /**
    * Get role hierarchy value for comparison
    */
-  private getRoleHierarchy(role?: boardTypes.BoardMemberRole): number {
+  private getRoleHierarchy(role?: boardSchemas.BoardMemberRole): number {
     if (!role) {
       return 0
     }
@@ -170,7 +159,7 @@ export class BoardRemoveMemberPolicy extends BasePolicy {
       Member: 2,
       Admin: 3
     }
-  
+
     return hierarchy[role] || 0
   }
 }

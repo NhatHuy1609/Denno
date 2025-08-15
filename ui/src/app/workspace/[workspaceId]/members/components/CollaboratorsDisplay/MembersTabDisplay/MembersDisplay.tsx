@@ -1,9 +1,9 @@
 import React, { useRef, useState } from 'react'
 import { cn } from '@/lib/styles/utils'
 import { arrayToMap } from '@/utils/arrayToMap'
-import { Workspace } from '@/entities/workspace/workspace.types'
 import MemberDisplayItem from './MemberDisplayItem'
 import PrimaryInputText from '@/app/_components/PrimaryInputText'
+import { Workspace } from '@/entities/workspace/workspace.schemas'
 
 type MembersDisplayProps = {
   members: Workspace['members']
@@ -15,9 +15,7 @@ function MembersDisplay({ members = [], boardCounts }: MembersDisplayProps) {
   const inputRef = useRef<HTMLInputElement>(null)
 
   // Filter members based on the searched name
-  const filteredMembers = members.filter((member) =>
-    member.fullName.toLowerCase().includes(searchedName.toLowerCase())
-  )
+  const filteredMembers = members.filter((member) => member.fullName.toLowerCase().includes(searchedName.toLowerCase()))
 
   // Use arrayToMap to create a map of board counts for quick lookup
   const joinedBoardCountsMap = arrayToMap(boardCounts, 'idMember')
@@ -43,9 +41,7 @@ function MembersDisplay({ members = [], boardCounts }: MembersDisplayProps) {
           <MemberDisplayItem
             key={member.id}
             member={member}
-            joinedBoardCount={
-              joinedBoardCountsMap.get(member.id) ?? { idMember: '', boardCount: 0 }
-            }
+            joinedBoardCount={joinedBoardCountsMap.get(member.id) ?? { idMember: '', boardCount: 0 }}
           />
         ))}
       </>
@@ -63,9 +59,7 @@ function MembersDisplay({ members = [], boardCounts }: MembersDisplayProps) {
           className={cn('w-[250px] border border-black p-2')}
         />
       </div>
-      <div className='mt-2 flex w-full flex-col divide-y divide-gray-300 py-2'>
-        {renderMemberDisplayItems()}
-      </div>
+      <div className='mt-2 flex w-full flex-col divide-y divide-gray-300 py-2'>{renderMemberDisplayItems()}</div>
     </div>
   )
 }

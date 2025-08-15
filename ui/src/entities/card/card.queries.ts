@@ -1,6 +1,6 @@
-import { CardService } from "@/service/api/card"
-import { queryOptions } from "@tanstack/react-query"
-import { transformCardsDtoToCards } from "./card.lib"
+import { CardService } from '@/service/api/card'
+import { queryOptions } from '@tanstack/react-query'
+import { transformCardsDtoToCards } from './card.lib'
 
 export class CardQueries {
   static readonly keys = {
@@ -13,7 +13,7 @@ export class CardQueries {
       queryKey: [...this.keys.list(), `card-[${cardListId}]`],
       queryFn: async ({ signal }) => {
         const response = await CardService.cardsByCardListQuery({ cardListId }, { signal })
-        return  transformCardsDtoToCards(response.data)
+        return transformCardsDtoToCards(response.data)
       }
     })
   }

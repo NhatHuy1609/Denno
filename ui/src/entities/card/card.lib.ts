@@ -1,16 +1,12 @@
-import { cardTypesDto } from "@/service/api/card";
-import { Card,Cards } from "./card.types";
+import { cardTypesDto } from '@/service/api/card'
+import { cardSchemas } from '.'
 
-export function transformCardDtoToCard(
-  cardDto: cardTypesDto.CardResponseDto
-): Card {
+export function transformCardDtoToCard(cardDto: cardTypesDto.CardResponseDto): cardSchemas.Card {
   return {
     ...cardDto
   }
 }
 
-export function transformCardsDtoToCards(
-  cardsDto: cardTypesDto.CardsResponseDto
-): Cards {
-  return cardsDto.map(c => transformCardDtoToCard(c))
+export function transformCardsDtoToCards(cardsDto: cardTypesDto.CardsResponseDto): cardSchemas.Cards {
+  return cardsDto.map((c) => transformCardDtoToCard(c))
 }

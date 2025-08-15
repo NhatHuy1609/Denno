@@ -1,10 +1,10 @@
 import React from 'react'
-import { cardTypes } from '@/entities/card'
+import { cardSchemas } from '@/entities/card'
 import { Transform, CSS } from '@dnd-kit/utilities'
 import { DraggableSyntheticListeners } from '@dnd-kit/core'
 
 interface Props {
-  cardData?: cardTypes.Card
+  cardData?: cardSchemas.Card
   dragging?: boolean
   transform?: Transform | null
   transition?: string | null

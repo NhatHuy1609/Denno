@@ -1,11 +1,14 @@
-import type { boardTypes } from "@/entities/board";
-import type { DropdownMenuPrimaryItemProps } from "@/app/_components/DropdownMenuPrimary";
-import { evaluateDynamicDropdownItems } from "@/permissions/utils/evaluate-dynamic-dropdown";
-import { PolicyContext } from "@/permissions/types/policy-context";
-import { BoardAssignMemberRolePolicyContext, BoardAssignMemberRolePolicyResource } from "@/permissions/policies/board/board-assign-member-role.policy";
+import type { boardSchemas } from '@/entities/board'
+import type { DropdownMenuPrimaryItemProps } from '@/app/_components/DropdownMenuPrimary'
+import { evaluateDynamicDropdownItems } from '@/permissions/utils/evaluate-dynamic-dropdown'
+import { PolicyContext } from '@/permissions/types/policy-context'
+import {
+  BoardAssignMemberRolePolicyContext,
+  BoardAssignMemberRolePolicyResource
+} from '@/permissions/policies/board/board-assign-member-role.policy'
 
 type BaseRoleDefinition = {
-  value: boardTypes.BoardMemberRole,
+  value: boardSchemas.BoardMemberRole
   label: string
 }
 
@@ -17,26 +20,23 @@ type DynamicProperties = {
 const baseRoleDefinitions: Array<BaseRoleDefinition> = [
   {
     value: 'Admin',
-    label: 'Admin',
+    label: 'Admin'
   },
   {
     value: 'Member',
-    label: 'Member',
+    label: 'Member'
   },
   {
     value: 'Observer',
-    label: 'Observer',
+    label: 'Observer'
   }
 ]
 
 export function getAssignableBoardMemberRoles(
   context: Omit<BoardAssignMemberRolePolicyContext, 'targetRole'> & PolicyContext,
   resourceData: BoardAssignMemberRolePolicyResource
-): DropdownMenuPrimaryItemProps<typeof baseRoleDefinitions[number]['value']>[] {
-  return evaluateDynamicDropdownItems<
-    typeof baseRoleDefinitions[number],
-    DynamicProperties
-  >(
+): DropdownMenuPrimaryItemProps<(typeof baseRoleDefinitions)[number]['value']>[] {
+  return evaluateDynamicDropdownItems<(typeof baseRoleDefinitions)[number], DynamicProperties>(
     baseRoleDefinitions,
     [
       {
@@ -61,10 +61,10 @@ export function getAssignableBoardMemberRoles(
         }),
         mapPolicyResult: (result) => {
           const { reason: { code } = {} } = result
-          switch (code){
+          switch (code) {
             case 'BOARD_MEMBER_ROLE::REQUIRED_AT_LEAST_ONE_OTHER_ADMIN':
               return 'Boards must have at least one admin'
-            default: 
+            default:
               return ''
           }
         }

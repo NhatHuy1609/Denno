@@ -1,6 +1,6 @@
-import { userTypes } from "@/entities/user"
+import { userSchemas } from '@/entities/user'
 
 export type PolicyContext = {
-  user: userTypes.User
+  user: userSchemas.User
   [key: string]: any
 }

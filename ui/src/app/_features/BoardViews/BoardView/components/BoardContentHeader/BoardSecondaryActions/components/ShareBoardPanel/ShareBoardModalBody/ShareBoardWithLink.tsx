@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { BoardQueries, boardTypes } from '@/entities/board'
+import { BoardQueries, boardSchemas } from '@/entities/board'
 import { PersistedStateKey } from '@/data/persisted-keys'
-import { getLocalStorageItem } from '@/utils/local-storage'
 import { generateBoardInvitationLink } from '@/utils/invitation-link'
 import { useQueryClient } from '@tanstack/react-query'
 import { useCreateBoardInvitationLink } from '@/app/_hooks/useCreateBoardInvitationLink'
@@ -12,16 +11,11 @@ import { FaRegCircleCheck } from 'react-icons/fa6'
 import { FiLink } from 'react-icons/fi'
 import UnderlineLinkButton from '@/app/_components/UnderlineLinkButton'
 import WaterFallLoading from '@/app/_components/Loadings/WaterFallLoading'
-import DropdownMenuPrimary, {
-  DropdownMenuPrimaryItemProps
-} from '@/app/_components/DropdownMenuPrimary'
+import DropdownMenuPrimary, { DropdownMenuPrimaryItemProps } from '@/app/_components/DropdownMenuPrimary'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 
 function ShareBoardWithLink() {
-  const [boardId, setRecentAccessBoardId] = useSyncedLocalStorage<string>(
-    PersistedStateKey.RecentAccessBoard,
-    ''
-  )
+  const [boardId, setRecentAccessBoardId] = useSyncedLocalStorage<string>(PersistedStateKey.RecentAccessBoard, '')
   const queryClient = useQueryClient()
 
   const { data: boardInvitationSecret } = useBoardInvitationSecretQuery(boardId, {
@@ -38,8 +32,7 @@ function ShareBoardWithLink() {
     })
 
   // Handle create invitation link on client and copy to clipboard
-  const [shareBoardLinkPermission, setShareBoardLinkPermission] =
-    useState<boardTypes.BoardMemberRole | null>(null)
+  const [shareBoardLinkPermission, setShareBoardLinkPermission] = useState<boardSchemas.BoardMemberRole | null>(null)
   const [_, copy] = useCopyToClipboard()
   const [isCopiedSuccess, setIsCopiedSuccess] = useState(false)
   const { createBoardInvitationLink, isCreatingLink } = useCreateBoardInvitationLink(
@@ -137,25 +130,22 @@ function ShareBoardWithLink() {
   }
 
   // Dropdown items for changing permissions when sharing the board link
-  const permissionsDropdownItems: Array<DropdownMenuPrimaryItemProps<boardTypes.BoardMemberRole>> =
-    [
-      {
-        value: 'Member',
-        label: 'Can join as member',
-        available: true,
-        description: 'Board members can view and edit cards, lists, and some board settings.'
-      },
-      {
-        value: 'Observer',
-        label: 'Can join as observer',
-        available: true,
-        description: 'Board observers can view and comment.'
-      }
-    ]
+  const permissionsDropdownItems: Array<DropdownMenuPrimaryItemProps<boardSchemas.BoardMemberRole>> = [
+    {
+      value: 'Member',
+      label: 'Can join as member',
+      available: true,
+      description: 'Board members can view and edit cards, lists, and some board settings.'
+    },
+    {
+      value: 'Observer',
+      label: 'Can join as observer',
+      available: true,
+      description: 'Board observers can view and comment.'
+    }
+  ]
 
-  const handleSelectShareBoardLinkPermission = (
-    item: DropdownMenuPrimaryItemProps<boardTypes.BoardMemberRole>
-  ) => {
+  const handleSelectShareBoardLinkPermission = (item: DropdownMenuPrimaryItemProps<boardSchemas.BoardMemberRole>) => {
     const { value } = item
     if (!value) return
 
@@ -172,9 +162,7 @@ function ShareBoardWithLink() {
           </div>
           <div className='flex h-full w-auto flex-1 flex-col justify-between'>
             <span className='text-base text-sm text-black'>
-              {boardInvitationSecret
-                ? 'Anyone with the link can join as a member'
-                : 'Share this board with a link'}
+              {boardInvitationSecret ? 'Anyone with the link can join as a member' : 'Share this board with a link'}
             </span>
             {renderShareBoardLinkActions()}
           </div>

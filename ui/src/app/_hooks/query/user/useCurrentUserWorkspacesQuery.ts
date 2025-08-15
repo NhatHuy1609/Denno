@@ -1,12 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
-import { UserQueries, userTypes } from '@/entities/user'
+import { UserQueries, userSchemas } from '@/entities/user'
 import { getLocalStorageItem } from '@/utils/local-storage'
 import { PersistedStateKey } from '@/data/persisted-keys'
 
-export default function useCurrentUserWorkspacesQuery({ filter }: { filter?: userTypes.UserWorkspacesFilterQuery }) {
+export default function useCurrentUserWorkspacesQuery({ filter }: { filter?: userSchemas.UserWorkspacesFilterQuery }) {
   const userId = getLocalStorageItem(PersistedStateKey.MeId) || ''
 
-  return useQuery(
-    UserQueries.userWorkspacesQuery(userId, filter)
-  )
+  return useQuery(UserQueries.userWorkspacesQuery(userId, filter))
 }

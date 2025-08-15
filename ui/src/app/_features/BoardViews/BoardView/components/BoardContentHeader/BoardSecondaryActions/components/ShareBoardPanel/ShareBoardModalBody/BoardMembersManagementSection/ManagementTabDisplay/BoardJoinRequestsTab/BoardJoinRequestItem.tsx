@@ -1,11 +1,9 @@
 import React from 'react'
 import Avatar from '@/ui/components/Avatar'
-import DropdownMenuPrimary, {
-  DropdownMenuPrimaryItemProps
-} from '@/app/_components/DropdownMenuPrimary'
+import DropdownMenuPrimary, { DropdownMenuPrimaryItemProps } from '@/app/_components/DropdownMenuPrimary'
 import { enumTypes } from '@/service/api/_enums'
 import { formatDateTime } from '@/utils/formatDateTime'
-import { boardTypes } from '@/entities/board'
+import { boardSchemas } from '@/entities/board'
 import { toastSuccess } from '@/ui'
 import CustomizableButton from '@/ui/components/CustomizableButton'
 import { HiOutlineXMark } from 'react-icons/hi2'
@@ -13,7 +11,7 @@ import useApproveBoardJoinRequest from '@/app/_hooks/mutation/joinRequest/useApp
 import useRejectBoardJoinRequest from '@/app/_hooks/mutation/joinRequest/useRejectBoardJoinRequest copy'
 
 interface BoardJoinRequestItemProps {
-  request: boardTypes.BoardJoinRequest
+  request: boardSchemas.BoardJoinRequest
 }
 
 function BoardJoinRequestItem({ request }: BoardJoinRequestItemProps) {
@@ -58,9 +56,7 @@ function BoardJoinRequestItem({ request }: BoardJoinRequestItemProps) {
 
   const { name = '', avatar = '' } = request?.requester || {}
 
-  const handleAcceptRequest = async (
-    item: DropdownMenuPrimaryItemProps<enumTypes.BoardMemberRoleEnum>
-  ) => {
+  const handleAcceptRequest = async (item: DropdownMenuPrimaryItemProps<enumTypes.BoardMemberRoleEnum>) => {
     if (!item.value || !request) return
 
     await approveBoardJoinRequestAsync({

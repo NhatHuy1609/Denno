@@ -1,22 +1,18 @@
 import React, { useRef } from 'react'
 import { cn } from '@/lib/styles/utils'
-import { userTypes } from '@/entities/user'
+import { userSchemas } from '@/entities/user'
 import { useParams } from 'next/navigation'
 import { useWorkspaceQuery } from '@/app/_hooks/query'
 import { useOnClickOutSide } from '@/app/_hooks/useOnClickOutSide'
 import { Avatar } from '@/ui'
 
 interface SearchedUsersResultProps {
-  searchedUserData: userTypes.Users
-  selectUserFn: (user: userTypes.User) => void
+  searchedUserData: userSchemas.Users
+  selectUserFn: (user: userSchemas.User) => void
   hideSearchedUsersResultFn: () => void
 }
 
-function SearchedUsersResult({
-  searchedUserData,
-  selectUserFn,
-  hideSearchedUsersResultFn
-}: SearchedUsersResultProps) {
+function SearchedUsersResult({ searchedUserData, selectUserFn, hideSearchedUsersResultFn }: SearchedUsersResultProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const { workspaceId } = useParams<{ workspaceId: string }>()
 
@@ -34,7 +30,7 @@ function SearchedUsersResult({
 
   // Handle user selection
   // Check if the user is already a member of the workspace before allowing selection
-  const handleSelectUser = (user: userTypes.User) => {
+  const handleSelectUser = (user: userSchemas.User) => {
     const isAlreadyMember = members.some((member) => member.id === user.id)
     if (!isAlreadyMember) {
       selectUserFn && selectUserFn(user)
@@ -62,7 +58,7 @@ function SearchedUsersResult({
 export default React.memo(SearchedUsersResult)
 
 interface SearchedUsersListProps {
-  users: userTypes.Users
+  users: userSchemas.Users
   children: React.ReactNode
 }
 
@@ -76,7 +72,7 @@ function SearchedUsersList({ users, children }: SearchedUsersListProps) {
 SearchedUsersList.Item = SearchedUserItem
 
 interface SearchedUserItemProps {
-  user: userTypes.User
+  user: userSchemas.User
   isAlreadyMember: boolean // Check if the user is already a member of the workspace
   memberRole?: string // Optional prop for member role to be used for display
   selectUserFn: SearchedUsersResultProps['selectUserFn']
