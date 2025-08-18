@@ -17,8 +17,6 @@ using server.Services.QueueHostedService;
 using server.Helpers;
 using server.Dtos.Response.InvitationSecret;
 using server.Models.Query;
-using Microsoft.AspNetCore.SignalR;
-using server.Hubs.BoardHub;
 
 namespace server.Controllers
 {
@@ -472,6 +470,30 @@ namespace server.Controllers
                 await _boardService.NotifyMemberRoleChanged(boardId);
                 //await _emailService.SendBoardActionEmailsAsync(action, isRunInBackground: true);
             }
+
+            return Ok();
+        }
+
+        [HttpDelete("[controller]/{boardId}/members/{memberId}")]
+        public async Task<IActionResult> RemoveBoardMemberAsync(Guid boardId, string memberId)
+        {
+            if (boardId == Guid.Empty || string.IsNullOrEmpty(memberId)) {
+                return BadRequest(new ApiErrorResponse()
+                {
+                    StatusMessage = "boardId or memberId can not be null"
+                });
+            }
+
+            var userId = _authService.GetCurrentUserId();
+            var actionContext = new DennoActionContext()
+            {
+                MemberCreatorId = userId,
+                BoardId = boardId,
+                TargetUserId = memberId,
+                IsBoardActivity = true
+            };
+
+            var action = await _actionService.CreateActionAsync(ActionTypes.RemoveBoardMember, actionContext);
 
             return Ok();
         }
