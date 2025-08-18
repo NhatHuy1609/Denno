@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using server.Dtos.Response;
+using server.Dtos.Response.Board;
 using server.Dtos.Response.Notification.Interfaces;
 using server.Dtos.Response.Users;
 using server.Dtos.Response.Workspace;
@@ -29,6 +30,7 @@ namespace server.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly INotificationService _notificationService;
         private readonly IUserService _userService;
+        private readonly IBoardService _boardService;
 
         public UserController(
             IMapper mapper,
@@ -36,7 +38,8 @@ namespace server.Controllers
             ILogger<UserController> logger,
             UserManager<AppUser> userManager,
             INotificationService notificationService,
-            IUserService userService)
+            IUserService userService,
+            IBoardService boardService)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -44,6 +47,24 @@ namespace server.Controllers
             _userManager = userManager;
             _notificationService = notificationService;
             _userService = userService;
+            _boardService = boardService;
+        }
+
+        [HttpGet]
+        [Route("[controller]/{userId}/joinedBoards")]
+        public async Task<IActionResult> GetJoinedBoardsAsync(string userId,[FromQuery] UserJoinedBoardQueryModel query)
+        {
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest(new ApiErrorResponse()
+                {
+                    StatusMessage = "userId can not be null"
+                });
+            }
+
+            var queryResult = await _boardService.GetJoinedBoardsAsync(userId, query);
+
+            return Ok(_mapper.Map<List<BoardResponseDto>>(queryResult.Value));
         }
 
         [HttpGet]
@@ -98,12 +119,6 @@ namespace server.Controllers
             }
 
             return Ok(responses);
-        }
-
-        [HttpGet("[controller]/{id}/boardsInvited")]
-        public async Task<IActionResult> GetUserBoardsInvitedAsync(string id)
-        {
-            return Ok();
         }
 
 
