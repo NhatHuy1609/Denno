@@ -22,6 +22,24 @@ namespace server.Hubs.BoardHub
             _logger = logger;
         }
 
+        public override async Task OnConnectedAsync()
+        {
+            var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!string.IsNullOrEmpty(userId)) 
+            {
+                await _connectionManagerService.AddConnectionAsync(userId, HubType.Board, Context.ConnectionId);
+            }
+
+            await base.OnConnectedAsync();
+        }
+
+        public override async Task OnDisconnectedAsync(Exception? exception)
+        {
+            await _connectionManagerService.RemoveConnectionAsync(Context.ConnectionId);
+            await base.OnDisconnectedAsync(exception);
+        }
+
         public async Task JoinBoard(Guid boardId)
         {
             try
@@ -40,7 +58,7 @@ namespace server.Hubs.BoardHub
 
                 // Add All user's connections to team group (If user has multiple tabs/devices)
                 var userConnections = await _connectionManagerService.GetUserConnectionsAsync(userId);
-                foreach (var connection in userConnections.Where(conn => conn != Context.ConnectionId))
+                foreach (var connection in userConnections.Where(conn => conn.ConnectionId != Context.ConnectionId))
                 {
                     await Groups.AddToGroupAsync(Context.ConnectionId, SignalRGroupNames.GetBoardGroupName(boardId));
                 }

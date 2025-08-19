@@ -23,6 +23,12 @@ namespace server.Services
             _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
+        public async Task<bool> IsWorkspaceMemberAsync(Guid workspaceId, string userId)
+        {
+            return await _dbContext.WorkspaceMembers
+                .AnyAsync(wm => wm.WorkspaceId == workspaceId && wm.AppUserId == userId);
+        }
+
         /// <summary>
         /// Retrieves workspace details based on the provided ID and query parameters.
         /// </summary>

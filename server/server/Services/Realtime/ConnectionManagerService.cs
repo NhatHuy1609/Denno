@@ -2,22 +2,36 @@
 
 namespace server.Services.Realtime
 {
+    public enum HubType
+    {
+        Notification,
+        Workspace,
+        Board
+    }
+
+    public record HubConnectionInfo(HubType Hub, string ConnectionId);
+
     public interface IConnectionManager
     {
-        Task AddConnectionAsync(string userId, string connectionId);
+        Task AddConnectionAsync(string userId, HubType hub, string connectionId);
         Task RemoveConnectionAsync(string connectionId);
-        Task<List<string>> GetUserConnectionsAsync(string userId);
-        Task<string> GetUserByConnectionAsync(string connectionId);
+        Task<List<HubConnectionInfo>> GetUserConnectionsAsync(string userId);
+        Task<List<HubConnectionInfo>> GetUserConnectionsByHubAsync(string userId, HubType hub);
+        Task<string?> GetUserByConnectionAsync(string connectionId);
         Task<bool> IsUserOnlineAsync(string userId);
         Task<List<string>> GetOnlineUsersAsync();
+
+        // Debug
+        int GetTotalConnections();
+        int GetOnlineUserCount();
     }
 
     public class ConnectionManagerService : IConnectionManager
     {
-        // userId -> HashSet của connectionIds
-        private readonly ConcurrentDictionary<string, HashSet<string>> _userConnections = new();
+        // userId -> HashSet<HubConnectionInfo>
+        private readonly ConcurrentDictionary<string, HashSet<HubConnectionInfo>> _userConnections = new();
 
-        // connectionId -> userId (để reverse lookup)
+        // connectionId -> userId (reverse lookup)
         private readonly ConcurrentDictionary<string, string> _connectionUsers = new();
 
         private readonly ILogger<ConnectionManagerService> _logger;
@@ -27,28 +41,29 @@ namespace server.Services.Realtime
             _logger = logger;
         }
 
-        public Task AddConnectionAsync(string userId, string connectionId)
+        public Task AddConnectionAsync(string userId, HubType hub, string connectionId)
         {
             try
             {
-                // Thêm connection vào user's connection list
+                var connectionInfo = new HubConnectionInfo(hub, connectionId);
+
                 _userConnections.AddOrUpdate(
                     userId,
-                    new HashSet<string> { connectionId },
+                    new HashSet<HubConnectionInfo> { connectionInfo },
                     (key, existingConnections) =>
                     {
                         lock (existingConnections)
                         {
-                            existingConnections.Add(connectionId);
+                            existingConnections.Add(connectionInfo);
                             return existingConnections;
                         }
                     });
 
-                // Map ngược: connectionId -> userId
                 _connectionUsers.TryAdd(connectionId, userId);
 
-                _logger.LogInformation("Added connection {ConnectionId} for user {UserId}. Total connections: {Count}",
-                    connectionId, userId, _userConnections[userId].Count);
+                _logger.LogInformation(
+                    "Added {Hub} connection {ConnectionId} for user {UserId}. Total connections: {Count}",
+                    hub, connectionId, userId, _userConnections[userId].Count);
 
                 return Task.CompletedTask;
             }
@@ -63,21 +78,18 @@ namespace server.Services.Realtime
         {
             try
             {
-                // Tìm userId từ connectionId
                 if (!_connectionUsers.TryRemove(connectionId, out var userId))
                 {
                     _logger.LogWarning("Connection {ConnectionId} not found for removal", connectionId);
                     return Task.CompletedTask;
                 }
 
-                // Remove connection từ user's connection list
                 if (_userConnections.TryGetValue(userId, out var connections))
                 {
                     lock (connections)
                     {
-                        connections.Remove(connectionId);
+                        connections.RemoveWhere(c => c.ConnectionId == connectionId);
 
-                        // Nếu user không còn connection nào, remove user khỏi dictionary
                         if (connections.Count == 0)
                         {
                             _userConnections.TryRemove(userId, out _);
@@ -85,7 +97,8 @@ namespace server.Services.Realtime
                         }
                         else
                         {
-                            _logger.LogInformation("Removed connection {ConnectionId} for user {UserId}. Remaining connections: {Count}",
+                            _logger.LogInformation(
+                                "Removed connection {ConnectionId} for user {UserId}. Remaining connections: {Count}",
                                 connectionId, userId, connections.Count);
                         }
                     }
@@ -100,7 +113,7 @@ namespace server.Services.Realtime
             }
         }
 
-        public Task<List<string>> GetUserConnectionsAsync(string userId)
+        public Task<List<HubConnectionInfo>> GetUserConnectionsAsync(string userId)
         {
             if (_userConnections.TryGetValue(userId, out var connections))
             {
@@ -110,10 +123,24 @@ namespace server.Services.Realtime
                 }
             }
 
-            return Task.FromResult(new List<string>());
+            return Task.FromResult(new List<HubConnectionInfo>());
         }
 
-        public Task<string> GetUserByConnectionAsync(string connectionId)
+        public Task<List<HubConnectionInfo>> GetUserConnectionsByHubAsync(string userId, HubType hub)
+        {
+            if (_userConnections.TryGetValue(userId, out var connections))
+            {
+                lock (connections)
+                {
+                    var filtered = connections.Where(c => c.Hub == hub).ToList();
+                    return Task.FromResult(filtered);
+                }
+            }
+
+            return Task.FromResult(new List<HubConnectionInfo>());
+        }
+
+        public Task<string?> GetUserByConnectionAsync(string connectionId)
         {
             _connectionUsers.TryGetValue(connectionId, out var userId);
             return Task.FromResult(userId);
@@ -121,7 +148,7 @@ namespace server.Services.Realtime
 
         public Task<bool> IsUserOnlineAsync(string userId)
         {
-            var isOnline = _userConnections.ContainsKey(userId) && _userConnections[userId].Count > 0;
+            var isOnline = _userConnections.TryGetValue(userId, out var connections) && connections.Count > 0;
             return Task.FromResult(isOnline);
         }
 
@@ -131,7 +158,7 @@ namespace server.Services.Realtime
             return Task.FromResult(onlineUsers);
         }
 
-        // Debug methods
+        // Debug
         public int GetTotalConnections() => _connectionUsers.Count;
         public int GetOnlineUserCount() => _userConnections.Count;
     }
