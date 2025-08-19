@@ -1,7 +1,6 @@
 ﻿using server.Constants;
 using server.Data;
 using server.Entities;
-using server.Factories;
 using server.Interfaces;
 using server.Strategies.ActionStrategy;
 using server.Strategies.ActionStrategy.Contexts;
@@ -70,6 +69,7 @@ namespace server.Services
                 ActionTypes.RejectBoardJoinRequest => new RejectBoardJoinRequestStrategy(_dbContext),
                 ActionTypes.UpdateBoardMemberRole => new UpdateBoardMemberRoleStrategy(_dbContext),
                 ActionTypes.RemoveBoardMember => new RemoveBoardMemberStrategy(_dbContext),
+                ActionTypes.UpdateWorkspaceMemberRole => new UpdateWorkspaceMemberRoleStrategy(_dbContext),
                 _ => throw new ArgumentException($"Unsupported action type: {actionType}")
             };
         }

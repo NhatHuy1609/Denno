@@ -58,6 +58,7 @@ namespace server.Infrastructure
             services.AddScoped<RejectWorkspaceJoinRequestNotificationResponseFactory>();
             services.AddScoped<SendWorkspaceJoinRequestNotificationResponseFactory>();
             services.AddScoped<AddMemberToBoardNotificationResponseFactory>();
+            services.AddScoped<UpdateWorkspaceMemberRoleNotificationResponseFactory>();
 
             // Background services
             services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();

@@ -487,6 +487,41 @@ namespace server.Controllers
 
             return Ok();
         }
+
+        [HttpPut]
+        [Route("[controller]/{workspaceId}/members/{memberId}/role")]
+        public async Task<IActionResult> UpdateWorkspaceMemberRoleAsync(
+            [FromRoute] Guid workspaceId,
+            [FromRoute] string memberId,
+            UpdateWorkspaceMemberRoleRequest request)
+        {
+            if (!ModelState.IsValid || workspaceId == Guid.Empty || string.IsNullOrEmpty(memberId))
+            {
+                return BadRequest(new ApiErrorResponse()
+                {
+                    StatusMessage = "Request or Route params are not valid"
+                });
+            }
+
+            var userId = _authService.GetCurrentUserId();
+
+            var actionContext = new UpdateWorkspaceMemberRoleActionContext()
+            {
+                MemberCreatorId = userId,
+                WorkspaceId = workspaceId,
+                TargetUserId = memberId,
+                NewMemberRole = request.NewMemberRole
+            };
+
+            var action = await _actionService.CreateActionAsync(ActionTypes.UpdateWorkspaceMemberRole, actionContext);
+
+            if (action != null)
+            {
+                await _workspaceService.NotifyUserActionToWorkspaceMembers(action, workspaceId);
+            }
+
+            return Ok();
+        }
     }
 }
 

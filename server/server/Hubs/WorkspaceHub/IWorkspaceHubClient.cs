@@ -2,5 +2,6 @@
 {
     public interface IWorkspaceHubClient : IBaseHubClient
     {
+        Task OnWorkspaceMemberRoleChanged();
     }
 }
