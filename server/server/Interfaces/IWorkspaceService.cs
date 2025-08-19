@@ -7,6 +7,7 @@ namespace server.Interfaces
     public interface IWorkspaceService
     {
         Task<bool> IsWorkspaceMemberAsync(Guid workspaceId, string userId);
+        Task NotifyUserActionToWorkspaceMembers(DennoAction action, Guid workspaceId);
         Task<WorkspaceResponseDto2?> GetWorkspaceResponseAsync(Guid id, WorkspaceQuery query);
     }
 }
