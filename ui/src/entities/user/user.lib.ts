@@ -1,5 +1,6 @@
 import type { userSchemasDto } from '@/service/api/user'
-import { User, Users, UserWorkspaces } from './user.schemas'
+import { User, UserJoinedBoardsFilterQuery, Users, UserWorkspaces } from './user.schemas'
+import { UserJoinedBoardQueryDto } from '@/service/api/_models/query-models/user/user.types'
 
 export function transformUserDtoToUser(userDto: userSchemasDto.GetUserResponseDto): User {
   return {
@@ -22,4 +23,10 @@ export function transformUserWorkspacesDtoToUserWorkspaces(
   return userWorkspacesDto.map((userWorkspace) => ({
     ...userWorkspace
   }))
+}
+
+export function mapToUserJoinedBoardQueryDto(queryDto: UserJoinedBoardsFilterQuery): UserJoinedBoardQueryDto {
+  return {
+    workspaceId: queryDto.workspaceId
+  }
 }

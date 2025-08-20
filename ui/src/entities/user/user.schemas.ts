@@ -39,6 +39,7 @@ export interface UserWorkspace {
 
 export type UserWorkspaces = UserWorkspace[]
 
+// Query model
 export interface UsersFilterQuery {
   name?: string
   email?: string
@@ -49,4 +50,8 @@ export interface UsersFilterQuery {
 export interface UserWorkspacesFilterQuery {
   filter: 'none' | 'members' | 'public' | 'all'
   fields?: Array<'id' | 'name' | 'logo'>
+}
+
+export interface UserJoinedBoardsFilterQuery {
+  workspaceId?: string
 }

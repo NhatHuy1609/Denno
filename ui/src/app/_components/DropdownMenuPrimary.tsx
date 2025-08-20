@@ -4,7 +4,8 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuLabel,
-  DropdownMenuItem
+  DropdownMenuItem,
+  DropdownMenuSeparator
 } from '@radix-ui/react-dropdown-menu'
 import CustomizableButton from '@/ui/components/CustomizableButton'
 import { FaAngleDown } from 'react-icons/fa6'
@@ -72,7 +73,11 @@ export default function DropdownMenuPrimary<T>({
       <DropdownMenuContent
         className={cn('min-w-78 z-[999] max-w-[320px] rounded-md bg-white py-2 shadow-lg', contentClassName)}
       >
-        {contentTitle && <DropdownMenuLabel title={contentTitle} />}
+        {contentTitle && (
+          <DropdownMenuLabel className='py-2 text-center text-sm font-medium text-slate-700'>
+            {contentTitle}
+          </DropdownMenuLabel>
+        )}
         {items.map((item, index) => (
           <DropdownMenuItem key={index} className='hover:outline-none' onSelect={() => handleSelectItem(index)}>
             {/* Render value and description if value is not empty */}

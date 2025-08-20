@@ -1,5 +1,4 @@
 import { WorkspaceQueries } from '@/entities/workspace'
-import { useQuery } from '@tanstack/react-query'
 import type { workspaceSchemas } from '@/entities/workspace'
 import { ApiQueryOptionsParams } from '../types'
 import { useApiQueryWrapper } from '../useApiQueryWrapper'
