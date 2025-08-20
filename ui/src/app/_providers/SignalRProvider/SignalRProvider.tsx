@@ -26,13 +26,10 @@ export const SignalRProvider = ({ children }: { children: React.ReactNode }) => 
     SignalRService.on('notification', 'ReceiveActionNotification', (notificationResponse) => {
       const notification = notificationLib.mapToNotification(notificationResponse)
       // Update notifications by adding new notification to the beginning of the list
-      queryClient.setQueryData(
-        UserQueries.usersNotificationsQuery(currentUserId).queryKey,
-        (oldData) => {
-          const newData = [notification, ...(oldData || [])]
-          return newData
-        }
-      )
+      queryClient.setQueryData(UserQueries.usersNotificationsQuery(currentUserId).queryKey, (oldData) => {
+        const newData = [notification, ...(oldData || [])]
+        return newData
+      })
     })
 
     return () => {
@@ -43,9 +40,5 @@ export const SignalRProvider = ({ children }: { children: React.ReactNode }) => 
     }
   }, [])
 
-  return (
-    <SignalRContext.Provider value={{ signalRService: SignalRService }}>
-      {children}
-    </SignalRContext.Provider>
-  )
+  return <SignalRContext.Provider value={{ signalRService: SignalRService }}>{children}</SignalRContext.Provider>
 }

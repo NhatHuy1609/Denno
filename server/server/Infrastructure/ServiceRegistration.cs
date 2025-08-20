@@ -12,6 +12,7 @@ using server.Factories;
 using server.Factories.NotificationResponseFactory;
 using server.Hubs.BoardHub;
 using server.Hubs.NotificationHub;
+using server.Hubs.WorkspaceHub;
 using server.Infrastructure.Configurations;
 using server.Infrastructure.Providers;
 using server.Interfaces;
@@ -193,6 +194,7 @@ namespace server.Infrastructure
             {
                 endpoints.MapHub<NotificationHub>("hubs/notification");
                 endpoints.MapHub<BoardHub>("hubs/board");
+                endpoints.MapHub<WorkspaceHub>("hubs/workspace");
             });
 
             return app;
