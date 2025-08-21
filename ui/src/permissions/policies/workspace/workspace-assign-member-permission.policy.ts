@@ -10,7 +10,7 @@ export interface WorkspaceAssignMemberPermissionPolicyContext extends PolicyCont
 
 export interface WorkspaceAssignMemberPermissionPolicyResource {
   workspaceOwnerId: workspaceSchemas.Workspace['idOwner']
-  workspaceMembers?: workspaceSchemas.Workspace['members']
+  workspaceMembers: workspaceSchemas.Workspace['members']
 }
 
 /**
