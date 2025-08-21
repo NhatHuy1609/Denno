@@ -1,27 +1,40 @@
 import React from 'react'
 import { useMemberDisplayItemContext } from '../context'
 import DropdownMenuPrimary, { DropdownMenuPrimaryItemProps } from '@/app/_components/DropdownMenuPrimary'
-import { workspaceSchemas } from '@/entities/workspace'
+import { useGetAssignableMemberPermissions } from './useGetAssignableMemberPermissions'
 
 function WorkspaceMemberRoleAdjustAction() {
   const { member } = useMemberDisplayItemContext()
-  const { memberType: role } = member
+  const { assignablePermissions, alertMessage } = useGetAssignableMemberPermissions(member.id)
 
-  const items: DropdownMenuPrimaryItemProps<workspaceSchemas.WorkspaceMemberType>[] = [
-    { value: 'Admin', label: 'Admin' },
-    { value: 'Normal', label: 'Normal' }
-  ]
+  const { memberType: memberRole } = member
+
+  const isRoleDropdownDisabled = () => {
+    return assignablePermissions.every((p) => !p.available)
+  }
 
   return (
     <DropdownMenuPrimary
-      items={items}
+      items={assignablePermissions}
       contentTitle='Change permissions'
-      triggerTitle={role}
-      defaultSelectedIndex={items.findIndex((item) => item.value === role)}
-      // renderOtherItems={() => <DropdownOtherActions boardId={boardId} memberId={member.id} />}
-      // disabled={isRoleDropdownDisabled()}
+      triggerTitle={memberRole}
+      defaultSelectedIndex={assignablePermissions.findIndex((item) => item.value === memberRole)}
+      renderOtherItems={() => {
+        if (!alertMessage) {
+          return
+        }
+
+        return (
+          <div className='w-full px-4'>
+            <div className='my-2 h-[1px] w-full bg-gray-200' />
+            <span className='block w-full text-[13px] font-medium text-slate-700'>{alertMessage}</span>
+          </div>
+        )
+      }}
+      disabled={isRoleDropdownDisabled()}
       // onSelect={handleUpdateBoardMemberRole}
       contentClassName='min-w-[290px]'
+      triggerClassName='max-w-24'
     />
   )
 }

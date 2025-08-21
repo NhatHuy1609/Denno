@@ -35,8 +35,8 @@ const baseRoleDefinitions: Array<BaseRoleDefinition> = [
 export function getAssignableBoardMemberRoles(
   context: Omit<BoardAssignMemberRolePolicyContext, 'targetRole'> & PolicyContext,
   resourceData: BoardAssignMemberRolePolicyResource
-): DropdownMenuPrimaryItemProps<(typeof baseRoleDefinitions)[number]['value']>[] {
-  return evaluateDynamicDropdownItems<(typeof baseRoleDefinitions)[number], DynamicProperties>(
+): DropdownMenuPrimaryItemProps<BaseRoleDefinition['value']>[] {
+  return evaluateDynamicDropdownItems<BaseRoleDefinition, DynamicProperties>(
     baseRoleDefinitions,
     [
       {
