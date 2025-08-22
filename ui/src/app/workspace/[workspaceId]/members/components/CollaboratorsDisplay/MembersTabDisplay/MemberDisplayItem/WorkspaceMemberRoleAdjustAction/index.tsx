@@ -1,16 +1,40 @@
 import React from 'react'
 import { useMemberDisplayItemContext } from '../context'
-import DropdownMenuPrimary, { DropdownMenuPrimaryItemProps } from '@/app/_components/DropdownMenuPrimary'
 import { useGetAssignableMemberPermissions } from './useGetAssignableMemberPermissions'
+import useUpdateWorkspaceMemberRoleMutation from '@/app/_hooks/mutation/workspace/useUpdateWorkspaceMemberRoleMutation'
+import { workspaceSchemas } from '@/entities/workspace'
+import DropdownMenuPrimary, { DropdownMenuPrimaryItemProps } from '@/app/_components/DropdownMenuPrimary'
 
 function WorkspaceMemberRoleAdjustAction() {
   const { member } = useMemberDisplayItemContext()
-  const { assignablePermissions, alertMessage } = useGetAssignableMemberPermissions(member.id)
+  const { assignablePermissions, alertMessage, workspaceId } = useGetAssignableMemberPermissions(member.id)
+
+  const { mutateAsync: updateWorkspaceMemberRoleAsync } = useUpdateWorkspaceMemberRoleMutation({
+    onError: (error) => {
+      console.error(error)
+    }
+  })
 
   const { memberType: memberRole } = member
 
   const isRoleDropdownDisabled = () => {
     return assignablePermissions.every((p) => !p.available)
+  }
+
+  const handleSelectWorkspaceMemberRole = async (
+    item: DropdownMenuPrimaryItemProps<workspaceSchemas.WorkspaceMemberType>
+  ) => {
+    if (item.value === memberRole) {
+      return
+    }
+
+    await updateWorkspaceMemberRoleAsync({
+      workspaceId,
+      memberId: member.id,
+      updateWorkspaceMemberRoleDto: {
+        newMemberRole: item.value
+      }
+    })
   }
 
   return (
@@ -21,7 +45,7 @@ function WorkspaceMemberRoleAdjustAction() {
       defaultSelectedIndex={assignablePermissions.findIndex((item) => item.value === memberRole)}
       renderOtherItems={() => {
         if (!alertMessage) {
-          return
+          return null
         }
 
         return (
@@ -32,7 +56,7 @@ function WorkspaceMemberRoleAdjustAction() {
         )
       }}
       disabled={isRoleDropdownDisabled()}
-      // onSelect={handleUpdateBoardMemberRole}
+      onSelect={handleSelectWorkspaceMemberRole}
       contentClassName='min-w-[290px]'
       triggerClassName='max-w-24'
     />

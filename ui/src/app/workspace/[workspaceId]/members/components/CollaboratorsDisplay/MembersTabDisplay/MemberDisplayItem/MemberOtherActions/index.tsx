@@ -4,6 +4,8 @@ import { FaXmark } from 'react-icons/fa6'
 import PopoverAction from '../PopoverAction'
 import { getLocalStorageItem } from '@/utils/local-storage'
 import { PersistedStateKey } from '@/data/persisted-keys'
+import LeaveBoardAction from './LeaveBoardAction'
+import RemoveMemberAction from './RemoveMeberAction'
 
 type ActionType = 'remove' | 'leave'
 
@@ -38,7 +40,13 @@ function MemberOtherActions({ memberId }: MemberOtherActionsProps) {
           startIcon={<FaXmark className='text-base' />}
         />
       )}
-      renderContent={(closePopoverFn) => <div></div>}
+      renderContent={(closePopoverFn) => (
+        <>
+          {actionType === 'remove' && <RemoveMemberAction />}
+          {actionType === 'leave' && <LeaveBoardAction />}
+        </>
+      )}
+      contentClassName='px-0 py-4'
     />
   )
 }

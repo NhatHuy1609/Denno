@@ -522,6 +522,34 @@ namespace server.Controllers
 
             return Ok();
         }
+
+        [HttpDelete]
+        [Route("[controller]/{workspaceId}/members/{memberId}")]
+        public async Task<IActionResult> RemoveWorkspaceMemberAsync(
+            [FromRoute] Guid workspaceId,
+            [FromRoute] Guid memberId)
+        {
+            if (workspaceId == Guid.Empty || memberId == Guid.Empty) 
+            {
+                return BadRequest(new ApiErrorResponse()
+                {
+                    StatusMessage = "workspaceId and memberId can not be null"
+                });
+            }
+
+            var userId = _authService.GetCurrentUserId();
+
+            var actionContext = new DennoActionContext()
+            {
+                MemberCreatorId = userId,
+                WorkspaceId = workspaceId,
+                TargetUserId = userId
+            };
+
+            var action = await _actionService.CreateActionAsync(ActionTypes.RemoveWorkspaceMember, actionContext);
+
+            return Ok();
+        }
     }
 }
 

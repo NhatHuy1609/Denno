@@ -9,7 +9,9 @@ export type BaseHubReceiveEvents = {
 export type NotificationReceiveEvents = {
   ReceiveActionNotification: (notificationResponse: notificationTypesDto.NotificationResponseDto) => void
 }
-export type WorkspaceReceiveEvents = {}
+export type WorkspaceReceiveEvents = {
+  OnWorkspaceMemberRoleChanged: () => void
+}
 
 export type BoardReceiveEvents = {
   ReceiveMemberRoleChanged: () => void

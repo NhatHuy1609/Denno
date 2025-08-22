@@ -46,6 +46,12 @@ export const CreateWorkspaceJoinRequestDtoSchema = z
   })
   .describe('CreateWorkspaceJoinRequestDtoSchema')
 
+export const UpdateWorkspaceMemberRoleDtoSchema = z
+  .object({
+    newMemberRole: enumContracts.MemberRoleEnumSchema
+  })
+  .describe('UpdateWorkspaceMemberRoleDtoSchema')
+
 // Response
 export const WorkspaceGuestResponseDtoSchema = z.object({
   user: userContractsDto.GetUserResponseDtoSchema,
