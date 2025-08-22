@@ -35,5 +35,5 @@ export const useGetAssignableMemberPermissions = (targetMemberId: string) => {
     setIsLoading(false)
   }, [currentUser, targetMemberId, workspace, workspaceMembers])
 
-  return { isLoading, assignablePermissions, alertMessage }
+  return { isLoading, assignablePermissions, alertMessage, workspaceId }
 }

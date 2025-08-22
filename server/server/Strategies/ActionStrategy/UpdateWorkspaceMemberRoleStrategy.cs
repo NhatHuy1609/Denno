@@ -25,7 +25,6 @@ namespace server.Strategies.ActionStrategy
                                          throw new ArgumentException("Invalid context type for UpdateBoardMemberRoleStrategy");
 
             ArgumentException.ThrowIfNullOrWhiteSpace(updateContext.MemberCreatorId);
-            ArgumentNullException.ThrowIfNull(updateContext.BoardId);
             ArgumentNullException.ThrowIfNull(updateContext.TargetUserId);
             ArgumentNullException.ThrowIfNull(updateContext.NewMemberRole);
 

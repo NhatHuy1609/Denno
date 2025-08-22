@@ -1,4 +1,4 @@
-import React, { ReactNode, useRef, useState } from 'react'
+import React, { ReactNode, useEffect, useRef, useState } from 'react'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -43,6 +43,10 @@ export default function DropdownMenuPrimary<T>({
 }: DropdownMenuPrimaryProps<T>) {
   const [isOpen, setIsOpen] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState<number>(defaultSelectedIndex)
+
+  useEffect(() => {
+    setSelectedIndex(defaultSelectedIndex)
+  }, [defaultSelectedIndex])
 
   const handleSelectItem = (index: number) => {
     const selectedItem = items[index]
