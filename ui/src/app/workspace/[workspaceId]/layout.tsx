@@ -15,7 +15,7 @@ function layout({ children }: { children: React.ReactNode }) {
 
   const onWorkspaceMemberRemoved = useCallback(
     (removedUserId: string) => {
-      if (removedUserId === userId) {
+      if (userId === removedUserId) {
         router.replace('/')
         setTimeout(() => {
           router.push(`workspace/${workspaceId}`)
@@ -23,6 +23,18 @@ function layout({ children }: { children: React.ReactNode }) {
       }
     },
     [userId, router, workspaceId]
+  )
+
+  const onWorkspaceMemberLeft = useCallback(
+    (leftUserId: string) => {
+      if (userId === leftUserId) {
+        router.replace('/')
+        setTimeout(() => {
+          router.push(`workspace/${workspaceId}`)
+        }, 0)
+      }
+    },
+    [userId, router]
   )
 
   // Sync recent access workspace id with local storage
@@ -38,11 +50,13 @@ function layout({ children }: { children: React.ReactNode }) {
 
     // Listen realtime events
     signalRService.on('workspace', 'OnWorkspaceMemberRemoved', onWorkspaceMemberRemoved)
+    signalRService.on('workspace', 'OnWorkspaceMemberLeft', onWorkspaceMemberLeft)
 
     return () => {
       signalRService.off('workspace', 'OnWorkspaceMemberRemoved', onWorkspaceMemberRemoved)
+      signalRService.off('workspace', 'OnWorkspaceMemberLeft', onWorkspaceMemberLeft)
     }
-  }, [workspaceId, signalRService, onWorkspaceMemberRemoved])
+  }, [workspaceId, signalRService, onWorkspaceMemberRemoved, onWorkspaceMemberLeft])
 
   return <>{children}</>
 }

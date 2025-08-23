@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using server.Constants;
@@ -18,15 +19,18 @@ namespace server.Services
 {
     public class WorkspaceService : IWorkspaceService
     {
+        private readonly ILogger<WorkspaceService> _logger;
         private readonly IMapper _mapper;
         private readonly ApplicationDBContext _dbContext;
         private readonly IHubContext<WorkspaceHub, IWorkspaceHubClient> _workspaceHubContext;
 
         public WorkspaceService(
+            ILogger<WorkspaceService> logger,
             IMapper mapper,
             ApplicationDBContext dbContext,
             IHubContext<WorkspaceHub,IWorkspaceHubClient> workspaceHubContext)
         {
+            _logger = logger;
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
             _workspaceHubContext = workspaceHubContext;
@@ -52,6 +56,41 @@ namespace server.Services
                 default:
                     break;
             }
+        }
+
+        public async Task<bool> LeaveWorkspaceAsync(Guid workspaceId, string userId)
+        {
+            var workspaceMember = await _dbContext.WorkspaceMembers
+                .FirstOrDefaultAsync(wm => wm.WorkspaceId == workspaceId && wm.AppUserId == userId);
+
+            if (workspaceMember == null) 
+            {
+                _logger.LogError($"Can not workspaceMember with workspaceId:{workspaceId} - userId:{userId}");
+                return false;
+            }
+
+            using var transaction = await _dbContext.Database.BeginTransactionAsync();
+            try
+            {
+                _dbContext.WorkspaceMembers.Remove(workspaceMember);
+                _dbContext.WorkspaceGuests.Add(new WorkspaceGuest()
+                {
+                    GuestId = userId,
+                    WorkspaceId = workspaceId
+                });
+
+                await _dbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+                _logger.LogInformation($"User:{userId} successfully leaved workspace");
+
+            } catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                await transaction.RollbackAsync();
+                return false;
+            }
+
+            return true;
         }
 
         public async Task<WorkspaceResponseDto2?> GetWorkspaceResponseAsync(Guid id, WorkspaceQuery query)
@@ -158,30 +197,23 @@ namespace server.Services
             if (!includeGuests)
                 return;
 
-            // Use left join
-            var workspaceGuests = await (
-                from bm in _dbContext.BoardMembers
-                join b in _dbContext.Boards on bm.BoardId equals b.Id
-                where b.WorkspaceId == workspaceId
-                join wm in _dbContext.WorkspaceMembers
-                    on new { b.WorkspaceId, bm.AppUserId }
-                    equals new { wm.WorkspaceId, wm.AppUserId }
-                    into wmGroup // IEnumerable<WorkspaceMember>
-                from wm in wmGroup.DefaultIfEmpty()
-                where wm == null
-                group b by bm.AppUser into bGroup
-                select new 
+            var workspaceGuests = await _dbContext.WorkspaceGuests
+                .Include(wg => wg.Guest)
+                .Where(wg => wg.WorkspaceId == workspaceId)
+                .Select(wg => new
                 {
-                    Guest = bGroup.Key, // AppUser
-                    Boards = bGroup.ToList()
-                }
-            )
-            .ToListAsync();
+                    Guest = wg.Guest,
+                    JoinedBoards = _dbContext.BoardMembers
+                        .Where(bm => bm.AppUserId == wg.GuestId && bm.Board.WorkspaceId == wg.WorkspaceId)
+                        .Select(bm => bm.Board)
+                        .ToList()
+                })
+                .ToListAsync();
 
             response.Guests = workspaceGuests
                 .Select(wg => new WorkspaceGuestResponse() {
                     User = _mapper.Map<GetUserResponseDto>(wg.Guest),
-                    JoinedBoards = _mapper.Map<List<BoardResponseDto>>(wg.Boards)
+                    JoinedBoards = _mapper.Map<List<BoardResponseDto>>(wg.JoinedBoards)
                 })
                 .ToList();
         }
