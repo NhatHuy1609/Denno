@@ -564,6 +564,32 @@ namespace server.Controllers
 
             return Ok();
         }
+
+        [HttpDelete]
+        [Route("[controller]/{workspaceId}/leave")]
+        public async Task<IActionResult> LeaveWorkspace([FromRoute] Guid workspaceId)
+        {
+            if (workspaceId == Guid.Empty)
+            {
+                return BadRequest(new ApiErrorResponse()
+                {
+                    StatusMessage = "WorkspaceId can not be null"
+                });
+            }
+
+            var userId = _authService.GetCurrentUserId();
+            var isSuccessful = await _workspaceService.LeaveWorkspaceAsync(workspaceId, userId);
+
+            if (isSuccessful)
+            {
+                await _workspaceHubContext
+                    .Clients
+                    .Groups(SignalRGroupNames.GetWorkspaceGroupName(workspaceId))
+                    .OnWorkspaceMemberLeft(userId, workspaceId);
+            }
+
+            return NoContent();
+        }
     }
 }
 

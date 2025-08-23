@@ -162,4 +162,8 @@ export class WorkspaceService {
 
     return httpDel(`${this.basePath}/${workspaceId}/members/${memberId}`, { data: removeWorkspaceMemberDto })
   }
+
+  static leaveWorkspace(workspaceId: string) {
+    return httpDel(`${this.basePath}/${workspaceId}/leave`)
+  }
 }

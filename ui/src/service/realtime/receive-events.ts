@@ -17,6 +17,7 @@ export type WorkspaceReceiveEvents = {
     workspaceId: string,
     removeRelatedAccessibleBoards: boolean
   ) => void
+  OnWorkspaceMemberLeft: (userId: string, workspaceId: string) => void
 }
 
 export type BoardReceiveEvents = {

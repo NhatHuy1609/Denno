@@ -27,12 +27,20 @@ function MembersTabDisplay() {
       if (removedUserId !== currentUser?.id) refetch()
     }
 
+    const onWorkspaceMemberLeft = (userId: string) => {
+      if (userId !== currentUser?.id) {
+        refetch()
+      }
+    }
+
     signalRService.on('workspace', 'OnWorkspaceMemberRoleChanged', onMemberRoleChanged)
     signalRService.on('workspace', 'OnWorkspaceMemberRemoved', onWorkspaceMemberRemoved)
+    signalRService.on('workspace', 'OnWorkspaceMemberLeft', onWorkspaceMemberLeft)
 
     return () => {
       signalRService.off('workspace', 'OnWorkspaceMemberRoleChanged', onMemberRoleChanged)
       signalRService.off('workspace', 'OnWorkspaceMemberRemoved', onWorkspaceMemberRemoved)
+      signalRService.off('workspace', 'OnWorkspaceMemberLeft', onWorkspaceMemberLeft)
     }
   }, [signalRService, refetch])
 
