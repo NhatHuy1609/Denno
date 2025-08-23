@@ -5,6 +5,7 @@ import {
   CreateWorkspaceDto,
   CreateWorkspaceJoinRequestDto,
   DetailedWorkspaceInvitationSecretResponseDto,
+  RemoveWorkspaceMemberDto,
   UpdateWorkspaceDto,
   UpdateWorkspaceLogoDto,
   UpdateWorkspaceMemberRoleDto,
@@ -19,6 +20,7 @@ import {
   AddWorkspaceMemberDtoSchema,
   CreateWorkspaceDtoSchema,
   CreateWorkspaceJoinRequestDtoSchema,
+  RemoveWorkspaceMemberDtoSchema,
   UpdateWorkspaceDtoSchema,
   UpdateWorkspaceLogoDtoSchema,
   UpdateWorkspaceMemberRoleDtoSchema,
@@ -146,7 +148,18 @@ export class WorkspaceService {
     return httpPut(`${this.basePath}/${workspaceId}/members/${memberId}/role`, updateWorkspaceMemberRoleDto)
   }
 
-  static removeWorkspaceMember(workspaceId: string, memberId: string) {
-    return httpDel(`${this.basePath}/${workspaceId}/members/${memberId}`)
+  static removeWorkspaceMember(
+    workspaceId: string,
+    memberId: string,
+    data: {
+      removeWorkspaceMemberDto: RemoveWorkspaceMemberDto
+    }
+  ) {
+    const removeWorkspaceMemberDto = AxiosContracts.requestContract(
+      RemoveWorkspaceMemberDtoSchema,
+      data.removeWorkspaceMemberDto
+    )
+
+    return httpDel(`${this.basePath}/${workspaceId}/members/${memberId}`, { data: removeWorkspaceMemberDto })
   }
 }

@@ -4,8 +4,10 @@ import { useWorkspaceQuery } from '@/app/_hooks/query'
 import MembersPanel from './MembersPanel'
 import MembersLinkInvitation from './MembersLinkInvitation'
 import { useSignalR } from '@/app/_providers/SignalRProvider/useSignalR'
+import { useMe } from '@/app/_hooks/query/user/useMe'
 
 function MembersTabDisplay() {
+  const { data: currentUser } = useMe()
   const { workspaceId } = useParams<{ workspaceId: string }>()
   const { data: detailedWorkspace, refetch } = useWorkspaceQuery(workspaceId, {
     members: true,
@@ -13,13 +15,25 @@ function MembersTabDisplay() {
   })
 
   const { signalRService } = useSignalR()
-
+  // Listening realtime events from hubs
   useEffect(() => {
     if (!signalRService) return
 
-    signalRService.on('workspace', 'OnWorkspaceMemberRoleChanged', () => {
+    const onMemberRoleChanged = () => {
       refetch()
-    })
+    }
+
+    const onWorkspaceMemberRemoved = (removedUserId: string) => {
+      if (removedUserId !== currentUser?.id) refetch()
+    }
+
+    signalRService.on('workspace', 'OnWorkspaceMemberRoleChanged', onMemberRoleChanged)
+    signalRService.on('workspace', 'OnWorkspaceMemberRemoved', onWorkspaceMemberRemoved)
+
+    return () => {
+      signalRService.off('workspace', 'OnWorkspaceMemberRoleChanged', onMemberRoleChanged)
+      signalRService.off('workspace', 'OnWorkspaceMemberRemoved', onWorkspaceMemberRemoved)
+    }
   }, [signalRService, refetch])
 
   const { members } = detailedWorkspace || {}

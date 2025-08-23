@@ -29,10 +29,16 @@ export default function BoardMembersTab() {
   useEffect(() => {
     if (!signalRService) return
 
-    // Sync board members data when member role changed
-    signalRService.on('board', 'ReceiveMemberRoleChanged', () => {
+    const handleMemberRoleChanged = () => {
       refetch()
-    })
+    }
+
+    // Sync board members data when member role changed
+    signalRService.on('board', 'ReceiveMemberRoleChanged', handleMemberRoleChanged)
+
+    return () => {
+      signalRService.off('board', 'ReceiveMemberRoleChanged', handleMemberRoleChanged)
+    }
   }, [signalRService])
 
   if (isPending) {

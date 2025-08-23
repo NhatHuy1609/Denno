@@ -11,11 +11,16 @@ import BoardView from '@/app/_features/BoardViews/BoardView'
 import PrivateBoardAccessRequest from './PrivateBoardAccessRequest'
 import PrimarySidebar from '@/layouts/shared/PrimarySidebar'
 import { useSignalR } from '@/app/_providers/SignalRProvider/useSignalR'
+import { useRouter } from 'next/navigation'
+import { getLocalStorageItem } from '@/utils/local-storage'
+import { PersistedStateKey } from '@/data/persisted-keys'
 
 function BoardHomePage() {
   // Apply auth guard
   const { isCheckingAuth } = useRequireAuth()
+  const router = useRouter()
   const { boardId } = useParams<{ boardId: string }>()
+  const currentUserId = getLocalStorageItem(PersistedStateKey.MeId)
 
   // Check if the user has permission to view the board
   const {
@@ -36,8 +41,23 @@ function BoardHomePage() {
   useEffect(() => {
     if (!boardId || !signalRService) return
 
+    const onWorkspaceMemberRemoved = (removedUserId: string) => {
+      if (removedUserId === currentUserId) {
+        router.replace('/')
+        setTimeout(() => {
+          router.push(`board/${boardId}`)
+        }, 0)
+      }
+    }
+
     signalRService.invoke('board', 'JoinBoard', boardId)
-  }, [signalRService, boardId])
+
+    signalRService.on('workspace', 'OnWorkspaceMemberRemoved', onWorkspaceMemberRemoved)
+
+    return () => {
+      signalRService.off('workspace', 'OnWorkspaceMemberRemoved', onWorkspaceMemberRemoved)
+    }
+  }, [signalRService, boardId, router])
 
   if (isCheckingAuth || isCheckingBoardViewPolicyAccess) {
     return (

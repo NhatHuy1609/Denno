@@ -162,6 +162,7 @@ namespace server.Services
             var workspaceGuests = await (
                 from bm in _dbContext.BoardMembers
                 join b in _dbContext.Boards on bm.BoardId equals b.Id
+                where b.WorkspaceId == workspaceId
                 join wm in _dbContext.WorkspaceMembers
                     on new { b.WorkspaceId, bm.AppUserId }
                     equals new { wm.WorkspaceId, wm.AppUserId }

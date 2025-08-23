@@ -11,6 +11,12 @@ export type NotificationReceiveEvents = {
 }
 export type WorkspaceReceiveEvents = {
   OnWorkspaceMemberRoleChanged: () => void
+  OnWorkspaceMemberRemoved: (
+    removedUserId: string,
+    actorUserId: string,
+    workspaceId: string,
+    removeRelatedAccessibleBoards: boolean
+  ) => void
 }
 
 export type BoardReceiveEvents = {

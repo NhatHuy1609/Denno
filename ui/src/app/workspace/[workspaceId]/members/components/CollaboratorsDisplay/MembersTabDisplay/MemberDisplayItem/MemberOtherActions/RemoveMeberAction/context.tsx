@@ -3,12 +3,12 @@ import { createContext, useContext } from 'react'
 interface RemoveMemberOptionsContext {
   // Whether to also remove the boards in this workspace that the member is part of
   removeRelatedBoards: boolean
-  toggleRemoveRelatedBoards: () => void
+  changeRemoveRelatedBoardsOption: (value: boolean) => void
 }
 
 export const removeMemberOptionsContext = createContext<RemoveMemberOptionsContext>({
   removeRelatedBoards: false,
-  toggleRemoveRelatedBoards: () => {}
+  changeRemoveRelatedBoardsOption: () => {}
 })
 
 export const RemoveMemberOptionsProvider = removeMemberOptionsContext.Provider

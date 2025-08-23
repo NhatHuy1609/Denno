@@ -52,6 +52,12 @@ export const UpdateWorkspaceMemberRoleDtoSchema = z
   })
   .describe('UpdateWorkspaceMemberRoleDtoSchema')
 
+export const RemoveWorkspaceMemberDtoSchema = z
+  .object({
+    deleteRelatedBoardMembers: z.boolean().optional().default(false)
+  })
+  .describe('RemoveWorkspaceMemberDtoSchema')
+
 // Response
 export const WorkspaceGuestResponseDtoSchema = z.object({
   user: userContractsDto.GetUserResponseDtoSchema,
