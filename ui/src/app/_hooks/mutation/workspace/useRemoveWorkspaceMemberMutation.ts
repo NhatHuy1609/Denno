@@ -1,9 +1,10 @@
 import { DefaultError, useMutation, UseMutationOptions } from '@tanstack/react-query'
-import { WorkspaceService } from '@/service/api/workspace'
+import { WorkspaceService, workspaceTypesDto } from '@/service/api/workspace'
 
 type RemoveWorkspaceMemberMutationParams = {
   workspaceId: string
   memberId: string
+  removeWorkspaceMemberDto: workspaceTypesDto.RemoveWorkspaceMemberDto
 }
 
 function useRemoveWorkspaceMemberMutation(
@@ -17,8 +18,10 @@ function useRemoveWorkspaceMemberMutation(
   return useMutation({
     mutationKey: ['workspace', 'member', 'remove', ...mutationKey],
     onMutate,
-    mutationFn: async ({ workspaceId, memberId }) => {
-      const response = await WorkspaceService.removeWorkspaceMember(workspaceId, memberId)
+    mutationFn: async ({ workspaceId, memberId, removeWorkspaceMemberDto }) => {
+      const response = await WorkspaceService.removeWorkspaceMember(workspaceId, memberId, {
+        removeWorkspaceMemberDto
+      })
       return response.data
     },
     onSuccess,

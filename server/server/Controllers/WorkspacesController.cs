@@ -11,6 +11,7 @@ using server.Dtos.Response.Workspace;
 using server.Entities;
 using server.Helpers;
 using server.Hubs.NotificationHub;
+using server.Hubs.WorkspaceHub;
 using server.Interfaces;
 using server.Models.Query;
 using server.Strategies.ActionStrategy.Contexts;
@@ -34,6 +35,7 @@ namespace server.Controllers
         private readonly IEmailService _emailService;
         private readonly IWorkspaceService _workspaceService;
         private readonly INotificationRealtimeService _notificationRealtimeService;
+        private readonly IHubContext<WorkspaceHub, IWorkspaceHubClient> _workspaceHubContext;
         private readonly IHubContext<NotificationHub, INotificationHubClient> _hubContext;
 
         public WorkspacesController(
@@ -46,6 +48,7 @@ namespace server.Controllers
             IEmailService emailService,
             IWorkspaceService workspaceService,
             INotificationRealtimeService notificationRealtimeService,
+            IHubContext<WorkspaceHub, IWorkspaceHubClient> workspaceHubContext,
             IHubContext<NotificationHub, INotificationHubClient> hubContext)
         {
             _unitOfWork = unitOfWork;
@@ -56,6 +59,7 @@ namespace server.Controllers
             _emailService = emailService;
             _workspaceService = workspaceService;
             _notificationRealtimeService = notificationRealtimeService;
+            _workspaceHubContext = workspaceHubContext;
             _mapper = mapper;
             _hubContext = hubContext;
         }
@@ -527,9 +531,10 @@ namespace server.Controllers
         [Route("[controller]/{workspaceId}/members/{memberId}")]
         public async Task<IActionResult> RemoveWorkspaceMemberAsync(
             [FromRoute] Guid workspaceId,
-            [FromRoute] Guid memberId)
+            [FromRoute] string memberId,
+            [FromBody] RemoveWorkspaceMemberDto request)
         {
-            if (workspaceId == Guid.Empty || memberId == Guid.Empty) 
+            if (workspaceId == Guid.Empty || string.IsNullOrEmpty(memberId))
             {
                 return BadRequest(new ApiErrorResponse()
                 {
@@ -539,14 +544,23 @@ namespace server.Controllers
 
             var userId = _authService.GetCurrentUserId();
 
-            var actionContext = new DennoActionContext()
+            var actionContext = new RemoveWorkspaceMemberActionContext()
             {
                 MemberCreatorId = userId,
                 WorkspaceId = workspaceId,
-                TargetUserId = userId
+                TargetUserId = memberId,
+                DeleteRelatedBoardMembers = request.DeleteRelatedBoardMembers
             };
 
             var action = await _actionService.CreateActionAsync(ActionTypes.RemoveWorkspaceMember, actionContext);
+
+            if (action != null)
+            {
+                await _workspaceHubContext
+                    .Clients
+                    .Users([memberId, userId])
+                    .OnWorkspaceMemberRemoved(memberId, userId, workspaceId, actionContext.DeleteRelatedBoardMembers);
+            }
 
             return Ok();
         }

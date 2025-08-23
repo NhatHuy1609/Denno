@@ -65,6 +65,17 @@ class SignalRService {
     >
   }
 
+  off<K extends keyof HubReceiveEventMap, E extends keyof HubReceiveEventMap[K]>(
+    hubName: K,
+    event: E,
+    callback?: HubReceiveEventMap[K][E]
+  ) {
+    const connection = this.connections[hubName]
+    if (connection) {
+      connection.off(event as string, callback as (...args: any[]) => void)
+    }
+  }
+
   stopConnection(hubName: HubType) {
     const connection = this.connections[hubName]
     if (connection) {
