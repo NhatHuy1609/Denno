@@ -14,7 +14,7 @@ export default function MemberControls({
   const { id, fullName } = member
 
   return (
-    <div className='flex h-8 flex-1 justify-end gap-3'>
+    <div className='grid grid-cols-[auto_auto_auto] justify-items-end gap-3'>
       <JoinedBoardAction userId={id} userName={fullName} boardCount={boardCount} />
       <WorkspaceMemberRoleAdjustAction />
       <MemberOtherActions memberId={id} />
