@@ -62,7 +62,7 @@ export default function DropdownMenuPrimary<T>({
 
   return (
     <DropdownMenu onOpenChange={setIsOpen} open={isOpen}>
-      <DropdownMenuTrigger asChild disabled={disabled} className={cn('min-w-32 justify-center', triggerClassName)}>
+      <DropdownMenuTrigger asChild disabled={disabled} className={cn('justify-center', triggerClassName)}>
         <CustomizableButton
           autoFocus={isOpen}
           size='medium'
