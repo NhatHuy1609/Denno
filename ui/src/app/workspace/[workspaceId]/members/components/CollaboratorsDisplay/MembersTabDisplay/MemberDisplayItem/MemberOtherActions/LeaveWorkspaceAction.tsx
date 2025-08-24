@@ -2,17 +2,30 @@ import React from 'react'
 import { PersistedStateKey } from '@/data/persisted-keys'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 import useLeaveWorkspaceMutation from '@/app/_hooks/mutation/workspace/useLeaveWorkspaceMutation'
+import { useLeaveWorkspacePolicy } from './useLeaveWorkspacePolicy'
+import { toastError } from '@/ui'
 
-function LeaveBoardAction() {
+function LeaveWorkspaceAction() {
   const [workspaceId] = useSyncedLocalStorage(PersistedStateKey.RecentAccessWorkspace, '')
   const { mutateAsync: leaveWorkspaceAsync } = useLeaveWorkspaceMutation({
     onError(error) {
       console.error(error)
     }
   })
+  const { evaluateLeaveWorkspacePolicy, isEvaluating } = useLeaveWorkspacePolicy(workspaceId)
 
   const handleLeaveWorkspace = async () => {
-    await leaveWorkspaceAsync({ workspaceId })
+    if (!evaluateLeaveWorkspacePolicy) return
+
+    const result = await evaluateLeaveWorkspacePolicy()
+
+    if (isEvaluating) return
+
+    if (result.allowed) {
+      await leaveWorkspaceAsync({ workspaceId })
+    } else {
+      result.reason?.message && toastError(result.reason?.message)
+    }
   }
 
   return (
@@ -31,4 +44,4 @@ function LeaveBoardAction() {
   )
 }
 
-export default LeaveBoardAction
+export default LeaveWorkspaceAction

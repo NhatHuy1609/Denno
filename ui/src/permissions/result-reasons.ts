@@ -46,6 +46,18 @@ export type PolicyReasonCode =
   | 'WORKSPACE_MEMBER_PERMISSION::DENIED_CANNOT_MODIFY_WORKSPACE_OWNER_ROLE'
   | 'WORKSPACE_MEMBER_PERMISSION::ALLOWED_SELF_ROLE_CHANGE'
   | 'WORKSPACE_MEMBER_PERMISSION::ALLOWED_ROLE_CHANGE'
+  // Workspace member removal codes
+  | 'WORKSPACE_MEMBER_REMOVAL::DENIED_USE_LEAVE_POLICY_FOR_SELF'
+  | 'WORKSPACE_MEMBER_REMOVAL::DENIED_TARGET_MEMBER_NOT_FOUND'
+  | 'WORKSPACE_MEMBER_REMOVAL::DENIED_INSUFFICIENT_PERMISSION'
+  | 'WORKSPACE_MEMBER_REMOVAL::DENIED_CANNOT_REMOVE_WORKSPACE_OWNER'
+  | 'WORKSPACE_MEMBER_REMOVAL::DENIED_CANNOT_REMOVE_EQUAL_OR_HIGHER_ROLE'
+  | 'WORKSPACE_MEMBER_REMOVAL::REQUIRED_AT_LEAST_ONE_ADMIN'
+  | 'WORKSPACE_MEMBER_REMOVAL::ALLOWED_REMOVAL'
+  | 'WORKSPACE_MEMBER_REMOVAL::ALLOWED_ADMIN_REMOVAL'
+  // Workspace member leave
+  | 'WORKSPACE_MEMBER_LEAVE::REQUIRED_AT_LEAST_ONE_ADMIN'
+  | 'WORKSPACE_MEMBER_LEAVE::DENIED_USER_NOT_MEMBER'
 
 // 3. Reason messages
 export const PolicyReasonMessages: Record<PolicyReasonCode, string> = {
@@ -95,7 +107,22 @@ export const PolicyReasonMessages: Record<PolicyReasonCode, string> = {
   'WORKSPACE_MEMBER_PERMISSION::DENIED_CANNOT_MODIFY_WORKSPACE_OWNER_ROLE':
     'Only the workspace owner can modify their own role.',
   'WORKSPACE_MEMBER_PERMISSION::ALLOWED_SELF_ROLE_CHANGE': 'You can change your own role.',
-  'WORKSPACE_MEMBER_PERMISSION::ALLOWED_ROLE_CHANGE': 'Member role change is allowed.'
+  'WORKSPACE_MEMBER_PERMISSION::ALLOWED_ROLE_CHANGE': 'Member role change is allowed.',
+  // Workspace member removal
+  'WORKSPACE_MEMBER_REMOVAL::DENIED_USE_LEAVE_POLICY_FOR_SELF':
+    'Use WorkspaceLeavePolicy to remove yourself from the workspace.',
+  'WORKSPACE_MEMBER_REMOVAL::DENIED_TARGET_MEMBER_NOT_FOUND': 'The target member was not found in the workspace.',
+  'WORKSPACE_MEMBER_REMOVAL::DENIED_INSUFFICIENT_PERMISSION': 'You do not have permission to remove workspace members.',
+  'WORKSPACE_MEMBER_REMOVAL::DENIED_CANNOT_REMOVE_WORKSPACE_OWNER':
+    'Cannot remove the workspace owner from the workspace.',
+  'WORKSPACE_MEMBER_REMOVAL::DENIED_CANNOT_REMOVE_EQUAL_OR_HIGHER_ROLE':
+    'You cannot remove members with equal or higher roles.',
+  'WORKSPACE_MEMBER_REMOVAL::REQUIRED_AT_LEAST_ONE_ADMIN': 'At least one admin must remain in the workspace.',
+  'WORKSPACE_MEMBER_REMOVAL::ALLOWED_REMOVAL': 'Member removal is allowed.',
+  'WORKSPACE_MEMBER_REMOVAL::ALLOWED_ADMIN_REMOVAL': 'Admin removal is allowed.',
+  // Workspace leave messages
+  'WORKSPACE_MEMBER_LEAVE::DENIED_USER_NOT_MEMBER': 'User is not a member of this workspace.',
+  'WORKSPACE_MEMBER_LEAVE::REQUIRED_AT_LEAST_ONE_ADMIN': 'At least one admin must remain in the workspace.'
 }
 
 export type PolicyReason = {
