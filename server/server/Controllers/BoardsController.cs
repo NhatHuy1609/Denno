@@ -29,12 +29,9 @@ namespace server.Controllers
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<BoardsController> _logger;
-        private readonly UserManager<AppUser> _userManager;
         private readonly IActionService _actionService;
-        private readonly IEmailService _emailService;
         private readonly IBoardService _boardService;
         private readonly IAuthService _authService;
-        private readonly IBackgroundTaskQueue _taskQueueService;
 
         public BoardsController(
             IMapper mapper,
@@ -50,13 +47,36 @@ namespace server.Controllers
             _mapper = mapper;
             _logger = logger;
             _unitOfWork = unitOfWork;
-            _userManager = userManager;
             _actionService = actionService;
-            _emailService = emailService;
             _boardService = boardService;
             _authService = authService;
-            _taskQueueService = taskQueueService;
         }
+
+        [HttpPut("[controller]/{boardId}/star")]
+        public async Task<IActionResult> StarBoardAsync(Guid boardId)
+        {
+            if (boardId == Guid.Empty)
+            {
+                return BadRequest(new ApiErrorResponse()
+                {
+                    StatusMessage = "boardId can not be null"
+                });
+            }
+
+            var updatedResult = await _boardService.StarBoardAsync(boardId);
+
+            if (updatedResult.IsFailure)
+            {
+                return BadRequest(new ApiErrorResponse()
+                {
+                    StatusMessage = updatedResult.Error.Description
+                });
+            }
+
+            _logger.LogInformation($"Successfully updated StarredStatus of board-{boardId}");
+            return Ok();
+        }
+
 
         [HttpGet("[controller]/{boardId}/activities")]
         public async Task<IActionResult> GetBoardActivitiesAsync(Guid boardId)

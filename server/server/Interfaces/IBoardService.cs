@@ -7,6 +7,7 @@ namespace server.Interfaces
 {
     public interface IBoardService
     {
+        Task<Result<bool>> StarBoardAsync(Guid boardId);
         Task<bool> IsBoardMemberAsync(Guid boardId, string userId);
         Task<Result<List<Board>>> GetJoinedBoardsAsync(string userId, UserJoinedBoardQueryModel query);
         Task<IEnumerable<IBoardActivityResponse>> GetBoardActivityResponsesAsync(Guid boardId);

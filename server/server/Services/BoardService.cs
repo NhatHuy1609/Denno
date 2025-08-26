@@ -32,6 +32,21 @@ namespace server.Services
             _dbContext = dbContext;
         }
 
+        public async Task<Result<bool>> StarBoardAsync(Guid boardId)
+        {
+            var board = await _dbContext.Boards.FindAsync(boardId);
+
+            if (board == null)
+            {
+                return Result<bool>.Failure(Error.FromDescription($"board-{boardId} not found"));
+            }
+
+            board.StarredStatus = !board.StarredStatus;
+            _dbContext.Boards.Update(board);
+
+            return Result<bool>.Success(true);
+        }
+
         public async Task<IEnumerable<IBoardActivityResponse>> GetBoardActivityResponsesAsync(Guid boardId)
         {
             var boardActivities = await _dbContext.Actions

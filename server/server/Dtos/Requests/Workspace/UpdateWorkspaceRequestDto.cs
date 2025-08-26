@@ -7,6 +7,7 @@ namespace server.Dtos.Requests.Workspace
     {
         [Required]
         public string Name { get; set; }
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
+        public WorkspaceVisibility? Visibility { get; set; }
     }
 }
