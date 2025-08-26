@@ -23,9 +23,22 @@ namespace server.Strategies.ActionStrategy
             ArgumentNullException.ThrowIfNull(context.BoardId);
             ArgumentNullException.ThrowIfNull(context.TargetUserId);
 
+            var boardId = context.BoardId;
+            var removedMemberId = context.TargetUserId;
+            var memberCreatorId = context.MemberCreatorId;
+
+            var board = await _dbContext.Boards.FindAsync(boardId);
+
             // Execute remove member logic
             var boardMember = await _dbContext.BoardMembers
                 .FirstOrDefaultAsync(bm => bm.AppUserId == context.TargetUserId && bm.BoardId == context.BoardId);
+            ArgumentNullException.ThrowIfNull(boardMember);
+
+            var joinedBoardsLeft = await _dbContext.BoardMembers
+                .Where(bm => bm.AppUserId == removedMemberId &&
+                              bm.BoardId != boardId &&
+                              bm.Board.WorkspaceId == board.WorkspaceId)
+                .ToListAsync();
 
             var action = new DennoAction()
             {
@@ -35,6 +48,13 @@ namespace server.Strategies.ActionStrategy
                 TargetUserId = context.TargetUserId,
                 IsBoardActivity = context.IsBoardActivity
             };
+
+            // Execute data modifications
+
+            if (!joinedBoardsLeft.Any())
+            {
+                _dbContext.BoardMembers.Remove(boardMember);
+            }
 
             _dbContext.BoardMembers.Remove(boardMember);
             _dbContext.Actions.Add(action);

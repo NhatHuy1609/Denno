@@ -34,10 +34,10 @@ namespace server.Strategies.ActionStrategy
             var deleteRelatedBoardMembers = removeContext.DeleteRelatedBoardMembers;
             var relatedBoardMembers = new List<BoardMember>();
 
-            var workspaceMember = await _dbContext.WorkspaceMembers
+            var removedWorkspaceMember = await _dbContext.WorkspaceMembers
                 .FirstOrDefaultAsync(wm => wm.WorkspaceId == workspaceId && wm.AppUserId == removedUserId);
 
-            ArgumentNullException.ThrowIfNull(workspaceMember);
+            ArgumentNullException.ThrowIfNull(removedWorkspaceMember);
 
             // Prepare related board members to delete from database if deleteRelatedBoardMembers is true
             if (deleteRelatedBoardMembers)
@@ -64,8 +64,23 @@ namespace server.Strategies.ActionStrategy
                 })
             };
 
+            // Take all boards in the workspace that removed member is participating in
+            var joinedBoardsCountInWorksapce = await _dbContext.BoardMembers
+                .Where(bm => bm.Board.WorkspaceId == workspaceId &&
+                             bm.AppUserId == removedUserId)
+                .ToListAsync();
+
+            // Execute data modifications
+            if (joinedBoardsCountInWorksapce.Any())
+            {
+                removedWorkspaceMember.Role = WorkspaceMemberRole.Guest;
+                _dbContext.Update(removedWorkspaceMember);
+            } else
+            {
+                _dbContext.WorkspaceMembers.Remove(removedWorkspaceMember);
+            }
+
             _dbContext.Actions.Add(action);
-            _dbContext.WorkspaceMembers.Remove(workspaceMember);
             _dbContext.RemoveRange(relatedBoardMembers);
 
             return action;

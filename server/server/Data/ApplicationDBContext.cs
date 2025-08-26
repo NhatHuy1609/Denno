@@ -13,7 +13,6 @@ namespace server.Data
 
         public DbSet<Workspace> Workspaces { get; set; }
         public DbSet<WorkspaceMember> WorkspaceMembers { get; set; }
-        public DbSet<WorkspaceGuest> WorkspaceGuests { get; set; }
         public DbSet<Board> Boards { get; set; }
         public DbSet<BoardMember> BoardMembers { get; set; }
         public DbSet<Restriction> Restrictions { get; set; }
@@ -72,20 +71,6 @@ namespace server.Data
                 .HasOne(e => e.AppUser)
                 .WithMany(e => e.WorkspaceMembers)
                 .HasForeignKey(e => e.AppUserId)
-                .OnDelete(DeleteBehavior.ClientCascade);
-
-            modelBuilder.Entity<WorkspaceGuest>()
-                .HasKey(wg => new { wg.WorkspaceId, wg.GuestId });
-
-            modelBuilder.Entity<WorkspaceGuest>()
-                .HasOne(wg => wg.Workspace)
-                .WithMany(w => w.WorkspaceGuests)
-                .HasForeignKey(wg => wg.WorkspaceId);
-
-            modelBuilder.Entity<WorkspaceGuest>()
-                .HasOne(wg => wg.Guest)
-                .WithMany(g => g.WorkspaceGuests)
-                .HasForeignKey(wg => wg.GuestId)
                 .OnDelete(DeleteBehavior.ClientCascade);
 
             modelBuilder.Entity<Board>()

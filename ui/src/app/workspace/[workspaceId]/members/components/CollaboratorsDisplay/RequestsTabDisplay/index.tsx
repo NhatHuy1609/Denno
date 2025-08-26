@@ -12,9 +12,8 @@ function RequestsTabDisplay() {
       <div className='flex w-full flex-col gap-4 border-b border-gray-300 py-3'>
         <h4 className='text-lg font-medium'>{`Workspace members (${workspaceJoinRequests?.length})`}</h4>
         <p className='text-sm'>
-          These people have requested to join this Workspace. Adding new Workspace members will
-          automatically update your bill. Workspace guests already count toward the free Workspace
-          collaborator limit.
+          These people have requested to join this Workspace. Adding new Workspace members will automatically update
+          your bill. Workspace guests already count toward the free Workspace collaborator limit.
         </p>
       </div>
       <RequestsPanel />

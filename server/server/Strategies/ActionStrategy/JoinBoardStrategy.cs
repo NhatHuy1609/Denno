@@ -47,12 +47,13 @@ namespace server.Strategies.ActionStrategy
                 IsBoardActivity = context.IsBoardActivity,
             };
 
-            if (isWorkspaceMember)
+            if (!isWorkspaceMember)
             {
-                _dbContext.WorkspaceGuests.Add(new WorkspaceGuest
+                _dbContext.WorkspaceMembers.Add(new WorkspaceMember
                 {
                     WorkspaceId = board.WorkspaceId,
-                    GuestId = userId
+                    AppUserId = userId,
+                    Role = WorkspaceMemberRole.Guest
                 });
             }
 
