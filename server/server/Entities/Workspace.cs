@@ -16,7 +16,6 @@ namespace server.Entities
 
         public ICollection<Board> Boards { get; set; } = new List<Board>();
         public virtual ICollection<WorkspaceMember> WorkspaceMembers { get; set; } = new List<WorkspaceMember>();
-        public virtual ICollection<WorkspaceGuest> WorkspaceGuests { get; set; } = new List<WorkspaceGuest>();
         public virtual ICollection<DennoAction> Actions { get; set; } = new List<DennoAction>();
         public virtual ICollection<JoinRequest> JoinRequests { get; set; } = new List<JoinRequest>();
     }

@@ -69,15 +69,22 @@ namespace server.Services
                 return false;
             }
 
+            // Get all boards in the workspace that the removed member is participating in
+            var joinedBoards = await _dbContext.BoardMembers
+                .Where(bm => bm.AppUserId == userId && bm.Board.WorkspaceId == workspaceId)
+                .ToListAsync();
+
             using var transaction = await _dbContext.Database.BeginTransactionAsync();
             try
             {
-                _dbContext.WorkspaceMembers.Remove(workspaceMember);
-                _dbContext.WorkspaceGuests.Add(new WorkspaceGuest()
+                if (joinedBoards.Count() > 0)
                 {
-                    GuestId = userId,
-                    WorkspaceId = workspaceId
-                });
+                    workspaceMember.Role = WorkspaceMemberRole.Guest;
+                    _dbContext.Update(workspaceMember);
+                } else
+                {
+                    _dbContext.Remove(workspaceMember);
+                }
 
                 await _dbContext.SaveChangesAsync();
                 await transaction.CommitAsync();
@@ -197,18 +204,25 @@ namespace server.Services
             if (!includeGuests)
                 return;
 
-            var workspaceGuests = await _dbContext.WorkspaceGuests
-                .Include(wg => wg.Guest)
-                .Where(wg => wg.WorkspaceId == workspaceId)
-                .Select(wg => new
+            var guestsWithBoards = await _dbContext.BoardMembers
+                .Where(bm => bm.Board.WorkspaceId == workspaceId
+                          && bm.AppUser.WorkspaceMembers
+                               .Any(wm => wm.WorkspaceId == workspaceId && wm.Role == WorkspaceMemberRole.Guest))
+                .Select(bm => new
                 {
-                    Guest = wg.Guest,
-                    JoinedBoards = _dbContext.BoardMembers
-                        .Where(bm => bm.AppUserId == wg.GuestId && bm.Board.WorkspaceId == wg.WorkspaceId)
-                        .Select(bm => bm.Board)
-                        .ToList()
+                    Guest = bm.AppUser!,
+                    Board = bm.Board
                 })
                 .ToListAsync();
+
+            var workspaceGuests = guestsWithBoards
+                .GroupBy(x => x.Guest)
+                .Select(g => new
+                {
+                    Guest = g.Key,
+                    JoinedBoards = g.Select(x => x.Board).ToList()
+                })
+                .ToList();
 
             response.Guests = workspaceGuests
                 .Select(wg => new WorkspaceGuestResponse() {

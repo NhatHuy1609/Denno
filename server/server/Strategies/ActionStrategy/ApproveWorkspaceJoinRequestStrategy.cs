@@ -28,8 +28,16 @@ namespace server.Strategies.ActionStrategy
             if (string.IsNullOrEmpty(context.MemberCreatorId))
                 throw new ArgumentNullException(nameof(context.MemberCreatorId), "MemberCreatorId is required");
 
-            if (_dbContext.WorkspaceMembers.Any(m => m.WorkspaceId == context.WorkspaceId && m.AppUserId == context.TargetUserId))
+            if (_dbContext.WorkspaceMembers
+                .Any(m => m.WorkspaceId == context.WorkspaceId &&
+                    m.AppUserId == context.TargetUserId &&
+                    m.Role != WorkspaceMemberRole.Guest)
+                )
                 throw new InvalidOperationException("User is already a member of this workspace");
+
+            var workspaceId = context.WorkspaceId;
+            var approvedUserId = context.TargetUserId;
+            var memberCreatorId = context.MemberCreatorId;
 
             var newMember = new WorkspaceMember()
             {
@@ -62,9 +70,20 @@ namespace server.Strategies.ActionStrategy
             var existedJoinRequest = await _dbContext.JoinRequests
                 .FirstOrDefaultAsync(j => j.WorkspaceId == context.WorkspaceId && j.RequesterId == context.TargetUserId);
 
+            var workspaceMember = await _dbContext.WorkspaceMembers
+                .FirstOrDefaultAsync(wm => wm.WorkspaceId == workspaceId && wm.AppUserId == approvedUserId);
+
+            // Execute data modifications
+
             if (existedJoinRequest != null)
             {
                 _dbContext.JoinRequests.Remove(existedJoinRequest);
+            }
+
+            if (workspaceMember != null && workspaceMember.Role == WorkspaceMemberRole.Guest)
+            {
+                workspaceMember.Role = WorkspaceMemberRole.Normal;
+                _dbContext.Update(workspaceMember);
             }
 
             _dbContext.Actions.Add(action);

@@ -72,6 +72,20 @@ namespace server.Strategies.ActionStrategy
             var joinRequest = await _dbContext.JoinRequests
                 .FirstOrDefaultAsync(j => j.BoardId == boardId && j.RequesterId == memberId);
 
+            var isWorkspaceMemberBefore = await _dbContext.WorkspaceMembers
+                .AnyAsync(wm => wm.AppUserId == memberId && wm.WorkspaceId == board.WorkspaceId);
+
+            // Execure data modifications
+            if (!isWorkspaceMemberBefore)
+            {
+                _dbContext.WorkspaceMembers.Add(new WorkspaceMember()
+                {
+                    WorkspaceId = board.WorkspaceId,
+                    AppUserId = memberId,
+                    Role = WorkspaceMemberRole.Guest
+                });
+            }
+
             if (joinRequest != null)
                 _dbContext.JoinRequests.Remove(joinRequest);
 
