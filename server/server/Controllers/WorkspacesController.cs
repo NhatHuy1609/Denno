@@ -151,7 +151,16 @@ namespace server.Controllers
             }
 
             updatedWorkspace.Name = request.Name;
-            updatedWorkspace.Description = request.Description;
+            
+            if (!string.IsNullOrEmpty(request.Description))
+            {
+                updatedWorkspace.Description = request.Description;
+            }
+
+            if (request.Visibility != null)
+            {
+                updatedWorkspace.Visibility = request.Visibility.Value;
+            }
 
             _unitOfWork.Complete();
 
