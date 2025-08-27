@@ -20,10 +20,7 @@ function WorkspaceMembersPage() {
           {showWorkspaceUpdateForm ? (
             <WorkspaceUpdateForm hideFormFn={handleHideForm} />
           ) : (
-            <WorkspaceInfoCard
-              showDescription
-              setShowWorkspaceUpdateForm={setShowWorkspaceUpdateForm}
-            />
+            <WorkspaceInfoCard showDescription setShowWorkspaceUpdateForm={setShowWorkspaceUpdateForm} />
           )}
         </div>
 
@@ -31,7 +28,6 @@ function WorkspaceMembersPage() {
           <InviteMemberModal />
         </div>
       </div>
-
       <CollaboratorsDisplay />
     </section>
   )
