@@ -157,7 +157,7 @@ namespace server.Services
 
             var workspaceMembers = await _dbContext.WorkspaceMembers
                 .Include(wm => wm.AppUser)
-                .Where(wm => wm.WorkspaceId == workspaceId)
+                .Where(wm => wm.WorkspaceId == workspaceId && wm.Role != WorkspaceMemberRole.Guest)
                 .ToListAsync();
 
             response.Members = workspaceMembers.Select(wm => new MemberDto
