@@ -44,12 +44,6 @@ namespace server.Strategies.ActionStrategy
             var addedToWorkspaceUserId = context.TargetUserId;
             var memberCreatorId = context.MemberCreatorId;
 
-            var newMember = new WorkspaceMember()
-            {
-                WorkspaceId = context.WorkspaceId.Value,
-                AppUserId = context.TargetUserId
-            };
-
             var action = new DennoAction()
             {
                 MemberCreatorId = context.MemberCreatorId,
@@ -84,16 +78,27 @@ namespace server.Strategies.ActionStrategy
                 _dbContext.JoinRequests.Remove(existedJoinRequest);
             }
 
-            if (workspaceMember != null && workspaceMember.Role == WorkspaceMemberRole.Guest)
+            if (workspaceMember != null)
             {
-                workspaceMember.Role = WorkspaceMemberRole.Normal;
-                _dbContext.Update(workspaceMember);
+                if (workspaceMember.Role == WorkspaceMemberRole.Guest)
+                {
+                    workspaceMember.Role = WorkspaceMemberRole.Normal;
+                    _dbContext.Update(workspaceMember);
+                }
+            }
+            else
+            {
+                var newMember = new WorkspaceMember
+                {
+                    WorkspaceId = context.WorkspaceId.Value,
+                    AppUserId = context.TargetUserId
+                };
+                _dbContext.WorkspaceMembers.Add(newMember);
             }
 
             _dbContext.Actions.Add(action);
             _dbContext.Notifications.Add(notification);
             _dbContext.NotificationRecipients.Add(recipient);
-            _dbContext.WorkspaceMembers.Add(newMember);
 
             // Load needed navigation properties
             action.MemberCreator = await _dbContext.Users.FindAsync(context.MemberCreatorId);

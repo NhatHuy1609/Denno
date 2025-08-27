@@ -18,5 +18,6 @@
         public const string RemoveBoardMember = "removeBoardMember";
         public const string UpdateWorkspaceMemberRole = "updateWorkspaceMemberRole";
         public const string RemoveWorkspaceMember = "removeWorkspaceMember";
+        public const string RemoveWorkspaceGuest = "removeWorkspaceGuest";
     }
 }

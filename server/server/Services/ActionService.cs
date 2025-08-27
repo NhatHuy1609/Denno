@@ -71,6 +71,7 @@ namespace server.Services
                 ActionTypes.RemoveBoardMember => new RemoveBoardMemberStrategy(_dbContext),
                 ActionTypes.UpdateWorkspaceMemberRole => new UpdateWorkspaceMemberRoleStrategy(_dbContext),
                 ActionTypes.RemoveWorkspaceMember => new RemoveWorkspaceMemberStrategy(_dbContext),
+                ActionTypes.RemoveWorkspaceGuest => new RemoveWorkspaceGuestStrategy(_dbContext),
                 _ => throw new ArgumentException($"Unsupported action type: {actionType}")
             };
         }

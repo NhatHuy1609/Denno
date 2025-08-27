@@ -25,8 +25,8 @@ namespace server.Strategies.ActionStrategy
                                                         throw new ArgumentNullException(nameof(context));
 
             ArgumentNullException.ThrowIfNull(removeContext.WorkspaceId);
-            ArgumentNullException.ThrowIfNullOrWhiteSpace(removeContext.MemberCreatorId);
-            ArgumentNullException.ThrowIfNullOrWhiteSpace(removeContext.TargetUserId);
+            ArgumentException.ThrowIfNullOrWhiteSpace(removeContext.MemberCreatorId);
+            ArgumentException.ThrowIfNullOrWhiteSpace(removeContext.TargetUserId);
 
             var workspaceId = removeContext.WorkspaceId;
             var removedUserId = removeContext.TargetUserId;
