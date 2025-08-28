@@ -5,8 +5,8 @@ import { ScrollArea } from '@/ui'
 
 function MorePhotosBackgroundSelection() {
   return (
-    <div className='max-h-[400px] w-full pl-4'>
-      <ScrollArea className='h-[400px] pr-6' type='always'>
+    <div className='max-h-[256px] w-full pl-4'>
+      <ScrollArea className='h-[256px] pr-6' type='always'>
         <BoardPhotoBackgroundSelection
           showOwner={true}
           photoQuantity={PHOTOS_BACKGROUND.length}

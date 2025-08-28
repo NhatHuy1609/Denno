@@ -20,7 +20,7 @@ function PopoverActionWrapper({ renderTrigger, renderContent, contentClassName, 
   return (
     <Popover.Popover onOpenChange={setOpen} open={open}>
       <Popover.Trigger asChild>{renderTrigger()}</Popover.Trigger>
-      <Popover.Content {...contentConfigs} className={cn('w-fit', contentClassName)}>
+      <Popover.Content {...contentConfigs} className={cn(contentClassName)}>
         {renderContent(handleClose)}
       </Popover.Content>
     </Popover.Popover>
