@@ -1,7 +1,7 @@
 import React from 'react'
 import { useUserJoinedBoardsQuery } from '@/app/_hooks/query/user/useUserJoinedBoardsQuery'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import JoinedBoardDisplayItem from './JoinedBoardDisplayItem'
 import WaterFallLoading from '@/app/_components/Loadings/WaterFallLoading'
 

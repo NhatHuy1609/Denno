@@ -18,7 +18,7 @@ import InviteMemberDescriptionInput from './InviteMemberDescriptionInput'
 import { generateWorkspaceInvitationLink } from '@/utils/invitation-link'
 import SearchedUsersResult from './SearchedUsersResult'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 
 type SearchedUserFilter = Pick<userSchemas.UsersFilterQuery, 'email'>
 

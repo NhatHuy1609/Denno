@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useMe } from '@/app/_hooks/query/user/useMe'
 import { useWorkspaceQuery } from '@/app/_hooks/query'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { getAssignableWorkspacePermissions } from './get-assignable-permissions'
 
 export const useGetAssignableMemberPermissions = (targetMemberId: string) => {

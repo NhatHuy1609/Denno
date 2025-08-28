@@ -2,7 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import { LinkProps } from 'next/link'
 import { setLocalStorageItem } from '@/utils/local-storage'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 
 type Props = Omit<LinkProps, 'href'> & {
   boardId: string

@@ -1,5 +1,5 @@
 import React from 'react'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { getLocalStorageItem } from '@/utils/local-storage'
 import { useRouter } from 'next/navigation'
 import useJoinWorkspaceByLinkMutation from '@/app/_hooks/mutation/workspace/useJoinWorkspaceByLinkMutation'
@@ -43,12 +43,7 @@ export default function LoggedInSection() {
       </div>
 
       <div className='w-fit'>
-        <CustomizableButton
-          intent='primary'
-          size='medium'
-          value='Join Workspace'
-          onClick={handleClickJoinWorkspace}
-        />
+        <CustomizableButton intent='primary' size='medium' value='Join Workspace' onClick={handleClickJoinWorkspace} />
       </div>
     </div>
   )

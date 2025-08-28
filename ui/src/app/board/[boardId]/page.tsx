@@ -13,7 +13,7 @@ import PrimarySidebar from '@/layouts/shared/PrimarySidebar'
 import { useSignalR } from '@/app/_providers/SignalRProvider/useSignalR'
 import { useRouter } from 'next/navigation'
 import { getLocalStorageItem } from '@/utils/local-storage'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 
 function BoardHomePage() {
   // Apply auth guard

@@ -1,7 +1,7 @@
 import React from 'react'
 import MemberItem from './MemberItem'
 import { useBoardQuery } from '@/app/_hooks/query'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 
 type Props = {}

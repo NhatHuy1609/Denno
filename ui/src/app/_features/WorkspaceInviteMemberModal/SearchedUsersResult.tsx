@@ -5,7 +5,7 @@ import { useWorkspaceQuery } from '@/app/_hooks/query'
 import { useOnClickOutSide } from '@/app/_hooks/useOnClickOutSide'
 import { Avatar } from '@/ui'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 
 interface SearchedUsersResultProps {
   searchedUserData: userSchemas.Users

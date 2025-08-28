@@ -2,7 +2,7 @@ import React from 'react'
 import WaterFallLoading from '@/app/_components/Loadings/WaterFallLoading'
 import { useBoardQuery } from '@/app/_hooks/query'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import BoardJoinRequestItem from './BoardJoinRequestItem'
 
 function BoardJoinRequestsTab() {
@@ -24,9 +24,7 @@ function BoardJoinRequestsTab() {
 
   if (!joinRequests?.length) {
     return (
-      <div className='flex w-full items-center justify-center p-4 text-lg text-gray-500'>
-        No join requests found!
-      </div>
+      <div className='flex w-full items-center justify-center p-4 text-lg text-gray-500'>No join requests found!</div>
     )
   }
 

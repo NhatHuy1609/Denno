@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useCallback, useEffect } from 'react'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { useParams, useRouter } from 'next/navigation'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 import { useSignalR } from '@/app/_providers/SignalRProvider/useSignalR'

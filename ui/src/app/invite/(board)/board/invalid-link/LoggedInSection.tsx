@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { getLocalStorageItem } from '@/utils/local-storage'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import useSendJoinRequestMutation from '@/app/_hooks/mutation/board/useSendBoardJoinRequestMutation'
 import CustomizableButton from '@/ui/components/CustomizableButton'
 import { useBoardJoinRequestsQuery } from '@/app/_hooks/query/board/useBoardJoinRequestsQuery'
@@ -14,23 +14,19 @@ function LoggedInSection() {
   const [_, boardId] = invitationPathArray
 
   // Get the board join requests to check if the current user has already sent a join request
-  const { data: boardJoinRequests, isLoading: isLoadingBoardJoinRequests } =
-    useBoardJoinRequestsQuery(boardId)
+  const { data: boardJoinRequests, isLoading: isLoadingBoardJoinRequests } = useBoardJoinRequestsQuery(boardId)
   const [isBoardJoinRequestSent, setIsBoardJoinRequestSent] = useState(false)
 
-  const { mutateAsync: sendJoinRequestAsync, isSuccess: isSendJoinRequestSuccess } =
-    useSendJoinRequestMutation({
-      onSuccess: () => {}
-    })
+  const { mutateAsync: sendJoinRequestAsync, isSuccess: isSendJoinRequestSuccess } = useSendJoinRequestMutation({
+    onSuccess: () => {}
+  })
 
   // Check if the current user has already sent a join request
   useEffect(() => {
     if (isLoadingBoardJoinRequests) return
 
     if (boardJoinRequests) {
-      const hasSentJoinRequest = boardJoinRequests.some(
-        (joinRequest) => joinRequest.requester.id === currentUserId
-      )
+      const hasSentJoinRequest = boardJoinRequests.some((joinRequest) => joinRequest.requester.id === currentUserId)
       setIsBoardJoinRequestSent(hasSentJoinRequest)
     }
   }, [isLoadingBoardJoinRequests, boardJoinRequests])
@@ -63,8 +59,8 @@ function LoggedInSection() {
     <div className='mt-2 w-[600px]'>
       <h3 className='mt-6 text-center text-xl font-medium'>You can't join this Board</h3>
       <p className='my-3 text-center text-base'>
-        The invitation link may have been disabled or this free Board may <br /> have reached the 10
-        collaborator limit. Try contacting the person who sent <br /> you the link for more info.
+        The invitation link may have been disabled or this free Board may <br /> have reached the 10 collaborator limit.
+        Try contacting the person who sent <br /> you the link for more info.
       </p>
 
       <div className='mt-6 flex justify-center'>

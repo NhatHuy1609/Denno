@@ -1,7 +1,7 @@
 import { useWorkspaceQuery } from '@/app/_hooks/query'
 import { useMe } from '@/app/_hooks/query/user/useMe'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { usePermissions } from '@/permissions/hooks/usePermissions'
 import {
   WorkspaceRemoveMemberPolicyContext,

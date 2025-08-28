@@ -3,7 +3,7 @@ import SignalRService from '@/service/realtime/signalR.service'
 import { notificationLib } from '@/entities/notification'
 import { useQueryClient } from '@tanstack/react-query'
 import { getLocalStorageItem } from '@/utils/local-storage'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { UserQueries } from '@/entities/user'
 
 type SignalRContextProps = {

@@ -1,7 +1,7 @@
 import React from 'react'
 import GuestsTabPanel from './GuestsTabPanel'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { useWorkspaceQuery } from '@/app/_hooks/query'
 
 function GuestsTabDisplay() {

@@ -5,7 +5,7 @@ import type { boardSchemas } from '@/entities/board'
 import { useMe } from '@/app/_hooks/query/user/useMe'
 import { useBoardQuery, useWorkspaceQuery } from '@/app/_hooks/query'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import {
   BoardAssignMemberRolePolicyContext,
   BoardAssignMemberRolePolicyResource

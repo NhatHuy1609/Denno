@@ -1,7 +1,6 @@
-import React, { useState, Suspense } from 'react'
+import React from 'react'
 import dynamic from 'next/dynamic'
 import { IoIosMore } from 'react-icons/io'
-import { Popover } from '@/ui'
 import NavigationMenu from '@/app/_components/NavigationMenu'
 import DefaultLazyFallbackComp from '@/app/_components/DefaultLazyFallbackComp'
 import PopoverActionWrapper from '@/app/_components/PopoverActionWrapper'

@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { FaRegUser, FaPlus } from 'react-icons/fa6'
 import WorkspaceInviteMemberModal from '@/app/_features/WorkspaceInviteMemberModal'
 

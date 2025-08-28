@@ -4,7 +4,7 @@ import { messageError, messageInfo } from '@/ui'
 import { getLocalStorageItem } from '@/utils/local-storage'
 import { authApiLib } from './auth'
 import { updateSession } from '@/store/features/session'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 
 // console.log('=================================')
 // console.log('process.env', process.env.NEXT_PUBLIC_BE_GATEWAY)
@@ -21,9 +21,9 @@ instance.interceptors.request.use(
       config.headers['Authorization'] = `Bearer ${token}`
     }
     return config
-  }, 
+  },
   (error) => {
-    return Promise.reject(error)  
+    return Promise.reject(error)
   }
 )
 

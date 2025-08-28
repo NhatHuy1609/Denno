@@ -1,7 +1,7 @@
 import React from 'react'
 import { useUserNotifications } from '@/app/_hooks/query/user/useUserNotifications'
 import { getLocalStorageItem } from '@/utils/local-storage'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import NotificationList from './components/NotificationList'
 
 function NotificationCenter() {

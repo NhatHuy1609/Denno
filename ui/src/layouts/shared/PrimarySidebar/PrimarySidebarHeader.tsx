@@ -1,5 +1,5 @@
 import React from 'react'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { getLocalStorageItem } from '@/utils/local-storage'
 import { useWorkspaceQuery } from '@/app/_hooks/query'
 import WorkspaceLogo from '@/app/_components/WorkspaceLogo'
@@ -11,10 +11,7 @@ interface IProps {
 }
 
 function PrimarySidebarHeader({ hideSideboard }: IProps) {
-  const [workspaceId, setRecentAccessWorkspaceId] = useSyncedLocalStorage(
-    PersistedStateKey.RecentAccessWorkspace,
-    ''
-  )
+  const [workspaceId, setRecentAccessWorkspaceId] = useSyncedLocalStorage(PersistedStateKey.RecentAccessWorkspace, '')
   const { data: workspace } = useWorkspaceQuery(workspaceId as string)
 
   const { name = '', logo } = workspace || {}

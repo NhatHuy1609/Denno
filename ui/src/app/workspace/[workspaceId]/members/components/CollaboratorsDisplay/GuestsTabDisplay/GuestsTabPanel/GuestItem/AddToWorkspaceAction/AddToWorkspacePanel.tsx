@@ -1,7 +1,7 @@
 import React from 'react'
 import useAddWorkspaceMemberMutation from '@/app/_hooks/mutation/workspace/useAddWorkspaceMemberMutation'
 import { getLocalStorageItem } from '@/utils/local-storage'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { useGuestItemContext } from '../context'
 import { useQueryClient } from '@tanstack/react-query'
 import { WorkspaceQueries } from '@/entities/workspace'

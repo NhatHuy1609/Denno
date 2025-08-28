@@ -5,7 +5,7 @@ import { toastError, toastSuccess } from '@/ui'
 import { WorkspaceQueries } from '@/entities/workspace'
 import { useGuestItemContext } from '../context'
 import { getLocalStorageItem } from '@/utils/local-storage'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import useRemoveWorkspaceGuestMutation from '@/app/_hooks/mutation/workspace/useRemoveWorkspaceGuestMutation'
 
 function RemoveGuestMainOption() {
