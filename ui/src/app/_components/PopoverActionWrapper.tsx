@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Popover } from '@/ui'
 import { PopoverContentProps } from '@radix-ui/react-popover'
+import { cn } from '@/lib/styles/utils'
 
 type Props = {
   renderTrigger: () => React.ReactNode
@@ -19,7 +20,7 @@ function PopoverActionWrapper({ renderTrigger, renderContent, contentClassName, 
   return (
     <Popover.Popover onOpenChange={setOpen} open={open}>
       <Popover.Trigger asChild>{renderTrigger()}</Popover.Trigger>
-      <Popover.Content {...contentConfigs} className={contentClassName}>
+      <Popover.Content {...contentConfigs} className={cn('w-fit', contentClassName)}>
         {renderContent(handleClose)}
       </Popover.Content>
     </Popover.Popover>
