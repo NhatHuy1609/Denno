@@ -14,7 +14,7 @@ function WorkspaceInviteMemberModal({ renderTrigger }: Props) {
         <div className='w-auto bg-white'>
           <InviteMemberModalBody closeModalFn={closeModalFn} />
         </div>
-      )}
+      )}  
       title='Invite to Workspace'
     />
   )
