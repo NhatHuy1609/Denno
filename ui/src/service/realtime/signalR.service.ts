@@ -4,7 +4,7 @@ import type { HubType } from './types'
 import { HubReceiveEventMap } from './receive-events'
 import { HubInvokeEventMap } from './send-events'
 import { getLocalStorageItem } from '@/utils/local-storage'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 
 class SignalRService {
   connections: Partial<Record<HubType, HubConnection>>

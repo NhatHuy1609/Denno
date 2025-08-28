@@ -1,7 +1,7 @@
 import React from 'react'
 import { useSignalR } from '@/app/_providers/SignalRProvider/useSignalR'
 import { useUserNotifications } from '@/app/_hooks/query/user/useUserNotifications'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { getLocalStorageItem } from '@/utils/local-storage'
 import { FiBell } from 'react-icons/fi'
 

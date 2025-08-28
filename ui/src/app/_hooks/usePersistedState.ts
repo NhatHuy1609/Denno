@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react"
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { useState, useEffect } from 'react'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { getLocalStorageItem, setLocalStorageItem } from '@/utils/local-storage'
 
 export function usePersistedState<T>(key: PersistedStateKey, initialValue: T) {

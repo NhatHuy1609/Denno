@@ -1,5 +1,5 @@
 import React from 'react'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 import useLeaveWorkspaceMutation from '@/app/_hooks/mutation/workspace/useLeaveWorkspaceMutation'
 import { useLeaveWorkspacePolicy } from './useLeaveWorkspacePolicy'

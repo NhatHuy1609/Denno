@@ -1,6 +1,6 @@
-import { useEffect } from "react"
-import { useSyncedLocalStorage } from "@/app/_hooks/useSyncedLocalStorage"
-import { PersistedStateKey } from "@/data/persisted-keys"
+import { useEffect } from 'react'
+import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 
 function useRecentAccessSync(boardId: string, workspaceId: string) {
   const [, setBoardId] = useSyncedLocalStorage(PersistedStateKey.RecentAccessBoard, '')

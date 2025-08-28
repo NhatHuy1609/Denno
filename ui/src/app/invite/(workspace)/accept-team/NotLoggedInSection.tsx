@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { getLocalStorageItem, setLocalStorageItem } from '@/utils/local-storage'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { useDetailedWorkspaceInvitationQuery } from '@/app/_hooks/query/workspace/useDetailedWorkspaceInvitationQuery'
 
 function NotLoggedInSection() {
@@ -17,10 +17,7 @@ function NotLoggedInSection() {
   })
 
   const handleClickLink = () => {
-    setLocalStorageItem(
-      PersistedStateKey.RedirectAfterLogin,
-      `/invite/${workspaceId}/${secretCode}`
-    )
+    setLocalStorageItem(PersistedStateKey.RedirectAfterLogin, `/invite/${workspaceId}/${secretCode}`)
   }
 
   return (
@@ -31,9 +28,7 @@ function NotLoggedInSection() {
         <h3 className='text-xl font-medium'>{invitation?.workspace.name}</h3>
       </div>
 
-      <p className='text-sm'>
-        Looks like you need to be logged into your Denno account to join this Workspace.
-      </p>
+      <p className='text-sm'>Looks like you need to be logged into your Denno account to join this Workspace.</p>
 
       <div className='mt-4 flex w-full justify-center gap-6'>
         <Link

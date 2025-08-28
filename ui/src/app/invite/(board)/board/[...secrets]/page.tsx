@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { setLocalStorageItem } from '@/utils/local-storage'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { setFixLoading } from '@/ui'
 import { useParams, useRouter } from 'next/navigation'
 import { useMe } from '@/app/_hooks/query/user/useMe'

@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { getLocalStorageItem, setLocalStorageItem } from '@/utils/local-storage'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { useDetailedBoardInvitationQuery } from '@/app/_hooks/query/board/useDetailedBoardInvitationQuery'
 
 function NotLoggedInSection() {
@@ -14,10 +14,7 @@ function NotLoggedInSection() {
   const { data: invitation } = useDetailedBoardInvitationQuery(boardId)
 
   const handleClickLink = () => {
-    setLocalStorageItem(
-      PersistedStateKey.RedirectAfterLogin,
-      `/invite/board/${boardId}/${secretCode}`
-    )
+    setLocalStorageItem(PersistedStateKey.RedirectAfterLogin, `/invite/board/${boardId}/${secretCode}`)
   }
 
   return (
@@ -28,9 +25,7 @@ function NotLoggedInSection() {
         <h3 className='text-xl font-medium'>{invitation?.board.name}</h3>
       </div>
 
-      <p className='text-sm'>
-        Looks like you need to be logged into your Denno account to join this Board.
-      </p>
+      <p className='text-sm'>Looks like you need to be logged into your Denno account to join this Board.</p>
 
       <div className='mt-4 flex w-full justify-center gap-6'>
         <Link

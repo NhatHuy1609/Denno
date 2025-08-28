@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react'
 import Link from 'next/link'
 import { setLocalStorageItem } from '@/utils/local-storage'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { LiaAngleDownSolid } from 'react-icons/lia'
 import { HiViewBoards } from 'react-icons/hi'
 import { FaRegHeart } from 'react-icons/fa6'

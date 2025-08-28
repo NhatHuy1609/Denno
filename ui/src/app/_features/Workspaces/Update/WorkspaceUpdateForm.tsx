@@ -1,7 +1,7 @@
 import React from 'react'
 import { WorkspaceQueries } from '@/entities/workspace'
 import { queryClient } from '@/lib/react-query/query-client'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { workspaceTypesDto, workspaceContractsDto } from '@/service/api/workspace'
 import { useForm, Controller } from 'react-hook-form'

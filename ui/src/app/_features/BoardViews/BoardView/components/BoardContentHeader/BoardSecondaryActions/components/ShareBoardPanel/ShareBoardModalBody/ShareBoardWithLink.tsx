@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { BoardQueries, boardSchemas } from '@/entities/board'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { generateBoardInvitationLink } from '@/utils/invitation-link'
 import { useQueryClient } from '@tanstack/react-query'
 import { useCreateBoardInvitationLink } from '@/app/_hooks/useCreateBoardInvitationLink'

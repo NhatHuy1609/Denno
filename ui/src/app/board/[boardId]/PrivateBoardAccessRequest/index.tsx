@@ -8,7 +8,7 @@ import { useMe } from '@/app/_hooks/query/user/useMe'
 import { useBoardQuery } from '@/app/_hooks/query'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 import useSendBoardJoinRequestMutation from '@/app/_hooks/mutation/board/useSendBoardJoinRequestMutation'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { FaRegCircleCheck } from 'react-icons/fa6'
 
 function PrivateBoardAccessRequest() {
@@ -59,13 +59,13 @@ function PrivateBoardAccessRequest() {
           <>
             <h1 className='text-center text-xl font-semibold text-black'>This board is private</h1>
             <p className='my-2 text-center text-sm'>
-              Send a request to this board’s admins to get access. <br /> If you’re approved to
-              join, you'll receive an email.
+              Send a request to this board’s admins to get access. <br /> If you’re approved to join, you'll receive an
+              email.
             </p>
             <LoggedInSection />
             <p className='my-2 text-xs text-gray-500'>
-              By requesting access, you agree to share your Atlassian account information, <br />{' '}
-              including your email address, with the board admins.
+              By requesting access, you agree to share your Atlassian account information, <br /> including your email
+              address, with the board admins.
             </p>
 
             <CustomizableButton

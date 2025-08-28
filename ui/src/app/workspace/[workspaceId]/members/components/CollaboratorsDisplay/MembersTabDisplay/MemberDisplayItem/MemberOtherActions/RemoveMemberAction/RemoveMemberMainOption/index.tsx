@@ -3,7 +3,7 @@ import useRemoveWorkspaceMemberMutation from '@/app/_hooks/mutation/workspace/us
 import MainActionItem from '../MainActionItem'
 import RemoveMemberOptionalActions from './RemoveMemberOptionalActions'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { useMemberDisplayItemContext } from '../../../context'
 import { useRemoveMemberOptionsContext } from '../context'
 

@@ -1,5 +1,5 @@
 import React from 'react'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { getLocalStorageItem } from '@/utils/local-storage'
 import { toastError } from '@/ui'
 import { useRouter } from 'next/navigation'
@@ -44,12 +44,7 @@ export default function LoggedInSection() {
       </div>
 
       <div className='w-fit'>
-        <CustomizableButton
-          intent='primary'
-          size='medium'
-          value='Join Board'
-          onClick={handleClickJoinBoard}
-        />
+        <CustomizableButton intent='primary' size='medium' value='Join Board' onClick={handleClickJoinBoard} />
       </div>
     </div>
   )
