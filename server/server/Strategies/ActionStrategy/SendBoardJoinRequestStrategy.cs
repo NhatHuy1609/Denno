@@ -16,6 +16,11 @@ namespace server.Strategies.ActionStrategy
             _dbContext = dbContext;
         }
 
+        public bool CanHandle(string actionType)
+        {
+            return actionType == ActionTypes.SendBoardJoinRequest;
+        }
+
         public async Task<DennoAction> Execute(DennoActionContext context)
         {
             ArgumentNullException.ThrowIfNull(context.BoardId);
@@ -29,13 +34,15 @@ namespace server.Strategies.ActionStrategy
                 .Include(b => b.BoardMembers)
                 .FirstOrDefaultAsync(b => b.Id == boardId);
 
+            if (board == null)
+                throw new ArgumentNullException(nameof(board), $"Can not found board with id-{boardId}");
+
             var action = new DennoAction()
             {
                 MemberCreatorId = context.MemberCreatorId,
                 ActionType = ActionTypes.SendBoardJoinRequest,
                 BoardId = boardId,
                 Date = DateTime.Now,
-                IsBoardActivity = context.IsBoardActivity
             };
 
             var newJoinRequest = new JoinRequest()
@@ -51,19 +58,14 @@ namespace server.Strategies.ActionStrategy
                 Action = action
             };
 
-            // Notify all members in the board if they are watching the board
+            // Notify to all board members having admin role
             var notificationRecipients = await _dbContext.BoardMembers
-                .Where(bm => bm.BoardId == boardId)
-                .Join(
-                    _dbContext.BoardUserSettings.Where(bu => bu.BoardId == boardId && bu.IsWatching),
-                    bm => new { bm.BoardId, UserId = bm.AppUserId },
-                    bu => new { bu.BoardId, bu.UserId },
-                    (bm, bu) => new NotificationRecipient
-                    {
-                        Notification = notification,
-                        RecipientId = bm.AppUserId
-                    }
-                )
+                .Where(bm => bm.BoardId == boardId && bm.Role == BoardMemberRole.Admin)
+                .Select(bm => new NotificationRecipient()
+                {
+                    Notification = notification,
+                    RecipientId = bm.AppUserId
+                })
                 .ToListAsync();
 
             _dbContext.JoinRequests.Add(newJoinRequest);

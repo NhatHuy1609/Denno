@@ -17,6 +17,11 @@ namespace server.Strategies.ActionStrategy
             _dbContext = dbContext;
         }
 
+        public bool CanHandle(string actionType)
+        {
+            return actionType == ActionTypes.RemoveBoardMember;
+        }
+
         public async Task<DennoAction> Execute(DennoActionContext context)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(context.MemberCreatorId);
@@ -34,22 +39,33 @@ namespace server.Strategies.ActionStrategy
                 .FirstOrDefaultAsync(bm => bm.AppUserId == context.TargetUserId && bm.BoardId == context.BoardId);
             ArgumentNullException.ThrowIfNull(boardMember);
 
-            var joinedBoardsLeft = await _dbContext.BoardMembers
-                .Where(bm => bm.AppUserId == removedMemberId &&
-                              bm.BoardId != boardId &&
-                              bm.Board.WorkspaceId == board.WorkspaceId)
-                .ToListAsync();
-
             var action = new DennoAction()
             {
                 MemberCreatorId = context.MemberCreatorId,
                 ActionType = ActionTypes.RemoveBoardMember,
                 BoardId = context.BoardId,
                 TargetUserId = context.TargetUserId,
-                IsBoardActivity = context.IsBoardActivity
+                IsBoardActivity = true
+            };
+
+            var notification = new Notification()
+            {
+                Date = DateTime.Now,
+                Action = action
+            };
+
+            var notificationRecipient = new NotificationRecipient()
+            {
+                Notification = notification,
+                RecipientId = removedMemberId
             };
 
             // Execute data modifications
+            var joinedBoardsLeft = await _dbContext.BoardMembers
+                .Where(bm => bm.AppUserId == removedMemberId &&
+                              bm.BoardId != boardId &&
+                              bm.Board.WorkspaceId == board.WorkspaceId)
+                .ToListAsync();
 
             if (!joinedBoardsLeft.Any())
             {
@@ -58,6 +74,8 @@ namespace server.Strategies.ActionStrategy
 
             _dbContext.BoardMembers.Remove(boardMember);
             _dbContext.Actions.Add(action);
+            _dbContext.Notifications.Add(notification);
+            _dbContext.NotificationRecipients.Add(notificationRecipient);
 
             return action;
         }

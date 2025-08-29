@@ -5,6 +5,7 @@ using server.Authorization.Extensions;
 using server.Exceptions;
 using server.Extensions;
 using server.Factories.BoardActivityResponseFactory.Helpers;
+using server.Factories.NotificationResponseFactory.Helper;
 using server.Infrastructure;
 using server.Infrastructure.Configurations;
 using System.Reflection;
@@ -32,9 +33,12 @@ builder.Services.AddApplicationApiVersioning();
 // Add http client for external services
 builder.Services.AddHttpContextAccessor();
 
-// Add custom factories
+// Add custom factories and strategies
+builder.Services.AddActionStrategies(Assembly.GetExecutingAssembly());
 builder.Services.AddBoardActivityResponseFactories(Assembly.GetExecutingAssembly());
+builder.Services.AddNotificationResponseFactories(Assembly.GetExecutingAssembly());
 builder.Services.AddScoped<BoardActivityResponseFactoryResolver>();
+builder.Services.AddScoped<NotificationResponseFactoryResolver>();
 
 // Configure Serilog
 builder.Host.UseSerilog((context, loggerConfiguration) =>

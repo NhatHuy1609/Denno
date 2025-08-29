@@ -19,6 +19,11 @@ namespace server.Strategies.ActionStrategy
             _dbContext = dbContext;
         }
 
+        public bool CanHandle(string actionType)
+        {
+            return actionType == ActionTypes.RemoveWorkspaceMember;
+        }
+
         public async Task<DennoAction> Execute(DennoActionContext context)
         {
             var removeContext = context as RemoveWorkspaceMemberActionContext ?? 
@@ -64,6 +69,18 @@ namespace server.Strategies.ActionStrategy
                 })
             };
 
+            var notification = new Notification()
+            {
+                Date = DateTime.Now,
+                Action = action
+            };
+
+            var notificationRecipient = new NotificationRecipient()
+            {
+                Notification = notification,
+                RecipientId = removedUserId
+            };
+
             // Take all boards in the workspace that removed member is participating in
             var joinedBoardsCountInWorksapce = await _dbContext.BoardMembers
                 .Where(bm => bm.Board.WorkspaceId == workspaceId &&
@@ -82,6 +99,8 @@ namespace server.Strategies.ActionStrategy
 
             _dbContext.Actions.Add(action);
             _dbContext.RemoveRange(relatedBoardMembers);
+            _dbContext.Notifications.Add(notification);
+            _dbContext.NotificationRecipients.Add(notificationRecipient);
 
             return action;
         }

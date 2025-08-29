@@ -8,15 +8,16 @@ using server.Dtos.Response.Notification.Models;
 using server.Dtos.Response.Users;
 using server.Entities;
 using server.Factories.NotificationResponseFactory.Interfaces;
+using server.Helpers;
 
 namespace server.Factories.NotificationResponseFactory
 {
-    public class SendWorkspaceJoinRequestNotificationResponseFactory : INotificationResponseFactory
+    public class RemoveWorkspaceGuestNotificationResponseFactory : INotificationResponseFactory
     {
         private readonly ApplicationDBContext _dbContext;
         private readonly IMapper _mapper;
 
-        public SendWorkspaceJoinRequestNotificationResponseFactory(
+        public RemoveWorkspaceGuestNotificationResponseFactory(
             ApplicationDBContext dbContext,
             IMapper mapper)
         {
@@ -26,7 +27,7 @@ namespace server.Factories.NotificationResponseFactory
 
         public bool CanHandle(string actionType)
         {
-            return actionType == ActionTypes.SendWorkspaceJoinRequest;
+            return actionType == ActionTypes.RemoveWorkspaceGuest;
         }
 
         public async Task<INotificationResponseDto> CreateNotificationResponse(NotificationRecipient notification)
@@ -36,9 +37,11 @@ namespace server.Factories.NotificationResponseFactory
                     .ThenInclude(a => a.Workspace)
                 .Include(n => n.Action)
                     .ThenInclude(a => a.MemberCreator)
+                .Include(n => n.Action)
+                    .ThenInclude(a => a.TargetUser)
                 .FirstOrDefaultAsync(n => n.Id == notification.NotificationId);
 
-            var notificationResponse = new SendWorkspaceJoinRequestNotificationResponse()
+            var notificationResponse = new RemoveWorkspaceGuestNotificationResponse()
             {
                 Id = notiDetails.Id,
                 IsRead = notification.IsRead,
@@ -48,13 +51,14 @@ namespace server.Factories.NotificationResponseFactory
                 ActionId = notiDetails.ActionId,
                 MemberCreator = _mapper.Map<GetUserResponseDto>(notiDetails.Action.MemberCreator),
 
-                Data = new SendWorkspaceJoinRequestData
+                Data = new()
                 {
                     WorkspaceId = notiDetails.Action.WorkspaceId.Value,
-                    RequesterId = notiDetails.Action.MemberCreatorId,
+                    MemberCreatorId = notiDetails.Action.MemberCreatorId,
+                    RemovedGuestId = notiDetails.Action.TargetUserId
                 },
 
-                Display = new NotificationDisplay
+                Display = new()
                 {
                     TranslationKey = TranslationKeys.SendWorkspaceJoinRequest,
                     Entities = new Dictionary<string, EntityTypeDisplay>
@@ -66,11 +70,18 @@ namespace server.Factories.NotificationResponseFactory
                                 Text = notiDetails.Action.Workspace.Name
                             }
                         },
-                        { EntityTypes.Requester, new EntityTypeDisplay
+                        { EntityTypes.MemberCreator, new EntityTypeDisplay
                             {
-                                Type = EntityTypes.Requester,
+                                Type = EntityTypes.MemberCreator,
                                 Id = notiDetails.Action.MemberCreatorId,
                                 Text = notiDetails.Action.MemberCreator.FullName
+                            }
+                        },
+                        { EntityTypes.RemovedGuest, new EntityTypeDisplay
+                            {
+                                Type = EntityTypes.UpdatedMember,
+                                Id = notiDetails.Action.TargetUserId,
+                                Text = notiDetails.Action.TargetUser.FullName
                             }
                         }
                     }

@@ -11,12 +11,12 @@ using server.Factories.NotificationResponseFactory.Interfaces;
 
 namespace server.Factories.NotificationResponseFactory
 {
-    public class SendWorkspaceJoinRequestNotificationResponseFactory : INotificationResponseFactory
+    public class RemoveWorkspaceMemberNotificationResponseFactory : INotificationResponseFactory
     {
         private readonly ApplicationDBContext _dbContext;
         private readonly IMapper _mapper;
 
-        public SendWorkspaceJoinRequestNotificationResponseFactory(
+        public RemoveWorkspaceMemberNotificationResponseFactory(
             ApplicationDBContext dbContext,
             IMapper mapper)
         {
@@ -26,7 +26,7 @@ namespace server.Factories.NotificationResponseFactory
 
         public bool CanHandle(string actionType)
         {
-            return actionType == ActionTypes.SendWorkspaceJoinRequest;
+            return actionType == ActionTypes.RemoveWorkspaceMember;
         }
 
         public async Task<INotificationResponseDto> CreateNotificationResponse(NotificationRecipient notification)
@@ -36,9 +36,11 @@ namespace server.Factories.NotificationResponseFactory
                     .ThenInclude(a => a.Workspace)
                 .Include(n => n.Action)
                     .ThenInclude(a => a.MemberCreator)
+                .Include(n => n.Action)
+                    .ThenInclude(a => a.TargetUser)
                 .FirstOrDefaultAsync(n => n.Id == notification.NotificationId);
 
-            var notificationResponse = new SendWorkspaceJoinRequestNotificationResponse()
+            var notificationResponse = new RemoveWorkspaceMemberNotificationResponse()
             {
                 Id = notiDetails.Id,
                 IsRead = notification.IsRead,
@@ -48,13 +50,14 @@ namespace server.Factories.NotificationResponseFactory
                 ActionId = notiDetails.ActionId,
                 MemberCreator = _mapper.Map<GetUserResponseDto>(notiDetails.Action.MemberCreator),
 
-                Data = new SendWorkspaceJoinRequestData
+                Data = new()
                 {
                     WorkspaceId = notiDetails.Action.WorkspaceId.Value,
-                    RequesterId = notiDetails.Action.MemberCreatorId,
+                    MemberCreatorId = notiDetails.Action.MemberCreatorId,
+                    RemovedMemberId = notiDetails.Action.TargetUserId
                 },
 
-                Display = new NotificationDisplay
+                Display = new()
                 {
                     TranslationKey = TranslationKeys.SendWorkspaceJoinRequest,
                     Entities = new Dictionary<string, EntityTypeDisplay>
@@ -66,11 +69,18 @@ namespace server.Factories.NotificationResponseFactory
                                 Text = notiDetails.Action.Workspace.Name
                             }
                         },
-                        { EntityTypes.Requester, new EntityTypeDisplay
+                        { EntityTypes.MemberCreator, new EntityTypeDisplay
                             {
-                                Type = EntityTypes.Requester,
+                                Type = EntityTypes.MemberCreator,
                                 Id = notiDetails.Action.MemberCreatorId,
                                 Text = notiDetails.Action.MemberCreator.FullName
+                            }
+                        },
+                        { EntityTypes.RemovedMember, new EntityTypeDisplay
+                            {
+                                Type = EntityTypes.UpdatedMember,
+                                Id = notiDetails.Action.TargetUserId,
+                                Text = notiDetails.Action.TargetUser.FullName
                             }
                         }
                     }

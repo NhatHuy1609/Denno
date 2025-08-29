@@ -2,18 +2,29 @@
 using server.Constants;
 using server.Data;
 using server.Entities;
+using server.Interfaces;
 using server.Strategies.ActionStrategy.Contexts;
 using server.Strategies.ActionStrategy.Interfaces;
+using server.UnitOfWorks;
 
 namespace server.Strategies.ActionStrategy
 {
     public class JoinBoardByLinkStrategy : IDennoActionStrategy
     {
         private readonly ApplicationDBContext _dbContext;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public JoinBoardByLinkStrategy(ApplicationDBContext dbContext)
+        public JoinBoardByLinkStrategy(
+            ApplicationDBContext dbContext,
+            IUnitOfWork unitOfWork)
         {
             _dbContext = dbContext;
+            _unitOfWork = unitOfWork;
+        }
+
+        public bool CanHandle(string actionType)
+        {
+            return actionType == ActionTypes.JoinBoardByLink;
         }
 
         public async Task<DennoAction> Execute(DennoActionContext context)
@@ -54,19 +65,13 @@ namespace server.Strategies.ActionStrategy
             };
 
             // Notify all members in the board if they are watching the board
-            var notificationRecipients = await _dbContext.BoardMembers
-                .Where(bm => bm.BoardId == boardId)
-                .Join(
-                    _dbContext.BoardUserSettings.Where(bu => bu.BoardId == boardId && bu.IsWatching),
-                    bm => new { bm.BoardId, UserId = bm.AppUserId },
-                    bu => new { bu.BoardId, bu.UserId },
-                    (bm, bu) => new NotificationRecipient
-                    {
-                        Notification = notification,
-                        RecipientId = bm.AppUserId
-                    }
-                )
-                .ToListAsync();
+            var boardMembersWatching = await _unitOfWork.Boards.GetWatchingMembersByBoardIdAsync(boardId);
+            var notificationRecipients = boardMembersWatching
+                .Select(bm => new NotificationRecipient()
+                {
+                    Notification = notification,
+                    RecipientId = bm.AppUserId
+                });
 
             // Delete board join requests related to the user who joined the board
             var joinRequest = await _dbContext.JoinRequests

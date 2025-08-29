@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using server.Data;
 using server.Dtos.Response.Notification.Interfaces;
-using server.Factories.NotificationResponseFactory;
+using server.Factories.NotificationResponseFactory.Helper;
 using server.Interfaces;
 
 namespace server.Services

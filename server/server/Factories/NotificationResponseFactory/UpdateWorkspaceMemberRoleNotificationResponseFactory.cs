@@ -7,6 +7,7 @@ using server.Dtos.Response.Notification.Interfaces;
 using server.Dtos.Response.Notification.Models;
 using server.Dtos.Response.Users;
 using server.Entities;
+using server.Factories.NotificationResponseFactory.Interfaces;
 using server.Helpers;
 
 namespace server.Factories.NotificationResponseFactory
@@ -23,6 +24,11 @@ namespace server.Factories.NotificationResponseFactory
         {
             _mapper = mapper;
             _dbContext = dbContext;
+        }
+
+        public bool CanHandle(string actionType)
+        {
+            return actionType == ActionTypes.UpdateWorkspaceMemberRole;
         }
 
         public async Task<INotificationResponseDto> CreateNotificationResponse(NotificationRecipient notification)
@@ -50,7 +56,7 @@ namespace server.Factories.NotificationResponseFactory
 
                 Data = new()
                 {
-                    WorkspaceIde = notiDetails.Action.WorkspaceId.Value,
+                    WorkspaceId = notiDetails.Action.WorkspaceId.Value,
                     MemberCreatorId = notiDetails.Action.MemberCreatorId,
                     UpdatedMemberId = notiDetails.Action.TargetUserId,
                     NewMemberRole = actionMetaData.NewMemberRole

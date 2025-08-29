@@ -12,13 +12,16 @@ namespace server.Services
     {
         private readonly ApplicationDBContext _dbContext;
         private readonly ILogger<ActionService> _logger;
+        private readonly IEnumerable<IDennoActionStrategy> _actionStrategies;
 
         public ActionService(
             ApplicationDBContext dbContext,
-            ILogger<ActionService> logger)
+            ILogger<ActionService> logger,
+            IEnumerable<IDennoActionStrategy> actionStrategies)
         {
             _dbContext = dbContext;
             _logger = logger;
+            _actionStrategies = actionStrategies;
         }
 
         public async Task<DennoAction> CreateActionAsync(string actionType, DennoActionContext context)
@@ -53,27 +56,14 @@ namespace server.Services
 
         private IDennoActionStrategy GetActionStrategy(string actionType)
         {
-            return actionType switch
+            var strategy = _actionStrategies.FirstOrDefault(s => s.CanHandle(actionType));
+
+            if (strategy == null)
             {
-                ActionTypes.AddMemberToWorkspace => new AddWorkspaceMemberStrategy(_dbContext),
-                ActionTypes.JoinWorkspaceByLink => new JoinWorkspaceByLinkStrategy(_dbContext),
-                ActionTypes.ApproveWorkspaceJoinRequest => new ApproveWorkspaceJoinRequestStrategy(_dbContext),
-                ActionTypes.RejectWorkspaceJoinRequest => new RejectWorkspaceJoinRequestStrategy(_dbContext),
-                ActionTypes.SendWorkspaceJoinRequest => new SendWorkspaceJoinRequestStrategy(_dbContext),
-                ActionTypes.AddMemberToBoard => new AddBoardMemberStrategy(_dbContext),
-                ActionTypes.CreateBoard => new CreateBoardStategy(_dbContext),
-                ActionTypes.JoinBoard => new JoinBoardStrategy(_dbContext),
-                ActionTypes.JoinBoardByLink => new JoinBoardByLinkStrategy(_dbContext),
-                ActionTypes.SendBoardJoinRequest => new SendBoardJoinRequestStrategy(_dbContext),
-                ActionTypes.ApproveBoardJoinRequest => new ApproveBoardJoinRequestStrategy(_dbContext),
-                ActionTypes.RejectBoardJoinRequest => new RejectBoardJoinRequestStrategy(_dbContext),
-                ActionTypes.UpdateBoardMemberRole => new UpdateBoardMemberRoleStrategy(_dbContext),
-                ActionTypes.RemoveBoardMember => new RemoveBoardMemberStrategy(_dbContext),
-                ActionTypes.UpdateWorkspaceMemberRole => new UpdateWorkspaceMemberRoleStrategy(_dbContext),
-                ActionTypes.RemoveWorkspaceMember => new RemoveWorkspaceMemberStrategy(_dbContext),
-                ActionTypes.RemoveWorkspaceGuest => new RemoveWorkspaceGuestStrategy(_dbContext),
-                _ => throw new ArgumentException($"Unsupported action type: {actionType}")
-            };
+                throw new ArgumentException(nameof(actionType), $"Can not find strategy for {actionType}");
+            }
+
+            return strategy;
         }
     }
 }

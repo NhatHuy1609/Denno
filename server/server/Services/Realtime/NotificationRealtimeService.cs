@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using server.Data;
 using server.Entities;
-using server.Factories.NotificationResponseFactory;
+using server.Factories.NotificationResponseFactory.Helper;
 using server.Hubs.NotificationHub;
 using server.Interfaces;
 using server.Services.QueueHostedService;

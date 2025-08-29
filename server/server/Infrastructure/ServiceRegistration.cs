@@ -51,16 +51,6 @@ namespace server.Infrastructure
                 options.UseSqlServer(connectionStringConfigName);
             });
 
-            // Factories
-            services.AddScoped<NotificationResponseFactoryResolver>();
-            services.AddScoped<AddedMemberWorkspaceNotificationResponseFactory>();
-            services.AddScoped<JoinWorkspaceWithLinkNotificationResponseFactory>();
-            services.AddScoped<ApproveWorkspaceJoinRequestNotificationResponseFactory>();
-            services.AddScoped<RejectWorkspaceJoinRequestNotificationResponseFactory>();
-            services.AddScoped<SendWorkspaceJoinRequestNotificationResponseFactory>();
-            services.AddScoped<AddMemberToBoardNotificationResponseFactory>();
-            services.AddScoped<UpdateWorkspaceMemberRoleNotificationResponseFactory>();
-
             // Background services
             services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
             services.AddHostedService<QueueHostedService>();

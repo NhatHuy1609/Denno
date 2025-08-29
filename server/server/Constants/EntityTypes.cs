@@ -15,5 +15,6 @@
         public const string Requester = "requester";
         public const string UpdatedMember = "updatedMember";
         public const string RemovedMember = "removedMember";
+        public const string RemovedGuest = "removedGuest";
     }
 }
