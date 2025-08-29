@@ -16,6 +16,11 @@ namespace server.Strategies.ActionStrategy
             _dbContext = dbContext;
         }
 
+        public bool CanHandle(string actionType)
+        {
+            return actionType == ActionTypes.RemoveWorkspaceGuest;
+        }
+
         public async Task<DennoAction> Execute(DennoActionContext context)
         {
             ArgumentNullException.ThrowIfNull(context.WorkspaceId);
@@ -38,6 +43,8 @@ namespace server.Strategies.ActionStrategy
                 throw new ArgumentException($"Deleted workspace guest with id-{removedGuestId} does not exist");
             }
 
+            // Create new entities
+
             var action = new DennoAction()
             {
                 WorkspaceId = workspaceId,
@@ -46,9 +53,25 @@ namespace server.Strategies.ActionStrategy
                 ActionType = ActionTypes.RemoveWorkspaceGuest
             };
 
+            var notification = new Notification()
+            {
+                Date = DateTime.Now,
+                Action = action
+            };
+
+            var notificationRecipient = new NotificationRecipient()
+            {
+                Notification = notification,
+                RecipientId = removedGuestId
+            };
+
+            // Execute data modifications
+
             _dbContext.Actions.Add(action);
             _dbContext.BoardMembers.RemoveRange(joinedBoardsAsMember);
             _dbContext.WorkspaceMembers.Remove(workspaceMember);
+            _dbContext.Notifications.Add(notification);
+            _dbContext.NotificationRecipients.Add(notificationRecipient);
 
             return action;
         }

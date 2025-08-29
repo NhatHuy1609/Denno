@@ -6,7 +6,7 @@ namespace server.Dtos.Response.Notification.Models
     {
         public string MemberCreatorId { get; set; }
         public string UpdatedMemberId { get; set; }
-        public Guid WorkspaceIde { get; set; }
+        public Guid WorkspaceId { get; set; }
         public WorkspaceMemberRole NewMemberRole { get; set; }
     }
 }

@@ -17,6 +17,12 @@ namespace server.Strategies.ActionStrategy
             _dbContext = dContext;
         }
 
+        public bool CanHandle(string actionType)
+        {
+            return actionType == ActionTypes.ApproveWorkspaceJoinRequest;
+        }
+
+
         public async Task<DennoAction> Execute(DennoActionContext context)
         {
             if (!context.WorkspaceId.HasValue)

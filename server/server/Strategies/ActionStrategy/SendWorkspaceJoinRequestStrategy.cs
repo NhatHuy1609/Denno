@@ -16,6 +16,11 @@ namespace server.Strategies.ActionStrategy
             _dbContext = dbContext;
         }
 
+        public bool CanHandle(string actionType)
+        {
+            return actionType == ActionTypes.SendWorkspaceJoinRequest;
+        }
+
         public async Task<DennoAction> Execute(DennoActionContext context)
         {
             ArgumentNullException.ThrowIfNull(context.WorkspaceId);
@@ -24,6 +29,11 @@ namespace server.Strategies.ActionStrategy
             var workspace = await _dbContext.Workspaces
                 .Include(w => w.WorkspaceMembers)
                 .FirstOrDefaultAsync(w => w.Id == context.WorkspaceId);
+
+            if (workspace == null) 
+            { 
+                throw new ArgumentNullException(nameof(workspace), $"Can not found workspace with id-{context.WorkspaceId}");
+            }
 
             var action = new DennoAction()
             {
@@ -39,7 +49,7 @@ namespace server.Strategies.ActionStrategy
                 WorkspaceId = context.WorkspaceId
             };
 
-            // Create notifications for user who is admin of the related workspace
+            // Create notification for user who is admin of the related workspace
             var notification = new Notification
             {
                 Date = DateTime.Now,

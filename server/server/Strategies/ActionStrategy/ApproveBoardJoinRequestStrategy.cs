@@ -2,6 +2,7 @@
 using server.Constants;
 using server.Data;
 using server.Entities;
+using server.Interfaces;
 using server.Strategies.ActionStrategy.Contexts;
 using server.Strategies.ActionStrategy.Interfaces;
 
@@ -10,11 +11,21 @@ namespace server.Strategies.ActionStrategy
     public class ApproveBoardJoinRequestStrategy : IDennoActionStrategy
     {
         private readonly ApplicationDBContext _dbContext;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ApproveBoardJoinRequestStrategy(ApplicationDBContext dbContext)
+        public ApproveBoardJoinRequestStrategy(
+            ApplicationDBContext dbContext,
+            IUnitOfWork unitOfWork)
         {
             _dbContext = dbContext;
+            _unitOfWork = unitOfWork;
         }
+
+        public bool CanHandle(string actionType)
+        {
+            return actionType == ActionTypes.ApproveBoardJoinRequest;
+        }
+
 
         public async Task<DennoAction> Execute(DennoActionContext context)
         {
@@ -54,7 +65,8 @@ namespace server.Strategies.ActionStrategy
                 ActionType = ActionTypes.ApproveBoardJoinRequest,
                 BoardId = boardId,
                 TargetUserId = targetUserId,
-                Date = DateTime.Now
+                Date = DateTime.Now,
+                IsBoardActivity = true
             };
 
             var notification = new Notification
@@ -63,19 +75,13 @@ namespace server.Strategies.ActionStrategy
                 Action = action
             };
 
-            var notificationRecipients = await _dbContext.BoardMembers
-                .Where(bm => bm.BoardId == boardId)
-                .Join(
-                        _dbContext.BoardUserSettings.Where(bu => bu.BoardId == boardId && bu.IsWatching),
-                        bm => new { bm.BoardId, UserId = bm.AppUserId },
-                        bu => new { bu.BoardId, bu.UserId },
-                        (bm, bu) => new NotificationRecipient
-                        {
-                            Notification = notification,
-                            RecipientId = bm.AppUserId
-                        }
-                )
-                .ToListAsync();
+            var boardMembersWatching = await _unitOfWork.Boards.GetWatchingMembersByBoardIdAsync(boardId);
+            var notificationRecipients = boardMembersWatching
+                .Select(bm => new NotificationRecipient()
+                {
+                    Notification = notification,
+                    RecipientId = bm.AppUserId
+                });
 
             var existedJoinRequest = await _dbContext.JoinRequests
                 .FirstOrDefaultAsync(j => j.BoardId == boardId && j.RequesterId == targetUserId);

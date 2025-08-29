@@ -11,12 +11,12 @@ using server.Factories.NotificationResponseFactory.Interfaces;
 
 namespace server.Factories.NotificationResponseFactory
 {
-    public class SendWorkspaceJoinRequestNotificationResponseFactory : INotificationResponseFactory
+    public class ApproveBoardJoinRequestNotificationResponseFactory : INotificationResponseFactory
     {
         private readonly ApplicationDBContext _dbContext;
         private readonly IMapper _mapper;
 
-        public SendWorkspaceJoinRequestNotificationResponseFactory(
+        public ApproveBoardJoinRequestNotificationResponseFactory(
             ApplicationDBContext dbContext,
             IMapper mapper)
         {
@@ -26,19 +26,21 @@ namespace server.Factories.NotificationResponseFactory
 
         public bool CanHandle(string actionType)
         {
-            return actionType == ActionTypes.SendWorkspaceJoinRequest;
+            return actionType == ActionTypes.ApproveBoardJoinRequest;
         }
 
         public async Task<INotificationResponseDto> CreateNotificationResponse(NotificationRecipient notification)
         {
             var notiDetails = await _dbContext.Notifications
                 .Include(n => n.Action)
-                    .ThenInclude(a => a.Workspace)
+                    .ThenInclude(a => a.Board)
                 .Include(n => n.Action)
                     .ThenInclude(a => a.MemberCreator)
+                .Include(n => n.Action)
+                    .ThenInclude(a => a.TargetUser)
                 .FirstOrDefaultAsync(n => n.Id == notification.NotificationId);
 
-            var notificationResponse = new SendWorkspaceJoinRequestNotificationResponse()
+            var notificationResponse = new ApproveBoardJoinRequestNotificationResponse()
             {
                 Id = notiDetails.Id,
                 IsRead = notification.IsRead,
@@ -48,29 +50,37 @@ namespace server.Factories.NotificationResponseFactory
                 ActionId = notiDetails.ActionId,
                 MemberCreator = _mapper.Map<GetUserResponseDto>(notiDetails.Action.MemberCreator),
 
-                Data = new SendWorkspaceJoinRequestData
+                Data = new()
                 {
-                    WorkspaceId = notiDetails.Action.WorkspaceId.Value,
-                    RequesterId = notiDetails.Action.MemberCreatorId,
+                    BoardId = notiDetails.Action.BoardId.Value,
+                    MemberCreatorId = notiDetails.Action.MemberCreatorId,
+                    AddedMemberId = notiDetails.Action.TargetUserId
                 },
 
-                Display = new NotificationDisplay
+                Display = new()
                 {
                     TranslationKey = TranslationKeys.SendWorkspaceJoinRequest,
                     Entities = new Dictionary<string, EntityTypeDisplay>
                     {
-                        { EntityTypes.Workspace, new EntityTypeDisplay
+                        { EntityTypes.Board, new EntityTypeDisplay
                             {
-                                Type = EntityTypes.Workspace,
-                                Id = notiDetails.Action.Workspace.Id,
-                                Text = notiDetails.Action.Workspace.Name
+                                Type = EntityTypes.Board,
+                                Id = notiDetails.Action.Board.Id,
+                                Text = notiDetails.Action.Board.Name
                             }
                         },
-                        { EntityTypes.Requester, new EntityTypeDisplay
+                        { EntityTypes.MemberCreator, new EntityTypeDisplay
                             {
-                                Type = EntityTypes.Requester,
+                                Type = EntityTypes.MemberCreator,
                                 Id = notiDetails.Action.MemberCreatorId,
                                 Text = notiDetails.Action.MemberCreator.FullName
+                            }
+                        },
+                        { EntityTypes.AddedMember, new EntityTypeDisplay
+                            {
+                                Type = EntityTypes.AddedMember,
+                                Id = notiDetails.Action.TargetUserId,
+                                Text = notiDetails.Action.TargetUser.FullName
                             }
                         }
                     }

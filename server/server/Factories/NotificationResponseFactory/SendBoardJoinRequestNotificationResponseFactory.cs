@@ -11,12 +11,12 @@ using server.Factories.NotificationResponseFactory.Interfaces;
 
 namespace server.Factories.NotificationResponseFactory
 {
-    public class SendWorkspaceJoinRequestNotificationResponseFactory : INotificationResponseFactory
+    public class SendBoardJoinRequestNotificationResponseFactory : INotificationResponseFactory
     {
         private readonly ApplicationDBContext _dbContext;
         private readonly IMapper _mapper;
 
-        public SendWorkspaceJoinRequestNotificationResponseFactory(
+        public SendBoardJoinRequestNotificationResponseFactory(
             ApplicationDBContext dbContext,
             IMapper mapper)
         {
@@ -26,19 +26,19 @@ namespace server.Factories.NotificationResponseFactory
 
         public bool CanHandle(string actionType)
         {
-            return actionType == ActionTypes.SendWorkspaceJoinRequest;
+            return actionType == ActionTypes.SendBoardJoinRequest;
         }
 
         public async Task<INotificationResponseDto> CreateNotificationResponse(NotificationRecipient notification)
         {
             var notiDetails = await _dbContext.Notifications
                 .Include(n => n.Action)
-                    .ThenInclude(a => a.Workspace)
+                    .ThenInclude(a => a.Board)
                 .Include(n => n.Action)
                     .ThenInclude(a => a.MemberCreator)
                 .FirstOrDefaultAsync(n => n.Id == notification.NotificationId);
 
-            var notificationResponse = new SendWorkspaceJoinRequestNotificationResponse()
+            var notificationResponse = new SendBoardJoinRequestNotificationResponse()
             {
                 Id = notiDetails.Id,
                 IsRead = notification.IsRead,
@@ -48,9 +48,9 @@ namespace server.Factories.NotificationResponseFactory
                 ActionId = notiDetails.ActionId,
                 MemberCreator = _mapper.Map<GetUserResponseDto>(notiDetails.Action.MemberCreator),
 
-                Data = new SendWorkspaceJoinRequestData
+                Data = new()
                 {
-                    WorkspaceId = notiDetails.Action.WorkspaceId.Value,
+                    BoardId = notiDetails.Action.BoardId.Value,
                     RequesterId = notiDetails.Action.MemberCreatorId,
                 },
 
@@ -59,11 +59,11 @@ namespace server.Factories.NotificationResponseFactory
                     TranslationKey = TranslationKeys.SendWorkspaceJoinRequest,
                     Entities = new Dictionary<string, EntityTypeDisplay>
                     {
-                        { EntityTypes.Workspace, new EntityTypeDisplay
+                        { EntityTypes.Board, new EntityTypeDisplay
                             {
-                                Type = EntityTypes.Workspace,
-                                Id = notiDetails.Action.Workspace.Id,
-                                Text = notiDetails.Action.Workspace.Name
+                                Type = EntityTypes.Board,
+                                Id = notiDetails.Action.Board.Id,
+                                Text = notiDetails.Action.Board.Name
                             }
                         },
                         { EntityTypes.Requester, new EntityTypeDisplay

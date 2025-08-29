@@ -15,6 +15,11 @@ namespace server.Strategies.ActionStrategy
             _dbContext = dbContext;
         }
 
+        public bool CanHandle(string actionType)
+        {
+            return actionType == ActionTypes.CreateBoard;
+        }
+
         public async Task<DennoAction> Execute(DennoActionContext context)
         {
             // Cast the context to CreateBoardActionContext

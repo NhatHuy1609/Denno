@@ -15,6 +15,10 @@ namespace server.Strategies.ActionStrategy
         {
             _dbContext = dbContext;
         }
+        public bool CanHandle(string actionType)
+        {
+            return actionType == ActionTypes.AddMemberToWorkspace;
+        }
 
         public async Task<DennoAction> Execute(DennoActionContext context)
         {

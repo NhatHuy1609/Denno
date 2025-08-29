@@ -19,6 +19,11 @@ namespace server.Strategies.ActionStrategy
             _dbContext = dbContext;
         }
 
+        public bool CanHandle(string actionType)
+        {
+            return actionType == ActionTypes.UpdateWorkspaceMemberRole;
+        }
+
         public async Task<DennoAction> Execute(DennoActionContext context)
         {
             var updateContext = context as UpdateWorkspaceMemberRoleActionContext ??
@@ -52,8 +57,22 @@ namespace server.Strategies.ActionStrategy
                 })
             };
 
+            var notification = new Notification
+            {
+                Date = DateTime.Now,
+                Action = action
+            };
+
+            var recipient = new NotificationRecipient
+            {
+                Notification = notification,
+                RecipientId = updateContext.TargetUserId
+            };
+
             _dbContext.Update(workspaceMember);
             _dbContext.Actions.Add(action);
+            _dbContext.Notifications.Add(notification);
+            _dbContext.NotificationRecipients.Add(recipient);
 
             return action;
         }

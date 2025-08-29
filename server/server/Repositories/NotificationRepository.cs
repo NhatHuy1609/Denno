@@ -9,11 +9,11 @@ namespace server.Repositories
 {
     public class NotificationRepository : INotificationRepository
     {
-        private readonly ApplicationDBContext _context;
+        private readonly ApplicationDBContext _dbContext;
 
         public NotificationRepository(ApplicationDBContext context)
         {
-            _context = context;
+            _dbContext = context;
         }
     }
 }

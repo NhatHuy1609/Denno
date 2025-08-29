@@ -8,6 +8,7 @@ using server.Dtos.Response.Notification.Interfaces;
 using server.Dtos.Response.Notification.Models;
 using server.Dtos.Response.Users;
 using server.Entities;
+using server.Factories.NotificationResponseFactory.Interfaces;
 
 namespace server.Factories.NotificationResponseFactory
 {
@@ -25,6 +26,11 @@ namespace server.Factories.NotificationResponseFactory
             _dbContext = dbContext;
             _mapper = mapper;
             _logger = logger;
+        }
+
+        public bool CanHandle(string actionType)
+        {
+            return actionType == ActionTypes.AddMemberToWorkspace;
         }
 
         public async Task<INotificationResponseDto> CreateNotificationResponse(NotificationRecipient notification)

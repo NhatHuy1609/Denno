@@ -16,6 +16,11 @@ namespace server.Strategies.ActionStrategy
             _dbContext = dbContext;
         }
 
+        public bool CanHandle(string actionType)
+        {
+            return actionType == ActionTypes.JoinBoard;
+        }
+
         public async Task<DennoAction> Execute(DennoActionContext context)
         {
             ArgumentNullException.ThrowIfNull(context.BoardId);
@@ -44,7 +49,7 @@ namespace server.Strategies.ActionStrategy
                 ActionType = ActionTypes.JoinBoard,
                 MemberCreatorId = userId,
                 BoardId = boardId,
-                IsBoardActivity = context.IsBoardActivity,
+                IsBoardActivity = true
             };
 
             if (!isWorkspaceMember)
