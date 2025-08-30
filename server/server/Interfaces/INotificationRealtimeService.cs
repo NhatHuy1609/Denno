@@ -4,6 +4,6 @@ namespace server.Interfaces
 {
     public interface INotificationRealtimeService
     {
-        Task SendActionNotificationToUsersAsync(DennoAction action);
+        Task SendActionNotificationToUsersAsync(DennoAction action, bool isRunInBackground = true);
     }
 }

@@ -4,5 +4,6 @@
     {
         public string RequesterId { get; set; }
         public Guid BoardId { get; set; }
+        public bool IsWorkspaceMember { get; set; }
     }
 }

@@ -467,6 +467,7 @@ namespace server.Controllers
             if (action != null)
             {
                 await _emailService.SendActionEmailAsync(action);
+                await _notificationRealtimeService.SendActionNotificationToUsersAsync(action);
             }
 
             return Ok();
@@ -496,6 +497,7 @@ namespace server.Controllers
             if (action != null)
             {
                 await _emailService.SendActionEmailAsync(action);
+                await _notificationRealtimeService.SendActionNotificationToUsersAsync(action);
             }
 
             return Ok();
@@ -531,6 +533,7 @@ namespace server.Controllers
             if (action != null)
             {
                 await _workspaceService.NotifyUserActionToWorkspaceMembers(action, workspaceId);
+                await _notificationRealtimeService.SendActionNotificationToUsersAsync(action);
             }
 
             return Ok();
@@ -565,6 +568,7 @@ namespace server.Controllers
 
             if (action != null)
             {
+                await _notificationRealtimeService.SendActionNotificationToUsersAsync(action);
                 await _workspaceHubContext
                     .Clients
                     .Users([memberId, userId])
@@ -600,7 +604,7 @@ namespace server.Controllers
 
             if (action != null)
             {
-                // 
+                await _notificationRealtimeService.SendActionNotificationToUsersAsync(action);
             }
 
             return Ok();

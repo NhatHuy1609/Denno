@@ -32,6 +32,7 @@ namespace server.Controllers
         private readonly IActionService _actionService;
         private readonly IBoardService _boardService;
         private readonly IAuthService _authService;
+        private readonly INotificationRealtimeService _notificationRealtimeService;
 
         public BoardsController(
             IMapper mapper,
@@ -42,7 +43,8 @@ namespace server.Controllers
             IEmailService emailService,
             IBoardService boardService,
             IAuthService authService,
-            IBackgroundTaskQueue taskQueueService)
+            IBackgroundTaskQueue taskQueueService,
+            INotificationRealtimeService notificationRealtimeService)
         {
             _mapper = mapper;
             _logger = logger;
@@ -50,6 +52,7 @@ namespace server.Controllers
             _actionService = actionService;
             _boardService = boardService;
             _authService = authService;
+            _notificationRealtimeService = notificationRealtimeService;
         }
 
         [HttpPut("[controller]/{boardId}/star")]
@@ -198,6 +201,7 @@ namespace server.Controllers
             if (action != null)
             {
                 //await _emailService.SendBoardActionEmailsAsync(action, isRunInBackground: true);
+                await _notificationRealtimeService.SendActionNotificationToUsersAsync(action);
             }
 
             return Ok(action);
@@ -360,6 +364,7 @@ namespace server.Controllers
             if (action != null)
             {
                 //await _emailService.SendBoardActionEmailsAsync(action, isRunInBackground: true);
+                await _notificationRealtimeService.SendActionNotificationToUsersAsync(action);
             }
 
             return Ok();
@@ -393,6 +398,7 @@ namespace server.Controllers
             if (action != null)
             {
                 //_emailService.SendActionEmailInBackgroundAsync(action);
+                await _notificationRealtimeService.SendActionNotificationToUsersAsync(action);
             }
 
             return Ok();
@@ -423,6 +429,7 @@ namespace server.Controllers
             if (action != null)
             {
                 //await _emailService.SendActionEmailAsync(action);
+                await _notificationRealtimeService.SendActionNotificationToUsersAsync(action);
             }
 
             return Ok();
@@ -453,6 +460,7 @@ namespace server.Controllers
             if (action != null)
             {
                 //await _emailService.SendActionEmailAsync(action);
+                await _notificationRealtimeService.SendActionNotificationToUsersAsync(action);
             }
 
             return Ok();
@@ -514,6 +522,11 @@ namespace server.Controllers
             };
 
             var action = await _actionService.CreateActionAsync(ActionTypes.RemoveBoardMember, actionContext);
+
+            if (action != null)
+            {
+                await _notificationRealtimeService.SendActionNotificationToUsersAsync(action);
+            }
 
             return Ok();
         }

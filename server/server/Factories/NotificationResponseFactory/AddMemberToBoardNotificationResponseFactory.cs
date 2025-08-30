@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using server.Constants;
 using server.Data;
 using server.Dtos.Response.Notification;
+using server.Dtos.Response.Notification.Bases;
 using server.Dtos.Response.Notification.Interfaces;
 using server.Dtos.Response.Notification.Models;
 using server.Dtos.Response.Users;
@@ -87,21 +88,22 @@ namespace server.Factories.NotificationResponseFactory
 
                 Display = new NotificationDisplay
                 {
-                    TranslationKey = TranslationKeys.AddMemberToBoard,
                     Entities = new Dictionary<string, EntityTypeDisplay>
                     {
                         { EntityTypes.Board, new EntityTypeDisplay
                             {
                                 Type = EntityTypes.Board,
                                 Id = notiDetails.Action.Board.Id,
-                                Text = notiDetails.Action.Board.Name
+                                Text = notiDetails.Action.Board.Name,
+                                ImageUrl = notiDetails.Action.Board.Background
                             }
                         },
                         { EntityTypes.MemberCreator, new EntityTypeDisplay
                             {
                                 Type = EntityTypes.User,
                                 Id = notiDetails.Action.MemberCreatorId,
-                                Text = notiDetails.Action.MemberCreator.FullName
+                                Text = notiDetails.Action.MemberCreator.FullName,
+                                ImageUrl = notiDetails.Action.MemberCreator.Avatar
                             }
                         },
                         { EntityTypes.AddedMember, new EntityTypeDisplay

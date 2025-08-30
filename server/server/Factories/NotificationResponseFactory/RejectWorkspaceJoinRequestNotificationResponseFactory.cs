@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using server.Constants;
 using server.Data;
 using server.Dtos.Response.Notification;
+using server.Dtos.Response.Notification.Bases;
 using server.Dtos.Response.Notification.Interfaces;
 using server.Dtos.Response.Notification.Models;
 using server.Dtos.Response.Users;
@@ -59,7 +60,6 @@ namespace server.Factories.NotificationResponseFactory
 
                 Display = new NotificationDisplay
                 {
-                    TranslationKey = TranslationKeys.ApproveWorkspaceJoinRequest,
                     Entities = new Dictionary<string, EntityTypeDisplay>
                     {
                         { EntityTypes.Workspace, new EntityTypeDisplay
