@@ -1,0 +1,20 @@
+export type ActionType =
+  | 'addMemberToWorkspace'
+  | 'joinWorkspaceByLink'
+  | 'approveWorkspaceJoinRequest'
+  | 'rejectWorkspaceJoinRequest'
+  | 'sendWorkspaceJoinRequest'
+  | 'createBoard'
+  | 'addMemberToBoard'
+  | 'joinBoard'
+  | 'joinBoardByLink'
+  | 'sendBoardJoinRequest'
+  | 'approveBoardJoinRequest'
+  | 'rejectBoardJoinRequest'
+  | 'updateBoardMemberRole'
+  | 'removeBoardMember'
+  | 'updateWorkspaceMemberRole'
+  | 'removeWorkspaceMember'
+  | 'removeWorkspaceGuest'
+
+export type NotifiableActionType = Exclude<ActionType, 'createBoard' | 'joinBoard' | 'updateBoardMemberRole'>
