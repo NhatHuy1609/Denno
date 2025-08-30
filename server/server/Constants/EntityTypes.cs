@@ -7,7 +7,7 @@
         public const string Board = "board";
         public const string CardList = "cardList";
         public const string Card = "card";
-        public const string MemberRole = "MemberRole";
+        public const string MemberRole = "memberRole";
 
         public const string MemberCreator = "memberCreator";
         public const string AddedMember = "addedMember";

@@ -1,7 +1,7 @@
 ﻿using server.Dtos.Response.Notification.Interfaces;
 using server.Dtos.Response.Users;
 
-namespace server.Dtos.Response.Notification
+namespace server.Dtos.Response.Notification.Bases
 {
     public class NotificationResponseDto<TData, TDisplay>: INotificationResponseDto
     {
