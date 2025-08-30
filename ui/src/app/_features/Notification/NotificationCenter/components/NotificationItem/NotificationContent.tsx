@@ -23,11 +23,7 @@ function NotificationContent({ content }: Props) {
 
       if (part.type === 'entity') {
         return (
-          <Link
-            key={index}
-            href={part.entity.url || ''}
-            className='text-sm text-blue-600 hover:underline'
-          >
+          <Link key={index} href={part.entity.url || ''} className='text-sm text-blue-600 hover:underline'>
             {part.entity.name}
           </Link>
         )
