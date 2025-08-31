@@ -75,13 +75,11 @@ namespace server.Strategies.ActionStrategy
                 Action = action
             };
 
-            var boardMembersWatching = await _unitOfWork.Boards.GetWatchingMembersByBoardIdAsync(boardId);
-            var notificationRecipients = boardMembersWatching
-                .Select(bm => new NotificationRecipient()
-                {
-                    Notification = notification,
-                    RecipientId = bm.AppUserId
-                });
+            var notificationRecipients = new NotificationRecipient()
+            {
+                Notification = notification,
+                RecipientId = targetUserId
+            };
 
             var existedJoinRequest = await _dbContext.JoinRequests
                 .FirstOrDefaultAsync(j => j.BoardId == boardId && j.RequesterId == targetUserId);

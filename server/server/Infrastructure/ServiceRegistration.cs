@@ -40,7 +40,6 @@ namespace server.Infrastructure
             services.AddTransient<IWorkspaceRepository, WorkspaceRepository>();
             #endregion
             services.AddTransient<INotificationService, NotificationService>();
-            services.AddTransient<IEmailService, EmailService>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddTransient<IActionService, ActionService>();
             services.AddScoped<IBoardService, BoardService>();
@@ -56,7 +55,12 @@ namespace server.Infrastructure
             services.AddHostedService<QueueHostedService>();
 
             // Realtime services
+            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<EmailService>();
+
             services.AddScoped<INotificationRealtimeService, NotificationRealtimeService>();
+            services.AddScoped<NotificationRealtimeService>();
+
 
             return services;
         }

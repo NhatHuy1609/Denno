@@ -18,7 +18,7 @@ namespace server.Extensions
 
             foreach (var impl in implementations) 
             {
-                services.AddScoped(impl);
+                services.AddScoped(factoryType, impl);
             }
 
             return services;
