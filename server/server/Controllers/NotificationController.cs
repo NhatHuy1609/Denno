@@ -15,15 +15,41 @@ namespace server.Controllers
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<NotificationController> _logger;
+        private readonly IAuthService _authService;
+        private readonly INotificationService _notificationService;
 
         public NotificationController(
             IMapper mapper,
             IUnitOfWork unitOfWork,
-            ILogger<NotificationController> logger)
+            ILogger<NotificationController> logger,
+            IAuthService authService,
+            INotificationService notificationService)
         {
             _mapper = mapper;
             _logger = logger;
+            _authService = authService;
+            _notificationService = notificationService;
             _unitOfWork = unitOfWork;
+        }
+
+        [HttpPut("[controller]/{notificationId}/read")]
+        public async Task<IActionResult> MarkAsReadNotificationAsync(int notificationId)
+        {
+            var userId = _authService.GetCurrentUserId();
+
+            await _notificationService.MarkNotificationAsReadAsync(notificationId, userId);
+
+            return NoContent();
+        }
+
+        [HttpPut("[controller]/markAllRead")]
+        public async Task<IActionResult> MarkAllNotificationsAsReadAsync()
+        {
+            var userId = _authService.GetCurrentUserId();
+
+            await _notificationService.MarkAllNotificationsAsReadAsync(userId);
+
+            return NoContent();
         }
     }
 }
