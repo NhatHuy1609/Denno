@@ -72,7 +72,24 @@ namespace server.Services
             await _dbContext.SaveChangesAsync();
             _logger.LogInformation($"Successfully mark notification-{notificationId} as read");
         }
-        
+
+        public async Task MarkNotificationAsUnReadAsync(int notificationId, string userId)
+        {
+            var recipient = await _dbContext.NotificationRecipients
+                .FirstOrDefaultAsync(r => r.NotificationId == notificationId && r.RecipientId == userId);
+
+            if (recipient == null)
+            {
+                _logger.LogError($"Can not find recipient with id-{userId} and notification-{notificationId}");
+                return;
+            }
+
+            recipient.IsRead = false;
+
+            await _dbContext.SaveChangesAsync();
+            _logger.LogInformation($"Successfully mark notification-{notificationId} as unread");
+        }
+
         public async Task MarkAllNotificationsAsReadAsync(string userId)
         {
             var unreadNotifications = await _dbContext.NotificationRecipients

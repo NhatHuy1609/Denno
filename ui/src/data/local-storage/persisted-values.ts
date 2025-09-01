@@ -14,6 +14,7 @@ export type PersistedStateValues = {
       isShowMoreBoardsInSidebar: boolean
     }
   >
+  [PersistedStateKey.NewNotificationCount]: number
 }
 
 export const defaultPersistedStateValues: PersistedStateValues = {
@@ -24,5 +25,6 @@ export const defaultPersistedStateValues: PersistedStateValues = {
   [PersistedStateKey.RecentAccessBoard]: '',
   [PersistedStateKey.Invitation]: '',
   [PersistedStateKey.RedirectAfterLogin]: '',
-  [PersistedStateKey.WorkspacesVisibility]: {}
+  [PersistedStateKey.WorkspacesVisibility]: {},
+  [PersistedStateKey.NewNotificationCount]: 0
 }

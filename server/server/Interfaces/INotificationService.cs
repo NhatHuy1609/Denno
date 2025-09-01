@@ -7,6 +7,7 @@ namespace server.Interfaces
     public interface INotificationService
     {
         Task MarkNotificationAsReadAsync(int notificationId, string userId);
+        Task MarkNotificationAsUnReadAsync(int notificationId, string userId);
         Task MarkAllNotificationsAsReadAsync(string userId);
         Task<List<INotificationResponseDto>> GetUserNotificationResponseDtos(string userId);
     }

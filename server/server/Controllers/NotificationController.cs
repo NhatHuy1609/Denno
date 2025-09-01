@@ -32,7 +32,7 @@ namespace server.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        [HttpPut("[controller]/{notificationId}/read")]
+        [HttpPut("{notificationId}/read")]
         public async Task<IActionResult> MarkAsReadNotificationAsync(int notificationId)
         {
             var userId = _authService.GetCurrentUserId();
@@ -42,7 +42,17 @@ namespace server.Controllers
             return NoContent();
         }
 
-        [HttpPut("[controller]/markAllRead")]
+        [HttpPut("{notificationId}/unread")]
+        public async Task<IActionResult> MarkAsUnReadNotificationAsync(int notificationId)
+        {
+            var userId = _authService.GetCurrentUserId();
+
+            await _notificationService.MarkNotificationAsUnReadAsync(notificationId, userId);
+
+            return NoContent();
+        }
+
+        [HttpPut("readAll")]
         public async Task<IActionResult> MarkAllNotificationsAsReadAsync()
         {
             var userId = _authService.GetCurrentUserId();
