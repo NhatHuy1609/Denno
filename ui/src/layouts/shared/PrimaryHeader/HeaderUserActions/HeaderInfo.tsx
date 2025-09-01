@@ -1,20 +1,26 @@
 import React from 'react'
 import { Popover } from '@/ui'
 import { HeaderPopupItem } from '../types'
+import PopoverActionWrapper from '@/app/_components/PopoverActionWrapper'
 
 function HeaderInfoItem({ item }: { item: HeaderPopupItem }) {
   const { triggerItem, activeItem } = item
   return (
-    <Popover.Popover>
-      <Popover.Trigger>
-        <div className='flex size-8 items-center justify-center rounded-full hover:bg-[var(--ds-button-hovered)]'>
+    <PopoverActionWrapper
+      renderTrigger={() => (
+        <button
+          type='button'
+          className='flex size-8 items-center justify-center rounded-full hover:bg-[var(--ds-button-hovered)]'
+        >
           {triggerItem}
-        </div>
-      </Popover.Trigger>
-      <Popover.Content align='end' className='w-fit'>
-        {activeItem}
-      </Popover.Content>
-    </Popover.Popover>
+        </button>
+      )}
+      renderContent={() => activeItem}
+      contentConfigs={{
+        align: 'end'
+      }}
+      contentClassName='w-fit p-0'
+    />
   )
 }
 

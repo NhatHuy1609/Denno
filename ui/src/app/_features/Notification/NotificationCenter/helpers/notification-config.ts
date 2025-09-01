@@ -185,7 +185,7 @@ const notificationConfig: Record<NotifiableActionType, NotificationConfigItem> =
           {
             type: 'text',
             content: isWorkspaceMember
-              ? ". They are not a member of the board's Workspace"
+              ? ". They are not a member of the board's Workspace "
               : ". They are already a member of the board's Workspace "
           },
           {

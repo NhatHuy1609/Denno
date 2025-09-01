@@ -15,7 +15,7 @@ function NotificationContent({ content }: Props) {
     return description.map((part, index) => {
       if (part.type === 'text') {
         return (
-          <span key={index} className='text-sm'>
+          <span key={index} className='text-sm leading-none'>
             {part.content}
           </span>
         )
@@ -23,7 +23,7 @@ function NotificationContent({ content }: Props) {
 
       if (part.type === 'entity') {
         return (
-          <Link key={index} href={part.entity.url || ''} className='text-sm text-blue-600 hover:underline'>
+          <Link key={index} href={part.entity.url || ''} className='text-sm leading-none text-blue-600 hover:underline'>
             {part.entity.name}
           </Link>
         )
@@ -38,7 +38,7 @@ function NotificationContent({ content }: Props) {
         <span className='text-sm font-bold'>{initiator.name}</span>
       </div>
       <div className='pl-8'>
-        <div className='w-fit'>{renderDescription()}</div>
+        <div className='inline-block items-baseline gap-x-1 leading-tight'>{renderDescription()}</div>
         <div className='mt-1 text-xs text-slate-500'>{date}</div>
         {actionButton && (
           <div className='mt-2 w-fit'>

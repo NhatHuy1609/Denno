@@ -35,7 +35,9 @@ export const EntityIcons: Partial<Record<EntityType, ReactNode>> = {
 
 export function getEntityIcon(type: EntityType, imageUrl?: string): ReactNode {
   if (type === 'board' && imageUrl) {
-    return <Image src={imageUrl} width={32} height={24} alt='board' className='aspect-[2/3] w-8' />
+    return (
+      <Image src={imageUrl} width={32} height={24} alt='board' className='aspect-[3/2] w-9 rounded-sm' loading='lazy' />
+    )
   }
 
   return EntityIcons[type]
