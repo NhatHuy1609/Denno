@@ -11,6 +11,7 @@ import {
   CreateBoardJoinRequestDto,
   DetailedBoardInvitationSecretResponseDto,
   UpdateBoardMemberRoleRequestDto,
+  UpdateBoardRequestDto,
   VerifyBoardInvitationSecretRequestDto
 } from './board.types'
 import {
@@ -20,6 +21,7 @@ import {
   CreateBoardInvitationSecretDtoSchema,
   CreateBoardJoinRequestDtoSchema,
   UpdateBoardMemberRoleRequestDtoSchema,
+  UpdateBoardRequestDtoSchema,
   VerifyBoardInvitationSecretRequestDtoSchema
 } from './board.contracts'
 import { boardTypesDto } from '.'
@@ -29,6 +31,17 @@ import { JoinBoardByLinkActionResponseDto } from '../action/action.types'
 
 export class BoardService {
   private static readonly basePath = '/boards'
+
+  static updateBoard(
+    boardId: string,
+    data: {
+      updateBoardDto: UpdateBoardRequestDto
+    }
+  ) {
+    const updateBoardDto = AxiosContracts.requestContract(UpdateBoardRequestDtoSchema, data.updateBoardDto)
+
+    return httpPut(`${this.basePath}/${boardId}`, updateBoardDto)
+  }
 
   static createBoardMutation(data: { createBoardDto: CreateBoardDto }) {
     const createBoardDto = AxiosContracts.requestContract(CreateBoardDtoSchema, data.createBoardDto)
