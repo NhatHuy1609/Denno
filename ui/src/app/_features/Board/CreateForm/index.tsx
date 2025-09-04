@@ -19,7 +19,11 @@ import BoardBackgroundSelectionDisplay from './BoardBackgroundSelectionDisplay'
 
 type FormValues = boardTypesDto.CreateBoardDto
 
-function BoardCreateForm() {
+type Props = {
+  selectedWorkspaceId?: string
+}
+
+function BoardCreateForm({ selectedWorkspaceId }: Props) {
   const { data: userWorkspaces = [] } = useCurrentUserWorkspacesQuery({})
 
   const {
@@ -34,7 +38,11 @@ function BoardCreateForm() {
     defaultValues: {
       name: '',
       visibility: 'Workspace',
-      workspaceId: getLocalStorageItem(PersistedStateKey.RecentAccessWorkspace) || userWorkspaces[0].id || '',
+      workspaceId:
+        selectedWorkspaceId ||
+        getLocalStorageItem(PersistedStateKey.RecentAccessWorkspace) ||
+        userWorkspaces[0].id ||
+        '',
       background: PHOTOS_BACKGROUND[0].url
     },
     resolver: zodResolver(boardContractsDto.CreateBoardDtoSchema)

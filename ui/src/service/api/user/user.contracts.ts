@@ -1,5 +1,7 @@
 import { z } from 'zod'
 import { createPaginatedResultSchema } from '../_models/pagination'
+import { boardContractsDto } from '../board'
+import { BoardResponseDtoSchema } from '../board/board.contracts'
 
 // Response Schemas
 export const GetUserResponseDtoSchema = z
@@ -41,3 +43,8 @@ export const UserWorkspacesResponseDtoSchema = z
     })
   )
   .describe('UserWorkspacesResponseDtoSchema')
+
+export const UserBoardsResponseDtoSchema = z.object({
+  boards: z.array(z.lazy(() => boardContractsDto.BoardResponseDtoSchema)),
+  starredBoards: z.array(z.lazy(() => boardContractsDto.BoardResponseDtoSchema))
+})

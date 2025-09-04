@@ -135,11 +135,6 @@ namespace server.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> UpdateWorkspaceBasicInformationAsync(Guid workspaceId, [FromBody] UpdateWorkspaceRequestDto request)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
-
             var updatedWorkspace = await _unitOfWork.Workspaces.GetByIdAsync(workspaceId, w => w.Logo);
 
             if (updatedWorkspace == null)
@@ -150,16 +145,19 @@ namespace server.Controllers
                 });
             }
 
-            updatedWorkspace.Name = request.Name;
-            
-            if (!string.IsNullOrEmpty(request.Description))
+            if (!string.IsNullOrWhiteSpace(request.Name))
             {
-                updatedWorkspace.Description = request.Description;
+                updatedWorkspace.Name = request.Name;
             }
 
             if (request.Visibility != null)
             {
                 updatedWorkspace.Visibility = request.Visibility.Value;
+            }
+
+            if (request.Description != null)
+            {
+                updatedWorkspace.Description = request.Description;
             }
 
             _unitOfWork.Complete();

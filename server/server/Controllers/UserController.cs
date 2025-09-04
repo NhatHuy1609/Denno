@@ -50,9 +50,25 @@ namespace server.Controllers
             _boardService = boardService;
         }
 
+        [HttpGet("[controller]/{userId}/boards")]
+        public async Task<IActionResult> GetUserBoardsAsync(string userId, [FromQuery] UserBoardsQueryModel query)
+        {
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest(new ApiErrorResponse()
+                {
+                    StatusMessage = "userId can not be null"
+                });
+            }
+
+            var userBoardsResponse = await _userService.GetUserBoardsResponseAsync(userId, query);
+
+            return Ok(userBoardsResponse);
+        }
+
         [HttpGet]
         [Route("[controller]/{userId}/joinedBoards")]
-        public async Task<IActionResult> GetJoinedBoardsAsync(string userId,[FromQuery] UserJoinedBoardQueryModel query)
+        public async Task<IActionResult> GetJoinedBoardsAsync(string userId, [FromQuery] UserJoinedBoardQueryModel query)
         {
             if (string.IsNullOrEmpty(userId))
             {

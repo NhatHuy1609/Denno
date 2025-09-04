@@ -15,9 +15,9 @@ export const CreateWorkspaceDtoSchema = z
 
 export const UpdateWorkspaceDtoSchema = z
   .object({
-    name: z.string({ required_error: 'Name required!' }).min(1),
-    description: z.string(),
-    visibility: enumContracts.WorkspaceVisibilityEnumSchema
+    name: z.string().nullable().optional(),
+    description: z.string().nullable().optional(),
+    visibility: enumContracts.WorkspaceVisibilityEnumSchema.nullable().optional()
   })
   .describe('UpdateWorkspaceDtoSchema')
 

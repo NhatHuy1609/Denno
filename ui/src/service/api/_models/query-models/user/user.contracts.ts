@@ -23,3 +23,9 @@ export const UserJoinedBoardQueryDtoSchema = z
     workspaceId: z.string().optional()
   })
   .describe('UserJoinedBoardQueryDtoSchema')
+
+export const UserBoardsQueryDtoSchema = z
+  .object({
+    starredBoards: z.boolean().optional()
+  })
+  .describe('UserBoardsQueryDtoSchema')

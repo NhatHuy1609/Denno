@@ -15,6 +15,10 @@ export type PersistedStateValues = {
     }
   >
   [PersistedStateKey.NewNotificationCount]: number
+  [PersistedStateKey.RecentBoards]: {
+    id: string
+    accessTime: string
+  }[]
 }
 
 export const defaultPersistedStateValues: PersistedStateValues = {
@@ -26,5 +30,6 @@ export const defaultPersistedStateValues: PersistedStateValues = {
   [PersistedStateKey.Invitation]: '',
   [PersistedStateKey.RedirectAfterLogin]: '',
   [PersistedStateKey.WorkspacesVisibility]: {},
-  [PersistedStateKey.NewNotificationCount]: 0
+  [PersistedStateKey.NewNotificationCount]: 0,
+  [PersistedStateKey.RecentBoards]: []
 }

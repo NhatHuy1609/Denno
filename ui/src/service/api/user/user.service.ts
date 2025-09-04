@@ -1,6 +1,7 @@
 import { httpGet } from '../_req'
-import { GetUserResponseDto, UsersResponseDto, UserWorkspacesResponseDto } from './user.types'
+import { GetUserResponseDto, UserBoardsResponseDto, UsersResponseDto, UserWorkspacesResponseDto } from './user.types'
 import {
+  UserBoardsQueryDto,
   UserJoinedBoardQueryDto,
   UsersQueryParamsDto,
   UserWorkspacesQueryParamsDto
@@ -32,5 +33,15 @@ export class UserService {
     config?: { signal?: AbortSignal; params?: UserJoinedBoardQueryDto }
   ) {
     return httpGet<BoardResponseDto[]>(`${this.basePath}/${data.userId}/joinedBoards`, config)
+  }
+
+  static userBoardsQuery(
+    userId: string,
+    config?: {
+      signal?: AbortSignal
+      params?: UserBoardsQueryDto
+    }
+  ) {
+    return httpGet<UserBoardsResponseDto>(`${this.basePath}/${userId}/boards`, config)
   }
 }

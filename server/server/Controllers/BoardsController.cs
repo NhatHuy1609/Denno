@@ -76,7 +76,32 @@ namespace server.Controllers
                 });
             }
 
-            _logger.LogInformation($"Successfully updated StarredStatus of board-{boardId}");
+            _logger.LogInformation($"Successfully starred board-{boardId}");
+            return Ok();
+        }
+
+        [HttpPut("[controller]/{boardId}/unstar")]
+        public async Task<IActionResult> UnstarBoardAsync(Guid boardId)
+        {
+            if (boardId == Guid.Empty)
+            {
+                return BadRequest(new ApiErrorResponse()
+                {
+                    StatusMessage = "boardId can not be null"
+                });
+            }
+
+            var updatedResult = await _boardService.UnstarBoardAsync(boardId);
+
+            if (updatedResult.IsFailure)
+            {
+                return BadRequest(new ApiErrorResponse()
+                {
+                    StatusMessage = updatedResult.Error.Description
+                });
+            }
+
+            _logger.LogInformation($"Successfully unstarred board-{boardId}");
             return Ok();
         }
 

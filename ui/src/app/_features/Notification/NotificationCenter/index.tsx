@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useUserNotifications } from '@/app/_hooks/query/user/useUserNotifications'
 import { getLocalStorageItem } from '@/utils/local-storage'
 import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
