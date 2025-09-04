@@ -1,5 +1,4 @@
 import React from 'react'
-import { Popover } from '@/ui'
 import { HeaderPopupItem } from '../types'
 import PopoverActionWrapper from '@/app/_components/PopoverActionWrapper'
 

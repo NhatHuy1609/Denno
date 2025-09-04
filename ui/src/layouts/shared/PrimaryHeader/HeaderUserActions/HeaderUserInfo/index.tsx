@@ -7,14 +7,7 @@ function HeaderUserInfo() {
   const { data: loggedInUserData } = useMe()
   const { avatar = '' } = loggedInUserData || {}
 
-  return (
-    <Avatar
-      size='sm'
-      src={avatar || ''}
-      name='user-avatar'
-      fallback={!avatar && DefaultAvatarUser}
-    />
-  )
+  return <Avatar size='sm' src={avatar || ''} name='user-avatar' fallback={!avatar && DefaultAvatarUser} />
 }
 
 export default HeaderUserInfo
