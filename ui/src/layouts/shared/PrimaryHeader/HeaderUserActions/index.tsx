@@ -5,6 +5,7 @@ import { HeaderPopupItem } from '../types'
 import HeaderUserInfo from './HeaderUserInfo'
 import UserNotifications from './HeaderUserNotifications/UserNotifications'
 import UserNotificationBell from './HeaderUserNotifications/UserNotificationBell'
+import HeaderUserInfoPanel from './HeaderUserInfo/HeaderUserInfoPanel'
 
 function HeaderUserActions() {
   const infoList: HeaderPopupItem[] = [
@@ -12,7 +13,7 @@ function HeaderUserActions() {
       triggerItem: <UserNotificationBell />,
       activeItem: <UserNotifications />
     },
-    { triggerItem: <HeaderUserInfo /> }
+    { triggerItem: <HeaderUserInfo />, activeItem: <HeaderUserInfoPanel /> }
   ]
 
   return (

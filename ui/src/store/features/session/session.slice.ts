@@ -31,7 +31,7 @@ export const sessionSlice = createSlice({
   name: 'session',
   initialState,
   reducers: {
-    updateEntireSession: (state, action: PayloadAction<{session: Session, currentUser: CurrentUser}>) => {
+    updateEntireSession: (state, action: PayloadAction<{ session: Session; currentUser: CurrentUser }>) => {
       const { session, currentUser } = action.payload
       state.session = session
       state.currentUser = currentUser
@@ -43,10 +43,29 @@ export const sessionSlice = createSlice({
     updateCurrentUser: (state, action: PayloadAction<Partial<CurrentUser>>) => {
       const latestData = { ...state.currentUser, ...action.payload }
       state.currentUser = latestData
+    },
+    clearSession: (state) => {
+      state.session = {
+        token: '',
+        refreshToken: ''
+      }
+      state.currentUser = {
+        id: '',
+        email: '',
+        avatar: '',
+        fullName: '',
+        userName: '',
+        jobTitle: '',
+        department: '',
+        basedIn: '',
+        organization: '',
+        coverImage: '',
+        userVisibilitySettings: null
+      }
     }
   }
 })
 
 export default sessionSlice.reducer
 
-export const { updateEntireSession, updateSession, updateCurrentUser } = sessionSlice.actions
+export const { updateEntireSession, updateSession, updateCurrentUser, clearSession } = sessionSlice.actions
