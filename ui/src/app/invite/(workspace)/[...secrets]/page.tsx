@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { setLocalStorageItem } from '@/utils/local-storage'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { setFixLoading } from '@/ui'
 import { useMe } from '@/app/_hooks/query/user/useMe'
 import { useParams, useRouter } from 'next/navigation'
@@ -27,12 +27,9 @@ function WorkspaceInvitePage() {
   const [isCheckingAlreadyMemberDone, setIsCheckingAlreadyMemberDone] = useState(false)
   // Get the workspace data and current user data so we can check if the current user is already a member of the invited workspace
   const { data: currentUser, isLoading: isLoadingCurrentUser } = useMe()
-  const { data: workspaceMembers, isLoading: isLoadingWorkspaceMembers } = useWorkspaceQuery(
-    workspaceId,
-    {
-      members: true
-    }
-  )
+  const { data: workspaceMembers, isLoading: isLoadingWorkspaceMembers } = useWorkspaceQuery(workspaceId, {
+    members: true
+  })
 
   const { mutate: verifyInvitationSecret } = useVerifyWorkspaceInvitationSecret({
     onMutate: () => {

@@ -1,22 +1,27 @@
+// Cài đặt: npm install path-to-regexp@^6.0.0
+
 import React, { ReactNode } from 'react'
 import { cn } from '@/lib/styles/utils'
 import Link from 'next/link'
-import { HiHome } from 'react-icons/hi2'
-import { HiTemplate, HiViewBoards } from 'react-icons/hi'
+import { HiViewBoards } from 'react-icons/hi'
 import { usePathname } from 'next/navigation'
+import { match } from 'path-to-regexp' // ✅ dùng match thay vì pathToRegexp
+import { useMe } from '@/app/_hooks/query/user/useMe'
 
 interface NavItem {
   title: string
-  icon?: ReactNode
-  iconActive?: ReactNode
+  icon: ReactNode
   href: string
+  matchPath: string
 }
 
 function SidebarHomeNavItem({ item }: { item: NavItem }) {
   const pathName = usePathname()
-  const { icon: IconComp, iconActive: IconActiveComp, href, title } = item
+  const { icon, href, title, matchPath } = item
 
-  const isActive = pathName.includes(title.toLowerCase())
+  // Create matcher function to check if current path matches
+  const matcher = match(matchPath, { decode: decodeURIComponent })
+  const isActive = matcher(pathName) !== false
 
   return (
     <Link
@@ -26,43 +31,30 @@ function SidebarHomeNavItem({ item }: { item: NavItem }) {
         isActive && 'bg-[#e9f2ff] hover:bg-[#e9f2ff]'
       )}
     >
-      {isActive ? IconActiveComp : IconComp}
-      <span className={cn('text-sm font-medium text-slate-800', isActive && 'text-blue-600')}>
-        {title}
-      </span>
+      {React.cloneElement(icon as React.ReactElement, {
+        className: cn('text-sm', isActive ? 'text-blue-600' : 'text-gray-600')
+      })}
+      <span className={cn('text-sm font-medium text-slate-800', isActive && 'text-blue-600')}>{title}</span>
     </Link>
   )
 }
 
 function SidebarHomeNav() {
-  const iconClass = 'text-sm text-gray-600'
-  const iconActiveClass = 'text-sm text-blue-600'
+  const { data: { userName: currentUserName } = {} } = useMe()
 
   const navItems: NavItem[] = [
     {
       title: 'Boards',
-      icon: <HiViewBoards className={iconClass} />,
-      iconActive: <HiViewBoards className={iconActiveClass} />,
-      href: '/'
-    },
-    {
-      title: 'Templates',
-      icon: <HiTemplate className={iconClass} />,
-      iconActive: <HiTemplate className={iconActiveClass} />,
-      href: '/'
-    },
-    {
-      title: 'Home',
-      icon: <HiHome className={iconClass} />,
-      iconActive: <HiHome className={iconActiveClass} />,
-      href: '/'
+      icon: <HiViewBoards />,
+      href: `/u/${currentUserName}/boards`,
+      matchPath: '/u/:userName/boards'
     }
   ]
 
   return (
     <ul className='flex list-none flex-col gap-1'>
-      {navItems.map((item, index) => (
-        <li key={index}>
+      {navItems.map((item) => (
+        <li key={item.title}>
           <SidebarHomeNavItem item={item} />
         </li>
       ))}

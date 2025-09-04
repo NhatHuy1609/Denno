@@ -11,6 +11,7 @@ using server.Dtos.Response.Workspace;
 using server.Entities;
 using server.Helpers;
 using server.Hubs.NotificationHub;
+using server.Hubs.WorkspaceHub;
 using server.Interfaces;
 using server.Models.Query;
 using server.Strategies.ActionStrategy.Contexts;
@@ -34,6 +35,7 @@ namespace server.Controllers
         private readonly IEmailService _emailService;
         private readonly IWorkspaceService _workspaceService;
         private readonly INotificationRealtimeService _notificationRealtimeService;
+        private readonly IHubContext<WorkspaceHub, IWorkspaceHubClient> _workspaceHubContext;
         private readonly IHubContext<NotificationHub, INotificationHubClient> _hubContext;
 
         public WorkspacesController(
@@ -46,6 +48,7 @@ namespace server.Controllers
             IEmailService emailService,
             IWorkspaceService workspaceService,
             INotificationRealtimeService notificationRealtimeService,
+            IHubContext<WorkspaceHub, IWorkspaceHubClient> workspaceHubContext,
             IHubContext<NotificationHub, INotificationHubClient> hubContext)
         {
             _unitOfWork = unitOfWork;
@@ -56,6 +59,7 @@ namespace server.Controllers
             _emailService = emailService;
             _workspaceService = workspaceService;
             _notificationRealtimeService = notificationRealtimeService;
+            _workspaceHubContext = workspaceHubContext;
             _mapper = mapper;
             _hubContext = hubContext;
         }
@@ -131,11 +135,6 @@ namespace server.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> UpdateWorkspaceBasicInformationAsync(Guid workspaceId, [FromBody] UpdateWorkspaceRequestDto request)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
-
             var updatedWorkspace = await _unitOfWork.Workspaces.GetByIdAsync(workspaceId, w => w.Logo);
 
             if (updatedWorkspace == null)
@@ -146,8 +145,20 @@ namespace server.Controllers
                 });
             }
 
-            updatedWorkspace.Name = request.Name;
-            updatedWorkspace.Description = request.Description;
+            if (!string.IsNullOrWhiteSpace(request.Name))
+            {
+                updatedWorkspace.Name = request.Name;
+            }
+
+            if (request.Visibility != null)
+            {
+                updatedWorkspace.Visibility = request.Visibility.Value;
+            }
+
+            if (request.Description != null)
+            {
+                updatedWorkspace.Description = request.Description;
+            }
 
             _unitOfWork.Complete();
 
@@ -454,6 +465,7 @@ namespace server.Controllers
             if (action != null)
             {
                 await _emailService.SendActionEmailAsync(action);
+                await _notificationRealtimeService.SendActionNotificationToUsersAsync(action);
             }
 
             return Ok();
@@ -483,9 +495,144 @@ namespace server.Controllers
             if (action != null)
             {
                 await _emailService.SendActionEmailAsync(action);
+                await _notificationRealtimeService.SendActionNotificationToUsersAsync(action);
             }
 
             return Ok();
+        }
+
+        [HttpPut]
+        [Route("[controller]/{workspaceId}/members/{memberId}/role")]
+        public async Task<IActionResult> UpdateWorkspaceMemberRoleAsync(
+            [FromRoute] Guid workspaceId,
+            [FromRoute] string memberId,
+            UpdateWorkspaceMemberRoleRequest request)
+        {
+            if (!ModelState.IsValid || workspaceId == Guid.Empty || string.IsNullOrEmpty(memberId))
+            {
+                return BadRequest(new ApiErrorResponse()
+                {
+                    StatusMessage = "Request or Route params are not valid"
+                });
+            }
+
+            var userId = _authService.GetCurrentUserId();
+
+            var actionContext = new UpdateWorkspaceMemberRoleActionContext()
+            {
+                MemberCreatorId = userId,
+                WorkspaceId = workspaceId,
+                TargetUserId = memberId,
+                NewMemberRole = request.NewMemberRole
+            };
+
+            var action = await _actionService.CreateActionAsync(ActionTypes.UpdateWorkspaceMemberRole, actionContext);
+
+            if (action != null)
+            {
+                await _workspaceService.NotifyUserActionToWorkspaceMembers(action, workspaceId);
+                await _notificationRealtimeService.SendActionNotificationToUsersAsync(action);
+            }
+
+            return Ok();
+        }
+
+        [HttpDelete]
+        [Route("[controller]/{workspaceId}/members/{memberId}")]
+        public async Task<IActionResult> RemoveWorkspaceMemberAsync(
+            [FromRoute] Guid workspaceId,
+            [FromRoute] string memberId,
+            [FromBody] RemoveWorkspaceMemberDto request)
+        {
+            if (workspaceId == Guid.Empty || string.IsNullOrEmpty(memberId))
+            {
+                return BadRequest(new ApiErrorResponse()
+                {
+                    StatusMessage = "workspaceId and memberId can not be null"
+                });
+            }
+
+            var userId = _authService.GetCurrentUserId();
+
+            var actionContext = new RemoveWorkspaceMemberActionContext()
+            {
+                MemberCreatorId = userId,
+                WorkspaceId = workspaceId,
+                TargetUserId = memberId,
+                DeleteRelatedBoardMembers = request.DeleteRelatedBoardMembers
+            };
+
+            var action = await _actionService.CreateActionAsync(ActionTypes.RemoveWorkspaceMember, actionContext);
+
+            if (action != null)
+            {
+                await _notificationRealtimeService.SendActionNotificationToUsersAsync(action);
+                await _workspaceHubContext
+                    .Clients
+                    .Users([memberId, userId])
+                    .OnWorkspaceMemberRemoved(memberId, userId, workspaceId, actionContext.DeleteRelatedBoardMembers);
+            }
+
+            return Ok();
+        }
+
+        [HttpDelete("[controller]/{workspaceId}/guests/{userId}")]
+        public async Task<IActionResult> RemoveWorkspaceGuestAsync(
+            [FromRoute] Guid workspaceId,
+            [FromRoute] string userId)
+        {
+            if (workspaceId == Guid.Empty || string.IsNullOrEmpty(userId))
+            {
+                return BadRequest(new ApiErrorResponse()
+                {
+                    StatusMessage = "workspaceId or userId can not be null"
+                });
+            }
+
+            var currentUserId = _authService.GetCurrentUserId();
+
+            var actionContext = new DennoActionContext()
+            {
+                MemberCreatorId = currentUserId,
+                TargetUserId = userId,
+                WorkspaceId = workspaceId,
+            };
+
+            var action = await _actionService.CreateActionAsync(ActionTypes.RemoveWorkspaceGuest, actionContext);
+
+            if (action != null)
+            {
+                await _notificationRealtimeService.SendActionNotificationToUsersAsync(action);
+            }
+
+            return Ok();
+        }
+
+
+        [HttpDelete]
+        [Route("[controller]/{workspaceId}/leave")]
+        public async Task<IActionResult> LeaveWorkspace([FromRoute] Guid workspaceId)
+        {
+            if (workspaceId == Guid.Empty)
+            {
+                return BadRequest(new ApiErrorResponse()
+                {
+                    StatusMessage = "WorkspaceId can not be null"
+                });
+            }
+
+            var userId = _authService.GetCurrentUserId();
+            var isSuccessful = await _workspaceService.LeaveWorkspaceAsync(workspaceId, userId);
+
+            if (isSuccessful)
+            {
+                await _workspaceHubContext
+                    .Clients
+                    .Groups(SignalRGroupNames.GetWorkspaceGroupName(workspaceId))
+                    .OnWorkspaceMemberLeft(userId, workspaceId);
+            }
+
+            return NoContent();
         }
     }
 }

@@ -2,7 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import { useBoardsByWorkspace } from '@/app/_hooks/query'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { getLocalStorageItem } from '@/utils/local-storage'
 import { boardSchemas } from '@/entities/board'
 import { FaAngleDown, FaAngleUp } from 'react-icons/fa6'
@@ -31,12 +31,20 @@ function UserBoardItem({ boardItem }: { boardItem: boardSchemas.Board }) {
 }
 
 function UserBoardsList() {
-  const [workspaceId, setRecentAccessWorkspaceId] = useSyncedLocalStorage(PersistedStateKey.RecentAccessWorkspace, '')
+  const [workspaceId] = useSyncedLocalStorage(PersistedStateKey.RecentAccessWorkspace, '')
+  const [workspacesVisibility, setWorkspacesVisibility] = useSyncedLocalStorage(PersistedStateKey.WorkspacesVisibility)
+
   const { data: boards = [] } = useBoardsByWorkspace(workspaceId)
+
+  // Get current workspace visibility settings
+  const currentWorkspaceVisibility = workspacesVisibility[workspaceId] || {
+    isShowMoreBoardsInSidebar: false
+  }
 
   const [boardQuantityToDisplay, setBoardQuantityToDisplay] = useState<number>(() =>
     Math.min(boards.length, MAX_QUANTITY_CAN_BE_DISPLAYED)
   )
+
   // Update boardQuantityToDisplay when boards change
   useEffect(() => {
     setBoardQuantityToDisplay((prev) =>
@@ -44,16 +52,51 @@ function UserBoardsList() {
     )
   }, [boards])
 
+  // Update boardQuantityToDisplay when boards or visibility settings change
+  useEffect(() => {
+    const shouldShowMore = currentWorkspaceVisibility.isShowMoreBoardsInSidebar
+
+    if (shouldShowMore) {
+      setBoardQuantityToDisplay(boards.length)
+    } else {
+      setBoardQuantityToDisplay(Math.min(boards.length, MAX_QUANTITY_CAN_BE_DISPLAYED))
+    }
+  }, [boards, currentWorkspaceVisibility.isShowMoreBoardsInSidebar])
+
   const isShowingMore = boardQuantityToDisplay > MAX_QUANTITY_CAN_BE_DISPLAYED
   const isShowMoreButton = boards.length > MAX_QUANTITY_CAN_BE_DISPLAYED && !isShowingMore
   const isShowLessButton = isShowingMore
 
   const handleShowMoreBoard = () => {
     setBoardQuantityToDisplay(boards.length)
+
+    // Update visibility for workspace with id is workspaceId
+    setWorkspacesVisibility((prev) => {
+      const prevVisibility = prev[workspaceId]
+      return {
+        ...prev,
+        [workspaceId]: {
+          ...prevVisibility,
+          isShowMoreBoardsInSidebar: true
+        }
+      }
+    })
   }
 
   const handleShowLessBoard = () => {
     setBoardQuantityToDisplay(MAX_QUANTITY_CAN_BE_DISPLAYED)
+
+    // Update visibility for workspace with id is workspaceId
+    setWorkspacesVisibility((prev) => {
+      const prevVisibility = prev[workspaceId]
+      return {
+        ...prev,
+        [workspaceId]: {
+          ...prevVisibility,
+          isShowMoreBoardsInSidebar: false
+        }
+      }
+    })
   }
 
   return (

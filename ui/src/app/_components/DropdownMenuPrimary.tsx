@@ -1,10 +1,11 @@
-import React, { ReactNode, useRef, useState } from 'react'
+import React, { ReactNode, useEffect, useRef, useState } from 'react'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuLabel,
-  DropdownMenuItem
+  DropdownMenuItem,
+  DropdownMenuSeparator
 } from '@radix-ui/react-dropdown-menu'
 import CustomizableButton from '@/ui/components/CustomizableButton'
 import { FaAngleDown } from 'react-icons/fa6'
@@ -43,6 +44,10 @@ export default function DropdownMenuPrimary<T>({
   const [isOpen, setIsOpen] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState<number>(defaultSelectedIndex)
 
+  useEffect(() => {
+    setSelectedIndex(defaultSelectedIndex)
+  }, [defaultSelectedIndex])
+
   const handleSelectItem = (index: number) => {
     const selectedItem = items[index]
     if (!selectedItem || !selectedItem.value || !selectedItem.available) {
@@ -57,7 +62,7 @@ export default function DropdownMenuPrimary<T>({
 
   return (
     <DropdownMenu onOpenChange={setIsOpen} open={isOpen}>
-      <DropdownMenuTrigger asChild disabled={disabled} className={cn('min-w-32 justify-center', triggerClassName)}>
+      <DropdownMenuTrigger asChild disabled={disabled} className={cn('justify-center', triggerClassName)}>
         <CustomizableButton
           autoFocus={isOpen}
           size='medium'
@@ -72,7 +77,11 @@ export default function DropdownMenuPrimary<T>({
       <DropdownMenuContent
         className={cn('min-w-78 z-[999] max-w-[320px] rounded-md bg-white py-2 shadow-lg', contentClassName)}
       >
-        {contentTitle && <DropdownMenuLabel title={contentTitle} />}
+        {contentTitle && (
+          <DropdownMenuLabel className='py-2 text-center text-sm font-medium text-slate-700'>
+            {contentTitle}
+          </DropdownMenuLabel>
+        )}
         {items.map((item, index) => (
           <DropdownMenuItem key={index} className='hover:outline-none' onSelect={() => handleSelectItem(index)}>
             {/* Render value and description if value is not empty */}

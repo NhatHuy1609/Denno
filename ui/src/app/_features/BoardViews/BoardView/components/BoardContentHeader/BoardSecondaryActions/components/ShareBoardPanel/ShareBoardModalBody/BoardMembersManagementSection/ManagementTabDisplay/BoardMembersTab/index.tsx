@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useBoardQuery } from '@/app/_hooks/query'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import WaterFallLoading from '@/app/_components/Loadings/WaterFallLoading'
 import BoardMemberItem from './BoardMemberItem'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
@@ -29,10 +29,16 @@ export default function BoardMembersTab() {
   useEffect(() => {
     if (!signalRService) return
 
-    // Sync board members data when member role changed
-    signalRService.on('board', 'ReceiveMemberRoleChanged', () => {
+    const handleMemberRoleChanged = () => {
       refetch()
-    })
+    }
+
+    // Sync board members data when member role changed
+    signalRService.on('board', 'ReceiveMemberRoleChanged', handleMemberRoleChanged)
+
+    return () => {
+      signalRService.off('board', 'ReceiveMemberRoleChanged', handleMemberRoleChanged)
+    }
   }, [signalRService])
 
   if (isPending) {

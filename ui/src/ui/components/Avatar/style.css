@@ -9,7 +9,7 @@
 }
 
 .avatar-root.size-lg {
-  @apply size-24;
+  @apply size-14;
 }
 
 .avatar-image {

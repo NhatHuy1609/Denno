@@ -5,7 +5,7 @@ import { TbUserShare } from 'react-icons/tb'
 import ShareBoardModalBody from './ShareBoardModalBody'
 import { useBoardQuery } from '@/app/_hooks/query'
 import { getLocalStorageItem } from '@/utils/local-storage'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 
 function ShareBoardPanel() {
   const boardId = getLocalStorageItem(PersistedStateKey.RecentAccessBoard)

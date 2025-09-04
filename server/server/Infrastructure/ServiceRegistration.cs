@@ -12,6 +12,7 @@ using server.Factories;
 using server.Factories.NotificationResponseFactory;
 using server.Hubs.BoardHub;
 using server.Hubs.NotificationHub;
+using server.Hubs.WorkspaceHub;
 using server.Infrastructure.Configurations;
 using server.Infrastructure.Providers;
 using server.Interfaces;
@@ -39,7 +40,6 @@ namespace server.Infrastructure
             services.AddTransient<IWorkspaceRepository, WorkspaceRepository>();
             #endregion
             services.AddTransient<INotificationService, NotificationService>();
-            services.AddTransient<IEmailService, EmailService>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddTransient<IActionService, ActionService>();
             services.AddScoped<IBoardService, BoardService>();
@@ -50,21 +50,17 @@ namespace server.Infrastructure
                 options.UseSqlServer(connectionStringConfigName);
             });
 
-            // Factories
-            services.AddScoped<NotificationResponseFactoryResolver>();
-            services.AddScoped<AddedMemberWorkspaceNotificationResponseFactory>();
-            services.AddScoped<JoinWorkspaceWithLinkNotificationResponseFactory>();
-            services.AddScoped<ApproveWorkspaceJoinRequestNotificationResponseFactory>();
-            services.AddScoped<RejectWorkspaceJoinRequestNotificationResponseFactory>();
-            services.AddScoped<SendWorkspaceJoinRequestNotificationResponseFactory>();
-            services.AddScoped<AddMemberToBoardNotificationResponseFactory>();
-
             // Background services
             services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
             services.AddHostedService<QueueHostedService>();
 
             // Realtime services
+            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<EmailService>();
+
             services.AddScoped<INotificationRealtimeService, NotificationRealtimeService>();
+            services.AddScoped<NotificationRealtimeService>();
+
 
             return services;
         }
@@ -192,6 +188,7 @@ namespace server.Infrastructure
             {
                 endpoints.MapHub<NotificationHub>("hubs/notification");
                 endpoints.MapHub<BoardHub>("hubs/board");
+                endpoints.MapHub<WorkspaceHub>("hubs/workspace");
             });
 
             return app;

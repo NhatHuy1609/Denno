@@ -27,15 +27,15 @@ export interface Workspace {
     idMember: string
     boardCount: number
   }[]
-  members?: {
+  members: {
     id: string
     email: string
     avatar: string
     fullName: string
     memberType: WorkspaceMemberType
   }[]
-  joinRequests?: WorkspaceJoinRequest[]
-  guests?: {
+  joinRequests: WorkspaceJoinRequest[]
+  guests: {
     user: Pick<User, 'id' | 'fullName' | 'email' | 'avatar'>
     joinedBoards: Pick<Board, 'id' | 'name' | 'background'>[]
   }[]

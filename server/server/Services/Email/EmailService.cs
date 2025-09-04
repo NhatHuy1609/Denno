@@ -178,7 +178,7 @@ namespace server.Services.Email
         {
             var recipients = await GetBoardEmailRecipientsAsync(action.Id);
 
-            if (recipients == null || recipients.Count == 0)
+            if (recipients == null || recipients.Count == 0 || recipients.Any(r => !string.IsNullOrEmpty(r)))
             {
                 _logger.LogWarning("No email recipients found for action ID: {ActionId}", action.Id);
                 return;

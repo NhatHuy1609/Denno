@@ -13,7 +13,7 @@ const BoardDto = z.object({
   members: z.array(
     z.object({
       memberId: z.string(),
-      member: userContractsDto.GetUserResponseDtoSchema,
+      member: z.lazy(() => userContractsDto.GetUserResponseDtoSchema),
       boardMemberRole: enumContracts.BoardMemberRoleEnumSchema
     })
   ),
@@ -119,7 +119,7 @@ export const BoardJoinRequestsResponseDtoSchema = z
 
 export const DetailedBoardInvitationSecretResponseDtoSchema = z
   .object({
-    inviter: userContractsDto.GetUserResponseDtoSchema,
+    inviter: z.lazy(() => userContractsDto.GetUserResponseDtoSchema),
     board: BoardResponseDtoSchema
   })
   .describe('DetailedBoardInvitationSecretResponseDtoSchema')

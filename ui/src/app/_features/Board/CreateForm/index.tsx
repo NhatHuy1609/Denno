@@ -1,6 +1,6 @@
 import React from 'react'
 import { getLocalStorageItem } from '@/utils/local-storage'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { queryClient } from '@/lib/react-query/query-client'
 import { BoardQueries } from '@/entities/board'
 import { PHOTOS_BACKGROUND } from '@/data/board-photo-backgrounds'
@@ -19,7 +19,11 @@ import BoardBackgroundSelectionDisplay from './BoardBackgroundSelectionDisplay'
 
 type FormValues = boardTypesDto.CreateBoardDto
 
-function BoardCreateForm() {
+type Props = {
+  selectedWorkspaceId?: string
+}
+
+function BoardCreateForm({ selectedWorkspaceId }: Props) {
   const { data: userWorkspaces = [] } = useCurrentUserWorkspacesQuery({})
 
   const {
@@ -35,7 +39,10 @@ function BoardCreateForm() {
       name: '',
       visibility: 'Workspace',
       workspaceId:
-        getLocalStorageItem(PersistedStateKey.RecentAccessWorkspace) || userWorkspaces[0].id || '',
+        selectedWorkspaceId ||
+        getLocalStorageItem(PersistedStateKey.RecentAccessWorkspace) ||
+        userWorkspaces[0].id ||
+        '',
       background: PHOTOS_BACKGROUND[0].url
     },
     resolver: zodResolver(boardContractsDto.CreateBoardDtoSchema)
@@ -106,15 +113,7 @@ function BoardCreateForm() {
             <VisibilityDropdown />
           </FormGroup>
 
-          <Button
-            block
-            primary
-            size='base'
-            type='submit'
-            title='Create'
-            loading={isPending}
-            disabled={!canSend}
-          />
+          <Button block primary size='base' type='submit' title='Create' loading={isPending} disabled={!canSend} />
         </form>
         <p className='mt-3 text-[11px] text-gray-600'>
           By using images from Unsplash, you agree to their license and Terms of Service

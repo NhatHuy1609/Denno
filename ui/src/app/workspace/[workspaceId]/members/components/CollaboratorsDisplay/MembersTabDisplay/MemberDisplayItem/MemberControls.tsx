@@ -1,8 +1,8 @@
 import React from 'react'
-import BoardAdjustButton from './BoardAdjustButton'
-import RoleAdjustButton from './RoleAdjustButton'
-import UserRemoveButton from './UserRemoveButton'
 import { Workspace } from '@/entities/workspace/workspace.schemas'
+import JoinedBoardAction from './JoinedBoardAction'
+import WorkspaceMemberRoleAdjustAction from './WorkspaceMemberRoleAdjustAction'
+import MemberOtherActions from './MemberOtherActions'
 
 export default function MemberControls({
   member,
@@ -14,10 +14,10 @@ export default function MemberControls({
   const { id, fullName } = member
 
   return (
-    <div className='flex h-8 flex-1 justify-end gap-3'>
-      <BoardAdjustButton userId={id} userName={fullName} boardCount={boardCount} />
-      <RoleAdjustButton />
-      <UserRemoveButton />
+    <div className='grid grid-cols-[auto_auto_auto] justify-items-end gap-3'>
+      <JoinedBoardAction userId={id} userName={fullName} boardCount={boardCount} />
+      <WorkspaceMemberRoleAdjustAction />
+      <MemberOtherActions memberId={id} />
     </div>
   )
 }

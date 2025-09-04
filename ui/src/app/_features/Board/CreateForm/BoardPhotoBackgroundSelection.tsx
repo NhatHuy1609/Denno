@@ -4,6 +4,7 @@ import { PHOTOS_BACKGROUND } from '@/data/board-photo-backgrounds'
 import { useBoardCreateForm } from './context'
 import { FaCheck } from 'react-icons/fa6'
 import type { BoardPhotoBackgroundImage } from '@/data/board-photo-backgrounds'
+import Image from 'next/image'
 
 function PhotoBackgroundSelectionItem({
   item,
@@ -22,15 +23,11 @@ function PhotoBackgroundSelectionItem({
   }
 
   return (
-    <button
-      type='button'
+    <div
       onClick={handleSelectPhotoBackground}
       className='group relative aspect-[3/2] w-full overflow-hidden rounded-sm'
-      style={{
-        backgroundSize: 'cover',
-        backgroundImage: `url(${backgroundUrl})`
-      }}
     >
+      <Image src={backgroundUrl} fill alt={photographerName} loading='lazy' className='absolute inset-0' />
       <div className='absolute inset-0 hidden bg-[rgba(0,0,0,0.2)] group-hover:block'></div>
       {showOwner && (
         <div className='absolute bottom-0 left-0 z-10 hidden w-full p-1 text-left group-hover:block'>
@@ -48,7 +45,7 @@ function PhotoBackgroundSelectionItem({
           <FaCheck className='text-xs text-white' />
         </div>
       )}
-    </button>
+    </div>
   )
 }
 

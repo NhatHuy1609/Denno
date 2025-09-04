@@ -3,5 +3,6 @@
     public interface IBoardHubClient : IBaseHubClient
     {
         Task ReceiveMemberRoleChanged();
+        Task OnBoardMemberRemoved();
     }
 }

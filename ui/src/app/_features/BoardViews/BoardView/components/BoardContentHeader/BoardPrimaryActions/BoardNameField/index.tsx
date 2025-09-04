@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { cn } from '@/lib/styles/utils'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { useBoardQuery } from '@/app/_hooks/query'
 import { useOnClickOutSide } from '@/app/_hooks/useOnClickOutSide'
 import PrimaryInputText from '@/app/_components/PrimaryInputText'

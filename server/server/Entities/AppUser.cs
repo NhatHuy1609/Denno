@@ -22,6 +22,7 @@ namespace server.Entities
 
         public virtual ICollection<WorkspaceMember> WorkspaceMembers { get; set; } = new List<WorkspaceMember>();
 
+
         public virtual ICollection<BoardMember> BoardMembers { get; set; } = new List<BoardMember>();
 
         public virtual ICollection<CardMember> CardMembers { get; set; } = new List<CardMember>();

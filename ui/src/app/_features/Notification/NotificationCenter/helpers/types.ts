@@ -1,7 +1,7 @@
-import { IconType } from "react-icons/lib"
+import { ReactNode } from 'react'
 
 export type NotificationHeaderInfo = {
-  entityIcon: IconType
+  entityIcon: ReactNode
   entityName: string
 }
 
@@ -10,16 +10,24 @@ type NotificationEntity = {
   id: string
   name: string
   url?: string
+  imageUrl?: string
 }
 
 type NotificationTextPart =
-  | { type: "text"; content: string }
-  | { type: "entity"; entity: NotificationEntity }
+  | {
+      type: 'text'
+      content: string
+    }
+  | {
+      type: 'entity'
+      entity: NotificationEntity
+    }
 
 type NotificationDescription = NotificationTextPart[]
 
 export type NotificationContentInfo = {
   initiator: {
+    id: string
     name: string
     avatar: string
   }

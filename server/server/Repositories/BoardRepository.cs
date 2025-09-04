@@ -6,7 +6,7 @@ using server.Models.Query;
 
 namespace server.Repositories;
 
-public class BoardRepository: GenericRepository<Board, Guid>, IBoardRepository
+public class BoardRepository : GenericRepository<Board, Guid>, IBoardRepository
 {
     public BoardRepository(ApplicationDBContext context) : base(context)
     {
@@ -54,5 +54,20 @@ public class BoardRepository: GenericRepository<Board, Guid>, IBoardRepository
             .ToListAsync();
 
         return boards;
+    }
+
+    public async Task<List<BoardMember>> GetWatchingMembersByBoardIdAsync(Guid boardId)
+    {
+        var watchingMembers = await _context.BoardMembers
+               .Where(bm => bm.BoardId == boardId)
+               .Join(
+                       _context.BoardUserSettings.Where(bu => bu.BoardId == boardId && bu.IsWatching),
+                       bm => new { bm.BoardId, UserId = bm.AppUserId },
+                       bu => new { bu.BoardId, bu.UserId },
+                       (bm, bu) => bm
+               )
+               .ToListAsync();
+
+        return watchingMembers;
     }
 }

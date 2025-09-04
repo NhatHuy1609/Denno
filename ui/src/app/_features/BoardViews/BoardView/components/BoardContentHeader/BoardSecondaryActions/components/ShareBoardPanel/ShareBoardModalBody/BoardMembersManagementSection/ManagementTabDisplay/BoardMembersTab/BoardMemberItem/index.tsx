@@ -7,7 +7,7 @@ import { useBoardAssignMemberRole } from '../hooks/useBoardAssignMemberRole'
 import { useAssignableBoardRoles } from '../hooks/useAssignableBoardRoles'
 import DropdownOtherActions from './DropdownOtherActions'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import useUpdateBoardMemberRole from '@/app/_hooks/mutation/board/useUpdateBoardMemberRole'
 import { WorkspaceParticipant } from '../hooks/useWorkspaceMembersWithGuests'
 

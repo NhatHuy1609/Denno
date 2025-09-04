@@ -1,20 +1,27 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using server.Data;
 using server.Dtos.Response.Notification.Interfaces;
-using server.Factories.NotificationResponseFactory;
+using server.Entities;
+using server.Factories.NotificationResponseFactory.Helper;
 using server.Interfaces;
 
 namespace server.Services
 {
     public class NotificationService : INotificationService
     {
+        private readonly ILogger<NotificationService> _logger;
+        private readonly IAuthService _authService;
         private readonly ApplicationDBContext _dbContext;
         private readonly NotificationResponseFactoryResolver _notificationResponseFactoryResolver;
 
         public NotificationService(
+            ILogger<NotificationService> logger,
+            IAuthService authService,
             ApplicationDBContext dbContext,
             NotificationResponseFactoryResolver notificationResponseFactoryResolver)
         {
+            _logger = logger;
+            _authService = authService;
             _dbContext = dbContext;
             _notificationResponseFactoryResolver = notificationResponseFactoryResolver;
         }
@@ -46,6 +53,57 @@ namespace server.Services
             }
 
             return responses;
+        }
+
+        public async Task MarkNotificationAsReadAsync(int notificationId, string userId)
+        {
+            var recipient = await _dbContext.NotificationRecipients
+                .FirstOrDefaultAsync(r => r.NotificationId == notificationId && r.RecipientId == userId);
+
+            if (recipient == null)
+            {
+                _logger.LogError($"Can not find recipient with id-{userId} and notification-{notificationId}");
+                return;
+            }
+
+            recipient.IsRead = true;
+            recipient.DateRead = DateTime.Now;
+
+            await _dbContext.SaveChangesAsync();
+            _logger.LogInformation($"Successfully mark notification-{notificationId} as read");
+        }
+
+        public async Task MarkNotificationAsUnReadAsync(int notificationId, string userId)
+        {
+            var recipient = await _dbContext.NotificationRecipients
+                .FirstOrDefaultAsync(r => r.NotificationId == notificationId && r.RecipientId == userId);
+
+            if (recipient == null)
+            {
+                _logger.LogError($"Can not find recipient with id-{userId} and notification-{notificationId}");
+                return;
+            }
+
+            recipient.IsRead = false;
+
+            await _dbContext.SaveChangesAsync();
+            _logger.LogInformation($"Successfully mark notification-{notificationId} as unread");
+        }
+
+        public async Task MarkAllNotificationsAsReadAsync(string userId)
+        {
+            var unreadNotifications = await _dbContext.NotificationRecipients
+                .Where(r => r.RecipientId == userId)
+                .ToListAsync();
+
+            foreach (var  unreadNotification in unreadNotifications)
+            {
+                unreadNotification.IsRead = true;
+                unreadNotification.DateRead = DateTime.Now;
+            }
+
+            await _dbContext.SaveChangesAsync();
+            _logger.LogInformation($"Successfully mark all notifications of user-{userId} as read");
         }
     }
 }

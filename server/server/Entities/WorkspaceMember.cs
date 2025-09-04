@@ -19,6 +19,8 @@ namespace server.Entities
         [Description("Can view, create and edit Workspace boards, and change settings for the Workspace. Will have admin rights on all boards in this Workspace.")]
         Normal = 0,
         [Description("Can view, create, and edit Workspace boards, but not change settings.")]
-        Admin = 1
+        Admin = 1,
+        [Description("Not a member of the Workspace. Can only participate in boards they are explicitly invited to within this Workspace.")]
+        Guest = 2
     }
 }

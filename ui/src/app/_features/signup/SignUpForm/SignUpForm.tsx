@@ -13,7 +13,7 @@ import { Button, Form, messageError, setFixLoading } from '@/ui'
 import SignInGoogleButton from '../../Signin/SignInForm/SignInGoogleButton'
 import AvatarInput from '@/app/(auth)/sign-up/complete-signup/AvatarInput'
 import { getLocalStorageItem, setLocalStorageItem } from '@/utils/local-storage'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 
 type RegisterUserFormData = authTypesDto.RegisterUserDto
 
@@ -78,9 +78,7 @@ export default function SignUpForm() {
           <Controller
             name='avatar'
             control={control}
-            render={({ field: { onChange, ref } }) => (
-              <AvatarInput size='lg' onChange={onChange} ref={ref} />
-            )}
+            render={({ field: { onChange, ref } }) => <AvatarInput size='lg' onChange={onChange} ref={ref} />}
           />
           <span className='text-sm font-medium text-black'>Choose your avatar</span>
         </div>

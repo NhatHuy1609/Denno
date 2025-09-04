@@ -1,24 +1,28 @@
 import React from 'react'
+import { z } from 'zod'
 import { WorkspaceQueries } from '@/entities/workspace'
 import { queryClient } from '@/lib/react-query/query-client'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { workspaceTypesDto, workspaceContractsDto } from '@/service/api/workspace'
 import { useForm, Controller } from 'react-hook-form'
 import { useWorkspaceQuery } from '@/app/_hooks/query'
 import useUpdateWorkspaceMutation from './workpsaceUpdate.mutation'
 import { Button, Form, toastSuccess } from '@/ui'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 
-const UpdateFormSchema = workspaceContractsDto.UpdateWorkspaceDtoSchema
-type UpdateFormValues = workspaceTypesDto.UpdateWorkspaceDto
+const UpdateFormSchema = z.object({
+  name: z.string({ required_error: 'Name required!' }).min(1),
+  description: z.string().nullable()
+})
+
+type UpdateFormValues = z.infer<typeof UpdateFormSchema>
 
 interface IWorkspaceUpdateFormProps {
   hideFormFn: () => void
 }
 
 function WorkspaceUpdateForm({ hideFormFn }: IWorkspaceUpdateFormProps) {
-  const [workspaceId, setRecentAccessWorkspaceId] = useSyncedLocalStorage(PersistedStateKey.RecentAccessWorkspace, '')
+  const [workspaceId] = useSyncedLocalStorage(PersistedStateKey.RecentAccessWorkspace, '')
   const { data: workspace } = useWorkspaceQuery(workspaceId)
 
   const {
@@ -75,7 +79,7 @@ function WorkspaceUpdateForm({ hideFormFn }: IWorkspaceUpdateFormProps) {
           name='description'
           control={control}
           render={({ field }) => (
-            <Form.Textarea title='Description (optional)' value={field.value} onChange={field.onChange} />
+            <Form.Textarea title='Description (optional)' value={field.value || ''} onChange={field.onChange} />
           )}
         />
 

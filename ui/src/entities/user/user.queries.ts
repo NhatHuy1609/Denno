@@ -7,7 +7,14 @@ import {
 } from './user.lib'
 import { UserWorkspacesQueryParamsDto } from '@/service/api/_models/query-models/user/user.types'
 import { mapToNotifications } from '../notification/notification.lib'
-import { UsersFilterQuery, UserWorkspacesFilterQuery } from './user.schemas'
+import {
+  UserBoardsQuery,
+  UserJoinedBoardsFilterQuery,
+  UsersFilterQuery,
+  UserWorkspacesFilterQuery
+} from './user.schemas'
+import { userLib } from '.'
+import { boardLib } from '../board'
 
 export class UserQueries {
   static readonly keys = {
@@ -60,6 +67,28 @@ export class UserQueries {
       queryFn: async ({ signal }) => {
         const response = await UserService.userNotificationsQuery(userId, { signal })
         return mapToNotifications(response.data)
+      }
+    })
+  }
+
+  static userJoinedBoardsQuery(userId: string, filter?: UserJoinedBoardsFilterQuery) {
+    return queryOptions({
+      queryKey: [...this.keys.root, userId, 'joinedBoards', filter] as unknown[],
+      queryFn: async ({ signal }) => {
+        const queryParams = filter && userLib.mapToUserJoinedBoardQueryDto(filter)
+        const response = await UserService.userJoinedBoardsQuery({ userId }, { signal, params: queryParams })
+        return boardLib.transformBoardsDtoToBoards(response.data)
+      }
+    })
+  }
+
+  static userBoardsQuery(userId: string, filter?: UserBoardsQuery) {
+    return queryOptions({
+      queryKey: [...this.keys.root, userId, 'boards', filter] as unknown[],
+      queryFn: async ({ signal }) => {
+        const queryParams = filter && userLib.mapToUserBoardsQueryDto(filter)
+        const response = await UserService.userBoardsQuery(userId, { signal, params: queryParams })
+        return userLib.mapToUserBoards(response.data)
       }
     })
   }

@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { useMe } from "./query/user/useMe"
-import { PersistedStateKey } from "@/data/persisted-keys"
-import { setLocalStorageItem } from "@/utils/local-storage"
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useMe } from './query/user/useMe'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
+import { setLocalStorageItem } from '@/utils/local-storage'
 
 export const useRequireAuth = (redirectUrl: string = '/sign-in') => {
   const router = useRouter()
@@ -14,13 +14,13 @@ export const useRequireAuth = (redirectUrl: string = '/sign-in') => {
       if (!currentUser) {
         // Store the current URL to redirect to after login
         setLocalStorageItem(PersistedStateKey.RedirectAfterLogin, window.location.href)
-        
+
         router.replace(redirectUrl)
       } else {
         setIsCheckingAuth(false)
       }
     }
-  }, [currentUser, isLoading, router]) 
+  }, [currentUser, isLoading, router])
 
   return { currentUser, isError, isCheckingAuth }
 }
