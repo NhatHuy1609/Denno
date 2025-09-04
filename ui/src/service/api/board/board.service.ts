@@ -134,4 +134,12 @@ export class BoardService {
 
     return httpPut(`${this.basePath}/${data.boardId}/members/${data.memberId}/role`, updateBoardMemberRoleDto)
   }
+
+  static starBoard(boardId: string) {
+    return httpPut(`${this.basePath}/${boardId}/star`)
+  }
+
+  static unstarBoard(boardId: string) {
+    return httpPut(`${this.basePath}/${boardId}/unstar`)
+  }
 }

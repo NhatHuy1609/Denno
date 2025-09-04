@@ -17,7 +17,7 @@ function useMarkNotificationAsUnreadMutation(
     mutationKey: ['notification', 'markAsUnread', ...mutationKey],
     onMutate,
     mutationFn: async ({ notificationId }) => {
-      const response = await NotificationService.markNotificationAsRead(notificationId)
+      const response = await NotificationService.markNotificationAsUnread(notificationId)
       return response.data
     },
     onSuccess,

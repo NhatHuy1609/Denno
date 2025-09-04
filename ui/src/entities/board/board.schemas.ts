@@ -18,7 +18,6 @@ export interface Board {
     boardMemberRole: BoardMemberRole
   }[]
   joinRequests: BoardJoinRequest[]
-  workspace: Workspace
 }
 
 export type Boards = Board[]

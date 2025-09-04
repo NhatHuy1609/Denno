@@ -55,3 +55,7 @@ export interface UserWorkspacesFilterQuery {
 export interface UserJoinedBoardsFilterQuery {
   workspaceId?: string
 }
+
+export interface UserBoardsQuery {
+  starredBoards: boolean
+}

@@ -7,5 +7,6 @@ export enum PersistedStateKey {
   Invitation = 'invitation',
   RedirectAfterLogin = 'redirect_after_login',
   WorkspacesVisibility = 'WorkspacesVisibility',
-  NewNotificationCount = 'newNotificationCount'
+  NewNotificationCount = 'newNotificationCount',
+  RecentBoards = 'recentBoards'
 }

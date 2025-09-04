@@ -16,11 +16,13 @@ namespace server.Services
     public class BoardService : IBoardService
     {
         private readonly IMapper _mapper;
+        private readonly ILogger<BoardService> _logger;
         private readonly ApplicationDBContext _dbContext;
         private readonly IHubContext<BoardHub, IBoardHubClient> _hubContext;
         private readonly BoardActivityResponseFactoryResolver _boardActivityResponseFactoryResolver;
 
         public BoardService(
+            ILogger<BoardService> logger,
             IMapper mapper,
             ApplicationDBContext dbContext,
             IHubContext<BoardHub, IBoardHubClient> hubContext,
@@ -28,6 +30,7 @@ namespace server.Services
         {
             _boardActivityResponseFactoryResolver = boardActivityResponseFactoryResolver;
             _hubContext = hubContext;
+            _logger = logger;
             _mapper = mapper;
             _dbContext = dbContext;
         }
@@ -41,8 +44,27 @@ namespace server.Services
                 return Result<bool>.Failure(Error.FromDescription($"board-{boardId} not found"));
             }
 
-            board.StarredStatus = !board.StarredStatus;
+            board.StarredStatus = true;
             _dbContext.Boards.Update(board);
+
+            await _dbContext.SaveChangesAsync();
+
+            return Result<bool>.Success(true);
+        }
+
+        public async Task<Result<bool>> UnstarBoardAsync(Guid boardId)
+        {
+            var board = await _dbContext.Boards.FindAsync(boardId);
+
+            if (board == null)
+            {
+                return Result<bool>.Failure(Error.FromDescription($"board-{boardId} not found"));
+            }
+
+            board.StarredStatus = false;
+            _dbContext.Boards.Update(board);
+
+            await _dbContext.SaveChangesAsync();
 
             return Result<bool>.Success(true);
         }
