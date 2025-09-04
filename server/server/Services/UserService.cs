@@ -1,20 +1,63 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Azure;
+using Microsoft.EntityFrameworkCore;
 using server.Data;
+using server.Dtos.Response.Board;
+using server.Dtos.Response.Users;
 using server.Dtos.Response.Workspace;
 using server.Entities;
 using server.Interfaces;
+using server.Models.Query;
 using server.Models.Query.UserWorkspacesQuery;
 
 namespace server.Services
 {
     public class UserService : IUserService
     {
+        private readonly IMapper _mapper;
         private readonly ApplicationDBContext _dbContext;
 
-        public UserService(ApplicationDBContext dbContext)
+        public UserService(
+            IMapper mapper,
+            ApplicationDBContext dbContext)
         {
+            _mapper = mapper;
             _dbContext = dbContext;
         }
+
+        public async Task<UserBoardsResponse> GetUserBoardsResponseAsync(string userId, UserBoardsQueryModel query)
+        {
+            var response = new UserBoardsResponse();
+
+            await MapJoinedBoardsAsync(userId, response);
+            await MapStarredBoardsAsync(userId, response, query.StarredBoards);
+
+            return response;
+        }
+
+        public async Task MapJoinedBoardsAsync(string userId, UserBoardsResponse response)
+        {
+            var joinedBoards = await _dbContext.BoardMembers
+                .Include(bm => bm.Board)
+                .Where(bm => bm.AppUserId == userId)
+                .Select(bm => bm.Board)
+                .ToListAsync();
+
+            response.Boards = _mapper.Map<List<BoardResponseDto>>(joinedBoards);
+        }
+
+        public async Task MapStarredBoardsAsync(string userId, UserBoardsResponse response, bool includeStarredBoards)
+        {
+            if (!includeStarredBoards) return;
+
+            var starredBoards = await _dbContext.BoardMembers
+                .Where(bm => bm.AppUserId == userId && bm.Board.StarredStatus == true)
+                .Select(bm => bm.Board)
+                .ToListAsync();
+
+            response.StarredBoards = _mapper.Map<List<BoardResponseDto>>(starredBoards);
+        }
+
 
         public async Task<List<UserWorkspaceResponse>?> GetUserWorkspacesResponse(string userId, UserWorkspacesQuery query)
         {
@@ -30,6 +73,7 @@ namespace server.Services
                 case FilterType.All:
                     var joinedWorkspaces = await _dbContext.WorkspaceMembers
                         .Include(wm => wm.Workspace)
+                        .ThenInclude(w => w.Logo)
                         .Where(wm => wm.AppUserId == userId)
                         .Select(wm => wm.Workspace)
                         .ToListAsync();

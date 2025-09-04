@@ -1,4 +1,4 @@
-﻿using Org.BouncyCastle.Cms;
+﻿using Microsoft.EntityFrameworkCore;
 using server.Constants;
 using server.Data;
 using server.Entities;
@@ -16,6 +16,11 @@ namespace server.Strategies.ActionStrategy
             _dbContext = dbContext;
         }
 
+        public bool CanHandle(string actionType)
+        {
+            return actionType == ActionTypes.JoinBoard;
+        }
+
         public async Task<DennoAction> Execute(DennoActionContext context)
         {
             ArgumentNullException.ThrowIfNull(context.BoardId);
@@ -24,6 +29,15 @@ namespace server.Strategies.ActionStrategy
             var boardId = context.BoardId.Value;
             var userId = context.MemberCreatorId;
 
+            // Verify that the user requesting to join the board is already a member of the workspace
+            var board = await _dbContext.Boards.FindAsync(boardId);
+            if (board is null)
+                throw new InvalidOperationException($"Board {boardId} not found.");
+
+            var isWorkspaceMember = await _dbContext.WorkspaceMembers
+                .AnyAsync(wm => wm.WorkspaceId == board.WorkspaceId && wm.AppUserId == userId);
+
+            // Create new board member
             var newMember = new BoardMember()
             {
                 BoardId = boardId,
@@ -35,8 +49,18 @@ namespace server.Strategies.ActionStrategy
                 ActionType = ActionTypes.JoinBoard,
                 MemberCreatorId = userId,
                 BoardId = boardId,
-                IsBoardActivity = context.IsBoardActivity,
+                IsBoardActivity = true
             };
+
+            if (!isWorkspaceMember)
+            {
+                _dbContext.WorkspaceMembers.Add(new WorkspaceMember
+                {
+                    WorkspaceId = board.WorkspaceId,
+                    AppUserId = userId,
+                    Role = WorkspaceMemberRole.Guest
+                });
+            }
 
             _dbContext.Actions.Add(action);
             _dbContext.BoardMembers.Add(newMember);

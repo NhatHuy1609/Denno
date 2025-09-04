@@ -25,7 +25,7 @@ function TooltipWrapper({
 }: TooltipWrapperProps) {
   const renderContent = () => {
     if (typeof content === 'string') {
-      return <span>{content}</span>
+      return <span className='block bg-slate-600 px-2 py-1 text-xs text-white'>{content}</span>
     }
 
     return content
@@ -34,7 +34,16 @@ function TooltipWrapper({
   return (
     <Tooltip delayDuration={delayDuration}>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
-      <TooltipContent side={side} sideOffset={sideOffset} className={className} {...contentProps}>
+      <TooltipContent
+        style={{
+          padding: 0,
+          background: 'transparent'
+        }}
+        side={side}
+        sideOffset={sideOffset}
+        className={className}
+        {...contentProps}
+      >
         {renderContent()}
       </TooltipContent>
     </Tooltip>

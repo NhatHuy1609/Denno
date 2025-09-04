@@ -6,11 +6,11 @@ type Props = {
 }
 
 function NotificationHeader({ header }: Props) {
-  const { entityIcon: HeaderIcon, entityName: headerTitle } = header
+  const { entityIcon: headerIcon, entityName: headerTitle } = header
 
   return (
     <div className='flex w-full items-center justify-start gap-2 rounded-t-md bg-white p-2'>
-      <HeaderIcon className='text-xl' />
+      {headerIcon}
       <span className='text-sm'>{headerTitle}</span>
     </div>
   )

@@ -1,6 +1,6 @@
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { setLocalStorageItem } from '@/utils/local-storage'
-import { AuthService, authTypesDto } from '@/service/api/auth';
+import { AuthService, authTypesDto } from '@/service/api/auth'
 import { DefaultError, useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { useAppDispatch } from '@/store/hooks'
 import { updateCurrentUser } from '@/store/features/session'
@@ -18,25 +18,21 @@ export function useLoginMutation(
 ) {
   const dispatch = useAppDispatch()
 
-  const {
-    mutationKey = [],
-    onMutate,
-    onSuccess,
-    onError,
-    onSettled
-  } = options || {}
+  const { mutationKey = [], onMutate, onSuccess, onError, onSettled } = options || {}
 
   return useMutation({
     mutationKey: ['sign-in', ...mutationKey],
     onMutate: async (variables) => {
-      dispatch(updateCurrentUser({
-        email: variables.email
-      }))
+      dispatch(
+        updateCurrentUser({
+          email: variables.email
+        })
+      )
 
       await onMutate?.(variables)
     },
-    mutationFn: async (loginUserDto: authTypesDto.LoginUserDto)  => {
-      return AuthService.loginUserMutation({loginUserDto})
+    mutationFn: async (loginUserDto: authTypesDto.LoginUserDto) => {
+      return AuthService.loginUserMutation({ loginUserDto })
     },
     onSuccess: async (response, variables, context) => {
       const { data } = response
@@ -46,9 +42,11 @@ export function useLoginMutation(
       setLocalStorageItem(PersistedStateKey.Token, accessToken)
       setLocalStorageItem(PersistedStateKey.RefreshToken, refreshToken)
 
-      dispatch(updateCurrentUser({
-        email: user?.email
-      }))
+      dispatch(
+        updateCurrentUser({
+          email: user?.email
+        })
+      )
 
       await onSuccess?.(response, variables, context)
     },

@@ -2,8 +2,8 @@ import { WorkspaceService, workspaceTypesDto } from '@/service/api/workspace'
 import { DefaultError, MutationOptions, useMutation } from '@tanstack/react-query'
 
 type UpdateWorkspaceVariables = {
-  workspaceId: string,
-  data: workspaceTypesDto.UpdateWorkspaceDto
+  workspaceId: string
+  data: Partial<workspaceTypesDto.UpdateWorkspaceDto>
 }
 
 export default function useUpdateWorkspaceMutation(
@@ -17,13 +17,7 @@ export default function useUpdateWorkspaceMutation(
     'mutationKey' | 'onMutate' | 'onSettled' | 'onSuccess' | 'onError'
   >
 ) {
-  const {
-    mutationKey = [],
-    onMutate,
-    onSuccess,
-    onError,
-    onSettled
-  } = options || {}
+  const { mutationKey = [], onMutate, onSuccess, onError, onSettled } = options || {}
 
   return useMutation({
     mutationKey: ['workspace', 'update', ...mutationKey],

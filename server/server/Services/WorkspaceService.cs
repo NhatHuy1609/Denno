@@ -1,5 +1,8 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using server.Constants;
 using server.Data;
 using server.Dtos.Response.Board;
 using server.Dtos.Response.Users;
@@ -7,6 +10,8 @@ using server.Dtos.Response.Workspace;
 using server.Dtos.Response.Workspace.WorkspaceResponseDto2;
 using server.Entities;
 using server.Extensions;
+using server.Helpers;
+using server.Hubs.WorkspaceHub;
 using server.Interfaces;
 using server.Models.Query;
 
@@ -14,21 +19,87 @@ namespace server.Services
 {
     public class WorkspaceService : IWorkspaceService
     {
+        private readonly ILogger<WorkspaceService> _logger;
         private readonly IMapper _mapper;
         private readonly ApplicationDBContext _dbContext;
+        private readonly IHubContext<WorkspaceHub, IWorkspaceHubClient> _workspaceHubContext;
 
-        public WorkspaceService(IMapper mapper, ApplicationDBContext dbContext)
+        public WorkspaceService(
+            ILogger<WorkspaceService> logger,
+            IMapper mapper,
+            ApplicationDBContext dbContext,
+            IHubContext<WorkspaceHub,IWorkspaceHubClient> workspaceHubContext)
         {
+            _logger = logger;
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+            _workspaceHubContext = workspaceHubContext;
         }
 
-        /// <summary>
-        /// Retrieves workspace details based on the provided ID and query parameters.
-        /// </summary>
-        /// <param name="id">The workspace ID</param>
-        /// <param name="query">Query parameters specifying which fields to include</param>
-        /// <returns>Workspace response DTO or null if not found</returns>
+        public async Task<bool> IsWorkspaceMemberAsync(Guid workspaceId, string userId)
+        {
+            return await _dbContext.WorkspaceMembers
+                .AnyAsync(wm => wm.WorkspaceId == workspaceId && wm.AppUserId == userId);
+        }
+
+        public async Task NotifyUserActionToWorkspaceMembers(DennoAction action, Guid workspaceId)
+        {
+            var clients = _workspaceHubContext
+                .Clients
+                .Groups(SignalRGroupNames.GetWorkspaceGroupName(workspaceId));
+
+            switch (action.ActionType)
+            {
+                case ActionTypes.UpdateWorkspaceMemberRole:
+                    await clients.OnWorkspaceMemberRoleChanged();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        public async Task<bool> LeaveWorkspaceAsync(Guid workspaceId, string userId)
+        {
+            var workspaceMember = await _dbContext.WorkspaceMembers
+                .FirstOrDefaultAsync(wm => wm.WorkspaceId == workspaceId && wm.AppUserId == userId);
+
+            if (workspaceMember == null) 
+            {
+                _logger.LogError($"Can not workspaceMember with workspaceId:{workspaceId} - userId:{userId}");
+                return false;
+            }
+
+            // Get all boards in the workspace that the removed member is participating in
+            var joinedBoards = await _dbContext.BoardMembers
+                .Where(bm => bm.AppUserId == userId && bm.Board.WorkspaceId == workspaceId)
+                .ToListAsync();
+
+            using var transaction = await _dbContext.Database.BeginTransactionAsync();
+            try
+            {
+                if (joinedBoards.Count() > 0)
+                {
+                    workspaceMember.Role = WorkspaceMemberRole.Guest;
+                    _dbContext.Update(workspaceMember);
+                } else
+                {
+                    _dbContext.Remove(workspaceMember);
+                }
+
+                await _dbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+                _logger.LogInformation($"User:{userId} successfully leaved workspace");
+
+            } catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                await transaction.RollbackAsync();
+                return false;
+            }
+
+            return true;
+        }
+
         public async Task<WorkspaceResponseDto2?> GetWorkspaceResponseAsync(Guid id, WorkspaceQuery query)
         {
             var workspace = await GetWorkspaceAsync(id);
@@ -86,7 +157,7 @@ namespace server.Services
 
             var workspaceMembers = await _dbContext.WorkspaceMembers
                 .Include(wm => wm.AppUser)
-                .Where(wm => wm.WorkspaceId == workspaceId)
+                .Where(wm => wm.WorkspaceId == workspaceId && wm.Role != WorkspaceMemberRole.Guest)
                 .ToListAsync();
 
             response.Members = workspaceMembers.Select(wm => new MemberDto
@@ -133,29 +204,30 @@ namespace server.Services
             if (!includeGuests)
                 return;
 
-            // Use left join
-            var workspaceGuests = await (
-                from bm in _dbContext.BoardMembers
-                join b in _dbContext.Boards on bm.BoardId equals b.Id
-                join wm in _dbContext.WorkspaceMembers
-                    on new { b.WorkspaceId, bm.AppUserId }
-                    equals new { wm.WorkspaceId, wm.AppUserId }
-                    into wmGroup // IEnumerable<WorkspaceMember>
-                from wm in wmGroup.DefaultIfEmpty()
-                where wm == null
-                group b by bm.AppUser into bGroup
-                select new 
+            var guestsWithBoards = await _dbContext.BoardMembers
+                .Where(bm => bm.Board.WorkspaceId == workspaceId
+                          && bm.AppUser.WorkspaceMembers
+                               .Any(wm => wm.WorkspaceId == workspaceId && wm.Role == WorkspaceMemberRole.Guest))
+                .Select(bm => new
                 {
-                    Guest = bGroup.Key, // AppUser
-                    Boards = bGroup.ToList()
-                }
-            )
-            .ToListAsync();
+                    Guest = bm.AppUser!,
+                    Board = bm.Board
+                })
+                .ToListAsync();
+
+            var workspaceGuests = guestsWithBoards
+                .GroupBy(x => x.Guest)
+                .Select(g => new
+                {
+                    Guest = g.Key,
+                    JoinedBoards = g.Select(x => x.Board).ToList()
+                })
+                .ToList();
 
             response.Guests = workspaceGuests
                 .Select(wg => new WorkspaceGuestResponse() {
                     User = _mapper.Map<GetUserResponseDto>(wg.Guest),
-                    JoinedBoards = _mapper.Map<List<BoardResponseDto>>(wg.Boards)
+                    JoinedBoards = _mapper.Map<List<BoardResponseDto>>(wg.JoinedBoards)
                 })
                 .ToList();
         }

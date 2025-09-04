@@ -2,7 +2,7 @@ import { DefaultError, useMutation, UseMutationOptions } from '@tanstack/react-q
 import { BoardService } from '@/service/api/board'
 import { boardTypesDto } from '@/service/api/board'
 
-type SendJoinRequestMutationParams = {
+type UpdateBoardMemberRoleMutationParams = {
   boardId: string
   memberId: string
   updateBoardMemberRoleRequestDto: boardTypesDto.UpdateBoardMemberRoleRequestDto
@@ -13,7 +13,7 @@ function useUpdateBoardMemberRole(
     UseMutationOptions<
       Awaited<boardTypesDto.BoardJoinRequestResponseDto>,
       DefaultError,
-      SendJoinRequestMutationParams,
+      UpdateBoardMemberRoleMutationParams,
       any
     >,
     'mutationKey' | 'onMutate' | 'onSuccess' | 'onError' | 'onSettled'

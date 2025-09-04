@@ -15,8 +15,9 @@ export const CreateWorkspaceDtoSchema = z
 
 export const UpdateWorkspaceDtoSchema = z
   .object({
-    name: z.string({ required_error: 'Name required!' }).min(1),
-    description: z.string()
+    name: z.string().nullable().optional(),
+    description: z.string().nullable().optional(),
+    visibility: enumContracts.WorkspaceVisibilityEnumSchema.nullable().optional()
   })
   .describe('UpdateWorkspaceDtoSchema')
 
@@ -45,6 +46,18 @@ export const CreateWorkspaceJoinRequestDtoSchema = z
     requesterId: z.string()
   })
   .describe('CreateWorkspaceJoinRequestDtoSchema')
+
+export const UpdateWorkspaceMemberRoleDtoSchema = z
+  .object({
+    newMemberRole: enumContracts.MemberRoleEnumSchema
+  })
+  .describe('UpdateWorkspaceMemberRoleDtoSchema')
+
+export const RemoveWorkspaceMemberDtoSchema = z
+  .object({
+    deleteRelatedBoardMembers: z.boolean().optional().default(false)
+  })
+  .describe('RemoveWorkspaceMemberDtoSchema')
 
 // Response
 export const WorkspaceGuestResponseDtoSchema = z.object({

@@ -18,6 +18,11 @@ namespace server.Strategies.ActionStrategy
             _dbContext = dbContext;
         }
 
+        public bool CanHandle(string actionType)
+        {
+            return actionType == ActionTypes.UpdateBoardMemberRole;
+        }
+
         public async Task<DennoAction> Execute(DennoActionContext context)
         {
             var updateContext = context as UpdateBoardMemberRoleActionContext ?? 
@@ -33,6 +38,9 @@ namespace server.Strategies.ActionStrategy
                     bm => bm.AppUserId == updateContext.TargetUserId &&
                     bm.BoardId == updateContext.BoardId);
 
+            if (boardMember == null) 
+                throw new ArgumentNullException(nameof(boardMember), $"Can not found board member with id-${context.TargetUserId} of boardId-{context.BoardId}");
+
             boardMember.Role = updateContext.TargetMemberRole;
 
             var action = new DennoAction()
@@ -40,7 +48,7 @@ namespace server.Strategies.ActionStrategy
                 MemberCreatorId = updateContext.MemberCreatorId,
                 ActionType = ActionTypes.UpdateBoardMemberRole,
                 BoardId = updateContext.BoardId,
-                IsBoardActivity = updateContext.IsBoardActivity,
+                IsBoardActivity = true,
                 TargetUserId = updateContext.TargetUserId,
                 MetaData = JsonConvert.SerializeObject(new UpdateBoardMemberRoleMetaData()
                 {

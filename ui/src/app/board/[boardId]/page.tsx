@@ -11,11 +11,18 @@ import BoardView from '@/app/_features/BoardViews/BoardView'
 import PrivateBoardAccessRequest from './PrivateBoardAccessRequest'
 import PrimarySidebar from '@/layouts/shared/PrimarySidebar'
 import { useSignalR } from '@/app/_providers/SignalRProvider/useSignalR'
+import { useRouter } from 'next/navigation'
+import { getLocalStorageItem } from '@/utils/local-storage'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
+import { useHubEventListener } from '@/app/_hooks/signalR/useHubEventListener'
+import { useHubInvoke } from '@/app/_hooks/signalR/useHubInvoke'
 
 function BoardHomePage() {
   // Apply auth guard
   const { isCheckingAuth } = useRequireAuth()
+  const router = useRouter()
   const { boardId } = useParams<{ boardId: string }>()
+  const currentUserId = getLocalStorageItem(PersistedStateKey.MeId)
 
   // Check if the user has permission to view the board
   const {
@@ -30,14 +37,27 @@ function BoardHomePage() {
   // Sync recent access to localstorage for the board
   useRecentAccessSync(boardId, workspaceId)
 
-  const { signalRService } = useSignalR()
-
-  // This effect is used to join the board when the user has access to  the board
+  // Join board once connected
+  const invoke = useHubInvoke()
   useEffect(() => {
-    if (!boardId || !signalRService) return
+    if (!boardId) return
 
-    signalRService.invoke('board', 'JoinBoard', boardId)
-  }, [signalRService, boardId])
+    invoke('board', 'JoinBoard', boardId)
+  }, [invoke, boardId])
+
+  // Listen to "OnWorkspaceMemberRemoved" event
+  useHubEventListener(
+    'workspace',
+    'OnWorkspaceMemberRemoved',
+    (removedUserId, actorUserId, workspaceId, removeRelatedAccessibleBoards) => {
+      if (removedUserId === currentUserId && removeRelatedAccessibleBoards) {
+        router.replace('/')
+        setTimeout(() => {
+          router.push(`board/${boardId}`)
+        }, 0)
+      }
+    }
+  )
 
   if (isCheckingAuth || isCheckingBoardViewPolicyAccess) {
     return (

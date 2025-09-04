@@ -1,20 +1,24 @@
-import { ActionType } from '@/service/api/_constants/action-types'
-import { EntityType } from '@/service/api/_constants/entity-types'
+import { NotifiableActionType } from '../action/action.schemas'
+import { EntityType } from '../metadata/metadata.schemas'
 
 export type Notification = {
   id: number
   isRead: boolean
-  type: ActionType
+  type: NotifiableActionType
   date: string
-  translationKey: string
   initiator: {
     id: string
     name: string
     avatar: string
   }
-  entities: Record<EntityType, {
-    id: string
-    type: EntityType
-    text: string
-  }>
+  entities: Record<
+    EntityType,
+    {
+      id: string
+      type: EntityType
+      text: string
+      imageUrl?: string
+    }
+  >
+  metaData: Record<string, any>
 }

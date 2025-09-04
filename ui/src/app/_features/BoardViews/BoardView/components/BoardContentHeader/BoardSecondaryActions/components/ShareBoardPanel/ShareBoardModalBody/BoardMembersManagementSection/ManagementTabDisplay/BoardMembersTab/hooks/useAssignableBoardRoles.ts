@@ -3,7 +3,7 @@ import { getAssignableBoardMemberRoles } from '../utils/getAssignableBoardMember
 import { DropdownMenuPrimaryItemProps } from '@/app/_components/DropdownMenuPrimary'
 import { boardSchemas } from '@/entities/board'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { useBoardQuery, useWorkspaceQuery } from '@/app/_hooks/query'
 import { BoardAssignMemberRolePolicyContext } from '@/permissions/policies/board/board-assign-member-role.policy'
 import { useMe } from '@/app/_hooks/query/user/useMe'

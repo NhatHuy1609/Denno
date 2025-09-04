@@ -15,11 +15,12 @@ function CollaboratorsDisplay() {
   const { data: detailedWorkspace } = useWorkspaceQuery(workspaceId, {
     members: true,
     boardCounts: true,
-    joinRequests: true
+    joinRequests: true,
+    includeGuests: true
   })
 
-  const { members = [], joinRequests = [] } = detailedWorkspace || {}
-  const collaboratorCount = members?.length || 0
+  const { members = [], joinRequests = [], guests = [] } = detailedWorkspace || {}
+  const collaboratorCount = members.length + guests.length
 
   const renderTabDisplay = () => {
     if (tab === 'members') {
@@ -35,13 +36,12 @@ function CollaboratorsDisplay() {
     <div className='w-full'>
       <h3 className='my-6 text-xl font-medium text-black'>
         Collaborators
-        <span className='ml-2 rounded-lg bg-gray-100 px-2 py-1 text-sm'>
-          {collaboratorCount} / 10
-        </span>
+        <span className='ml-2 rounded-lg bg-gray-100 px-2 py-1 text-sm'>{collaboratorCount} / 10</span>
       </h3>
       <div className='mt-4 flex w-full gap-6'>
         <CollaboratorTabs
           memberCount={members?.length}
+          guestCount={guests?.length}
           requestCount={joinRequests?.length}
           setTabFn={setTab}
         />

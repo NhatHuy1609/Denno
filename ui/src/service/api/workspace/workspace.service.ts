@@ -1,26 +1,30 @@
 import { httpPost, httpGet, httpPut, httpDel } from '../_req'
 import { AxiosContracts } from '@/lib/axios/AxiosContracts'
-import { 
-  AddWorkspaceMemberDto, 
-  CreateWorkspaceDto, 
+import {
+  AddWorkspaceMemberDto,
+  CreateWorkspaceDto,
   CreateWorkspaceJoinRequestDto,
-  DetailedWorkspaceInvitationSecretResponseDto, 
-  UpdateWorkspaceDto, 
-  UpdateWorkspaceLogoDto, 
-  VerifyWorkspaceInvitationSecretRequestDto, 
-  WorkspaceInvitationSecretResponseDto, 
-  WorkspaceJoinRequestResponseDto, 
-  WorkspaceJoinRequestsResponseDto, 
-  WorkspaceResponseDto 
+  DetailedWorkspaceInvitationSecretResponseDto,
+  RemoveWorkspaceMemberDto,
+  UpdateWorkspaceDto,
+  UpdateWorkspaceLogoDto,
+  UpdateWorkspaceMemberRoleDto,
+  VerifyWorkspaceInvitationSecretRequestDto,
+  WorkspaceInvitationSecretResponseDto,
+  WorkspaceJoinRequestResponseDto,
+  WorkspaceJoinRequestsResponseDto,
+  WorkspaceResponseDto
 } from './workspace.types'
 
-import { 
+import {
   AddWorkspaceMemberDtoSchema,
   CreateWorkspaceDtoSchema,
   CreateWorkspaceJoinRequestDtoSchema,
+  RemoveWorkspaceMemberDtoSchema,
   UpdateWorkspaceDtoSchema,
   UpdateWorkspaceLogoDtoSchema,
-  VerifyWorkspaceInvitationSecretRequestDtoSchema,
+  UpdateWorkspaceMemberRoleDtoSchema,
+  VerifyWorkspaceInvitationSecretRequestDtoSchema
 } from './workspace.contracts'
 
 import { WorkspaceQueryParamsDto } from '../_models/query-models/workspace/workspace.types'
@@ -29,28 +33,23 @@ import { AddWorkspaceMemberActionResponseDto, JoinWorkspaceByLinkActionResponseD
 export class WorkspaceService {
   private static readonly basePath = '/workspaces'
 
-  static workspaceQuery(workspaceId: string, config?: { signal?: AbortSignal, params?: WorkspaceQueryParamsDto }) {
+  static workspaceQuery(workspaceId: string, config?: { signal?: AbortSignal; params?: WorkspaceQueryParamsDto }) {
     return httpGet<WorkspaceResponseDto>(`${this.basePath}/${workspaceId}`, config)
   }
 
   static CreateWorkspaceMutation(data: { createWorkspaceDto: CreateWorkspaceDto }) {
-    const createWorkspaceDto = AxiosContracts.requestContract(
-      CreateWorkspaceDtoSchema,
-      data.createWorkspaceDto)
+    const createWorkspaceDto = AxiosContracts.requestContract(CreateWorkspaceDtoSchema, data.createWorkspaceDto)
 
     return httpPost<WorkspaceResponseDto>(this.basePath, createWorkspaceDto)
   }
 
-  static updateWorkspaceMutation(data: { workspaceId: string, updateWorkspaceDto: UpdateWorkspaceDto }) {
-    const updateWorkspaceDto = AxiosContracts.requestContract(
-      UpdateWorkspaceDtoSchema,
-      data.updateWorkspaceDto
-    )
+  static updateWorkspaceMutation(data: { workspaceId: string; updateWorkspaceDto: UpdateWorkspaceDto }) {
+    const updateWorkspaceDto = AxiosContracts.requestContract(UpdateWorkspaceDtoSchema, data.updateWorkspaceDto)
 
     return httpPut(`${this.basePath}/${data.workspaceId}`, updateWorkspaceDto)
   }
 
-  static updateWorkspaceLogoMutation(data: { workspaceId: string, updateWorkspaceLogoDto: UpdateWorkspaceLogoDto }) {
+  static updateWorkspaceLogoMutation(data: { workspaceId: string; updateWorkspaceLogoDto: UpdateWorkspaceLogoDto }) {
     const updateWorkspaceLogoDto = AxiosContracts.requestContract(
       UpdateWorkspaceLogoDtoSchema,
       data.updateWorkspaceLogoDto
@@ -63,7 +62,7 @@ export class WorkspaceService {
     })
   }
 
-  static addWorkspaceMemberMutation(data: { workspaceId: string, addWorkspaceMemberDto: AddWorkspaceMemberDto }) {
+  static addWorkspaceMemberMutation(data: { workspaceId: string; addWorkspaceMemberDto: AddWorkspaceMemberDto }) {
     const addWorkspaceMemberDto = AxiosContracts.requestContract(
       AddWorkspaceMemberDtoSchema,
       data.addWorkspaceMemberDto
@@ -80,14 +79,19 @@ export class WorkspaceService {
   }
 
   static detailedWorkspaceInvitationSecretQuery(workspaceId: string) {
-    return httpGet<DetailedWorkspaceInvitationSecretResponseDto>(`${this.basePath}/${workspaceId}/invitationSecret/detailed`)
+    return httpGet<DetailedWorkspaceInvitationSecretResponseDto>(
+      `${this.basePath}/${workspaceId}/invitationSecret/detailed`
+    )
   }
 
   static createWorkspaceInvitationSecretMutation(workspaceId: string) {
     return httpPost<WorkspaceInvitationSecretResponseDto>(`${this.basePath}/${workspaceId}/invitationSecret`)
   }
 
-  static verifyWorkspaceInvitationSecretMutation(workspaceId: string, data: { verifyInvitationSecretDto: VerifyWorkspaceInvitationSecretRequestDto }) {
+  static verifyWorkspaceInvitationSecretMutation(
+    workspaceId: string,
+    data: { verifyInvitationSecretDto: VerifyWorkspaceInvitationSecretRequestDto }
+  ) {
     const verifyInvitationSecretDto = AxiosContracts.requestContract(
       VerifyWorkspaceInvitationSecretRequestDtoSchema,
       data.verifyInvitationSecretDto
@@ -101,16 +105,17 @@ export class WorkspaceService {
   }
 
   static joinWorkspaceByLinkMutation(workspaceId: string) {
-    return httpPost<JoinWorkspaceByLinkActionResponseDto>(
-      `${this.basePath}/${workspaceId}/joinByLink`
-    )
+    return httpPost<JoinWorkspaceByLinkActionResponseDto>(`${this.basePath}/${workspaceId}/joinByLink`)
   }
 
   static workspaceJoinRequestsQuery(workspaceId: string) {
     return httpGet<WorkspaceJoinRequestsResponseDto>(`${this.basePath}/${workspaceId}/joinRequests`)
   }
 
-  static createWorkspaceJoinRequestMutation(workspaceId: string, data: { createWorkspaceJoinRequestDto: CreateWorkspaceJoinRequestDto }) {
+  static createWorkspaceJoinRequestMutation(
+    workspaceId: string,
+    data: { createWorkspaceJoinRequestDto: CreateWorkspaceJoinRequestDto }
+  ) {
     const createWorkspaceJoinRequestDto = AxiosContracts.requestContract(
       CreateWorkspaceJoinRequestDtoSchema,
       data.createWorkspaceJoinRequestDto
@@ -128,5 +133,41 @@ export class WorkspaceService {
 
   static rejectWorkspaceJoinRequest(requestId: number) {
     return httpDel(`${this.basePath}/joinRequests//${requestId}/rejection`)
+  }
+
+  static updateWorkspaceMemberRole(
+    workspaceId: string,
+    memberId: string,
+    data: { updateWorkspaceMemberRoleDto: UpdateWorkspaceMemberRoleDto }
+  ) {
+    const updateWorkspaceMemberRoleDto = AxiosContracts.requestContract(
+      UpdateWorkspaceMemberRoleDtoSchema,
+      data.updateWorkspaceMemberRoleDto
+    )
+
+    return httpPut(`${this.basePath}/${workspaceId}/members/${memberId}/role`, updateWorkspaceMemberRoleDto)
+  }
+
+  static removeWorkspaceMember(
+    workspaceId: string,
+    memberId: string,
+    data: {
+      removeWorkspaceMemberDto: RemoveWorkspaceMemberDto
+    }
+  ) {
+    const removeWorkspaceMemberDto = AxiosContracts.requestContract(
+      RemoveWorkspaceMemberDtoSchema,
+      data.removeWorkspaceMemberDto
+    )
+
+    return httpDel(`${this.basePath}/${workspaceId}/members/${memberId}`, { data: removeWorkspaceMemberDto })
+  }
+
+  static removeWorkspaceGuest(workspaceId: string, userId: string) {
+    return httpDel(`${this.basePath}/${workspaceId}/guests/${userId}`)
+  }
+
+  static leaveWorkspace(workspaceId: string) {
+    return httpDel(`${this.basePath}/${workspaceId}/leave`)
   }
 }

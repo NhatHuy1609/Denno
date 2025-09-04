@@ -15,6 +15,10 @@ namespace server.Strategies.ActionStrategy
         {
             _dbContext = dbContext;
         }
+        public bool CanHandle(string actionType)
+        {
+            return actionType == ActionTypes.AddMemberToWorkspace;
+        }
 
         public async Task<DennoAction> Execute(DennoActionContext context)
         {
@@ -31,14 +35,18 @@ namespace server.Strategies.ActionStrategy
             if (context.MemberCreatorId == context.TargetUserId)
                 throw new InvalidOperationException("User cannot add themselves as a member");
 
-            if (_dbContext.WorkspaceMembers.Any(m => m.WorkspaceId == context.WorkspaceId && m.AppUserId == context.TargetUserId))
-                throw new InvalidOperationException("User is already a member of this workspace");
-
-            var newMember = new WorkspaceMember()
+            if (_dbContext.WorkspaceMembers
+                .Any(m => m.WorkspaceId == context.WorkspaceId && 
+                    m.AppUserId == context.TargetUserId && 
+                    m.Role != WorkspaceMemberRole.Guest)
+                )
             {
-                WorkspaceId = context.WorkspaceId.Value,
-                AppUserId = context.TargetUserId
-            };
+                throw new InvalidOperationException("User is already a member of this workspace");
+            }
+
+            var workspaceId = context.WorkspaceId;
+            var addedToWorkspaceUserId = context.TargetUserId;
+            var memberCreatorId = context.MemberCreatorId;
 
             var action = new DennoAction()
             {
@@ -65,15 +73,36 @@ namespace server.Strategies.ActionStrategy
             var existedJoinRequest = await _dbContext.JoinRequests
                 .FirstOrDefaultAsync(j => j.WorkspaceId == context.WorkspaceId && j.RequesterId == context.TargetUserId);
 
+            var workspaceMember = await _dbContext.WorkspaceMembers
+                .FirstOrDefaultAsync(wm => wm.WorkspaceId == workspaceId && wm.AppUserId == addedToWorkspaceUserId);
+
+            // Execute data modifications
             if (existedJoinRequest != null)
             {
                 _dbContext.JoinRequests.Remove(existedJoinRequest);
             }
 
+            if (workspaceMember != null)
+            {
+                if (workspaceMember.Role == WorkspaceMemberRole.Guest)
+                {
+                    workspaceMember.Role = WorkspaceMemberRole.Normal;
+                    _dbContext.Update(workspaceMember);
+                }
+            }
+            else
+            {
+                var newMember = new WorkspaceMember
+                {
+                    WorkspaceId = context.WorkspaceId.Value,
+                    AppUserId = context.TargetUserId
+                };
+                _dbContext.WorkspaceMembers.Add(newMember);
+            }
+
             _dbContext.Actions.Add(action);
             _dbContext.Notifications.Add(notification);
             _dbContext.NotificationRecipients.Add(recipient);
-            _dbContext.WorkspaceMembers.Add(newMember);
 
             // Load needed navigation properties
             action.MemberCreator = await _dbContext.Users.FindAsync(context.MemberCreatorId);

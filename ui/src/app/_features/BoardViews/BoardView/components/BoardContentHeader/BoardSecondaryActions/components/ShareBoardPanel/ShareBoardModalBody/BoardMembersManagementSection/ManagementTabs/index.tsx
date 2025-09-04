@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import TabButton from './TabButton'
 import type { ManagementTabs, TabKey } from '../types'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { useBoardQuery } from '@/app/_hooks/query'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 import { boardSchemas } from '@/entities/board'

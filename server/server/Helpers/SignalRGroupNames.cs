@@ -6,5 +6,10 @@
         {
             return $"board_{boardId}";
         }
+
+        public static string GetWorkspaceGroupName(Guid workspaceId) 
+        {
+            return $"workspace_{workspaceId}";
+        }
     }
 }

@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore;
 using server.Constants;
 using server.Data;
 using server.Dtos.Response.Notification;
+using server.Dtos.Response.Notification.Bases;
 using server.Dtos.Response.Notification.Interfaces;
 using server.Dtos.Response.Notification.Models;
 using server.Dtos.Response.Users;
 using server.Entities;
+using server.Factories.NotificationResponseFactory.Interfaces;
 
 namespace server.Factories.NotificationResponseFactory
 {
@@ -24,6 +26,11 @@ namespace server.Factories.NotificationResponseFactory
             _dbContext = dbContext;
             _mapper = mapper;
             _logger = logger;
+        }
+
+        public bool CanHandle(string actionType)
+        {
+            return actionType == ActionTypes.AddMemberToBoard;
         }
 
         public async Task<INotificationResponseDto> CreateNotificationResponse(NotificationRecipient notification)
@@ -81,21 +88,22 @@ namespace server.Factories.NotificationResponseFactory
 
                 Display = new NotificationDisplay
                 {
-                    TranslationKey = TranslationKeys.AddMemberToBoard,
                     Entities = new Dictionary<string, EntityTypeDisplay>
                     {
                         { EntityTypes.Board, new EntityTypeDisplay
                             {
                                 Type = EntityTypes.Board,
                                 Id = notiDetails.Action.Board.Id,
-                                Text = notiDetails.Action.Board.Name
+                                Text = notiDetails.Action.Board.Name,
+                                ImageUrl = notiDetails.Action.Board.Background
                             }
                         },
                         { EntityTypes.MemberCreator, new EntityTypeDisplay
                             {
                                 Type = EntityTypes.User,
                                 Id = notiDetails.Action.MemberCreatorId,
-                                Text = notiDetails.Action.MemberCreator.FullName
+                                Text = notiDetails.Action.MemberCreator.FullName,
+                                ImageUrl = notiDetails.Action.MemberCreator.Avatar
                             }
                         },
                         { EntityTypes.AddedMember, new EntityTypeDisplay

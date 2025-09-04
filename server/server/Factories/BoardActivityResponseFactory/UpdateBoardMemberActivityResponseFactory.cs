@@ -76,7 +76,6 @@ namespace server.Factories.BoardActivityResponseFactory
                         {
                             EntityTypes.MemberRole, new EntityTypeDisplay()
                             {
-                                Id = metaData.NewRole.ToString(),
                                 Type = EntityTypes.MemberRole,
                                 Text = metaData.NewRole.ToString(),
                             }

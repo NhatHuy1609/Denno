@@ -9,9 +9,7 @@ import { FaAngleRight } from 'react-icons/fa6'
 
 function ShowPrimarySidebarButton({ showSidebar }: { showSidebar: () => void }) {
   // Take header height pixel value
-  const originalHeaderSidebarHeightPixelValue = getCssVariableValue(
-    '--primary-sidebar-header-height'
-  )
+  const originalHeaderSidebarHeightPixelValue = getCssVariableValue('--primary-sidebar-header-height')
   // Take header height number value
   const headerSidebarHeightValue: number = +originalHeaderSidebarHeightPixelValue.slice(
     0,
@@ -106,7 +104,7 @@ function PrimarySidebar() {
         <PrimarySidebarHeader hideSideboard={handleHideSidebar} />
         <div className='max-h-[calc(100%-var(--primary-sidebar-header-height))] overflow-y-auto'>
           <PrimarySidebarNavLinks />
-          <PrimarySidebarWorkspaceViews />
+          {/* <PrimarySidebarWorkspaceViews /> */}
           <PrimarySidebarUserBoardsByWorkspace />
         </div>
       </div>

@@ -11,7 +11,7 @@ import {
 } from '@/permissions/policies/board/board-remove-member.policy'
 import { useBoardQuery, useWorkspaceQuery } from '@/app/_hooks/query'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { PolicyResult } from '@/permissions/types/policy-result'
 
 type MemberOtherActions = 'leaveBoard' | 'removeFromBoard'

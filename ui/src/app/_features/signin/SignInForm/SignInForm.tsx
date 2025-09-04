@@ -13,7 +13,7 @@ import { LuMail, LuLock } from 'react-icons/lu'
 import { Form, Button, messageError, messageInfo } from '@/ui'
 import SignInGoogleButton from './SignInGoogleButton'
 import { getLocalStorageItem, setLocalStorageItem } from '@/utils/local-storage'
-import { PersistedStateKey } from '@/data/persisted-keys'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 
 type SignInFormValues = authTypesDto.LoginUserDto
 

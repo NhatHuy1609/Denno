@@ -1,5 +1,5 @@
-import { Notification } from "./notification.types";
-import { NotificationResponseDto } from "@/service/api/notification/notification.types";
+import { Notification } from './notification.types'
+import { NotificationResponseDto } from '@/service/api/notification/notification.types'
 
 export function mapToNotification(dto: NotificationResponseDto): Notification {
   return {
@@ -7,13 +7,13 @@ export function mapToNotification(dto: NotificationResponseDto): Notification {
     isRead: dto.isRead,
     type: dto.type,
     date: dto.date,
-    translationKey: dto.display.translationKey,
     initiator: {
       id: dto.memberCreator.id,
       name: dto.memberCreator.fullName,
-      avatar: dto.memberCreator.avatar,
+      avatar: dto.memberCreator.avatar
     },
     entities: dto.display.entities,
+    metaData: dto.data
   }
 }
 

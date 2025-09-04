@@ -8,17 +8,12 @@ import {
   DetailedBoardInvitation
 } from './board.schemas'
 import { InvitationSecret } from '../invitationSecret/invitationSecret.schemas'
+import { userTypesDto } from '@/service/api/user'
+import { dot } from 'node:test/reporters'
 
 export function transformBoardDtoToBoard(boardDto: boardTypesDto.BoardResponseDto): Board {
-  const { workspace } = boardDto
-
   return {
-    ...boardDto,
-    workspace: {
-      ...workspace,
-      idOwner: workspace?.ownerId,
-      logo: workspace?.logoUrl || null
-    }
+    ...boardDto
   }
 }
 

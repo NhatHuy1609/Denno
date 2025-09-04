@@ -15,5 +15,9 @@
         public const string ApproveBoardJoinRequest = "approveBoardJoinRequest";
         public const string RejectBoardJoinRequest = "rejectBoardJoinRequest";
         public const string UpdateBoardMemberRole = "updateBoardMemberRole";
+        public const string RemoveBoardMember = "removeBoardMember";
+        public const string UpdateWorkspaceMemberRole = "updateWorkspaceMemberRole";
+        public const string RemoveWorkspaceMember = "removeWorkspaceMember";
+        public const string RemoveWorkspaceGuest = "removeWorkspaceGuest";
     }
 }
