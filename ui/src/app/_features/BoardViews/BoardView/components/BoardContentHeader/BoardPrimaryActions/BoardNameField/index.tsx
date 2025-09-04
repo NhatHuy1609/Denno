@@ -5,14 +5,16 @@ import { useBoardQuery } from '@/app/_hooks/query'
 import { useOnClickOutSide } from '@/app/_hooks/useOnClickOutSide'
 import PrimaryInputText from '@/app/_components/PrimaryInputText'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
+import useUpdateBoardMutation from '@/app/_hooks/mutation/board/useUpdateBoardMutation'
+import { toastError, toastSuccess } from '@/ui'
 
 type Props = {
   enabledEdit?: boolean
 }
 
 function BoardNameField({ enabledEdit = false }: Props) {
-  const [boardId] = useSyncedLocalStorage<string>(PersistedStateKey.RecentAccessBoard, '')
-  const { data: board } = useBoardQuery(boardId)
+  const [boardId] = useSyncedLocalStorage(PersistedStateKey.RecentAccessBoard)
+  const { data: board, refetch } = useBoardQuery(boardId)
 
   const containerRef = useRef<HTMLDivElement>(null)
   // Span to measure the width of the input text
@@ -33,9 +35,26 @@ function BoardNameField({ enabledEdit = false }: Props) {
     }
   })
 
+  const { mutateAsync: updateBoardAsync } = useUpdateBoardMutation({
+    onSuccess: () => {
+      refetch()
+      toastSuccess("Successfully updated board's name")
+    },
+    onError: (error) => {
+      toastError("Failed to update board's name")
+    }
+  })
+
   const handleUpdateBoardName = () => {
-    if (inputValue.trim()) {
+    const currentValue = inputRef.current?.value || ''
+    if (currentValue.trim()) {
       // Assuming you have a function to update the board name
+      updateBoardAsync({
+        boardId,
+        updateBoardRequestDto: {
+          name: currentValue
+        }
+      })
     }
   }
 

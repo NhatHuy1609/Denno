@@ -12,7 +12,8 @@ import {
   BoardJoinRequestsResponseDtoSchema,
   CreateBoardJoinRequestDtoSchema,
   ApproveBoardJoinRequestDtoSchema,
-  UpdateBoardMemberRoleRequestDtoSchema
+  UpdateBoardMemberRoleRequestDtoSchema,
+  UpdateBoardRequestDtoSchema
 } from './board.contracts'
 
 export type CreateBoardDto = z.infer<typeof CreateBoardDtoSchema>
@@ -28,3 +29,4 @@ export type BoardJoinRequestsResponseDto = z.infer<typeof BoardJoinRequestsRespo
 export type CreateBoardJoinRequestDto = z.infer<typeof CreateBoardJoinRequestDtoSchema>
 export type ApproveBoardJoinRequestDto = z.infer<typeof ApproveBoardJoinRequestDtoSchema>
 export type UpdateBoardMemberRoleRequestDto = z.infer<typeof UpdateBoardMemberRoleRequestDtoSchema>
+export type UpdateBoardRequestDto = z.infer<typeof UpdateBoardRequestDtoSchema>
