@@ -88,6 +88,13 @@ export const UpdateBoardMemberRoleRequestDtoSchema = z
   })
   .describe('UpdateBoardMemberRoleRequestDtoSchema')
 
+export const UpdateBoardRequestDtoSchema = z
+  .object({
+    name: z.string().optional().nullable(),
+    visibility: enumContracts.BoardVisibilityEnumSchema.optional()
+  })
+  .describe('UpdateBoardRequestDtoSchema')
+
 // Response
 export const BoardResponseDtoSchema = BoardDto.describe('BoardResponseDtoSchema')
 
