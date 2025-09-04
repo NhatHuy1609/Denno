@@ -166,7 +166,7 @@ namespace server.Helpers.LexoRank
         public static LexoRankCore Between(object lexBefore, object lexAfter)
         {
             if (lexBefore == null && lexAfter == null)
-                throw new ArgumentException("Only one argument may be null");
+                return new LexoRankCore(LexoRankConstants.START_STRING, LexoRankConstants.MIN_BUCKET);
 
             if (lexAfter == null)
                 return From(lexBefore).Increment();

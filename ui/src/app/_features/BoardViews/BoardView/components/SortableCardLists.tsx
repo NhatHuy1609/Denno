@@ -310,6 +310,8 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
     },
     [activeId, lists]
   )
+
+  // Store old lists when drag event happening
   const [clonedLists, setClonedLists] = useState<TransformedItems | null>(null)
 
   const findContainer = (id: UniqueIdentifier) => {
@@ -419,6 +421,7 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
   }
 
   const onDragEnd = ({ active, over }: DragEndEvent) => {
+    // Handle dragging card lists
     if (active.id in lists && over?.id && active.id !== over?.id) {
       setContainers((containers) => {
         const activeIndex = containers.indexOf(active.id)
@@ -451,7 +454,7 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
       return
     }
 
-    // Handling dragged card to another cardList container
+    // Handle dragging cards
     if (!over || !over.id) {
       return
     }
@@ -459,38 +462,75 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
     const activeContainer = findContainer2(activeId || '')
     const overContainer = findContainer(over?.id as UniqueIdentifier)
 
+    if (!clonedLists) {
+      return
+    }
+
     if (!activeContainer || !overContainer) {
       setActiveId(null)
       return
     }
 
     if (activeContainer !== overContainer) {
-      const overIndex = lists[overContainer].indexOf(over.id)
-      const activeIndex = lists[overContainer].indexOf(active.id)
+      // Moving card to a different list
+      const overContainerItems = lists[overContainer]
+      let updateCardRankDto = {} as cardTypesDto.UpdateCardRankDto
 
-      if (activeIndex !== -1 && overIndex !== -1) {
-        setLists((lists) => ({
-          ...lists,
-          [overContainer]: arrayMove(lists[overContainer], activeIndex, overIndex)
-        }))
-
-        let updateCardRankDto = {} as cardTypesDto.UpdateCardRankDto
-        const overContainerItems = lists[overContainer]
+      // Check if the target container is empty
+      if (overContainerItems.length === 0) {
+        // Moving to empty list - no previous or next cards
         updateCardRankDto = {
           oldCardListId: activeContainer as string,
           newCardListId: overContainer as string,
-          nextRank: cardsMap[overContainerItems[overIndex + 1]]?.rank ?? null,
-          previousRank: cardsMap[overContainerItems[overIndex - 1]]?.rank ?? null
+          nextRank: null,
+          previousRank: null
         }
+      } else {
+        // Target container has cards
+        const overIndex = overContainerItems.indexOf(over.id)
 
-        updateCardRank({
-          id: active.id as string,
-          updateCardRankDto
-        })
+        if (overIndex === -1) {
+          // over.id is the container itself (dropping at the end of the list)
+          const lastCardInContainer = overContainerItems[overContainerItems.length - 1]
+          updateCardRankDto = {
+            oldCardListId: activeContainer as string,
+            newCardListId: overContainer as string,
+            nextRank: null,
+            previousRank: cardsMap[lastCardInContainer]?.rank ?? null
+          }
+        } else {
+          // Dropping between cards
+          const activeIndex = lists[overContainer].indexOf(active.id)
+
+          if (activeIndex !== -1) {
+            setLists((lists) => ({
+              ...lists,
+              [overContainer]: arrayMove(lists[overContainer], activeIndex, overIndex)
+            }))
+          }
+
+          updateCardRankDto = {
+            oldCardListId: activeContainer as string,
+            newCardListId: overContainer as string,
+            nextRank: cardsMap[overContainerItems[overIndex + 1]]?.rank ?? null,
+            previousRank: cardsMap[overContainerItems[overIndex - 1]]?.rank ?? null
+          }
+        }
       }
+
+      updateCardRank({
+        id: active.id as string,
+        updateCardRankDto
+      })
     } else {
+      // Moving card within the same list
       const activeIndex = lists[activeContainer].indexOf(active.id)
       const overIndex = lists[activeContainer].indexOf(over.id)
+
+      if (activeIndex === -1 || overIndex === -1) {
+        setActiveId(null)
+        return
+      }
 
       setLists((lists) => ({
         ...lists,
@@ -498,12 +538,13 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
       }))
 
       let updateCardRankDto = {
-        oldCardListId: activeContainer,
+        oldCardListId: activeContainer as string,
         newCardListId: null
       } as cardTypesDto.UpdateCardRankDto
 
       const isDraggingUpward = activeIndex > overIndex
       const overContainerItems = lists[overContainer]
+
       updateCardRankDto = isDraggingUpward
         ? {
             ...updateCardRankDto,
