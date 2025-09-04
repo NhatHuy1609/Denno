@@ -55,6 +55,42 @@ namespace server.Controllers
             _notificationRealtimeService = notificationRealtimeService;
         }
 
+        [HttpPut("[controller]/{boardId}")]
+        public async Task<IActionResult> UpdateBoardAsync(Guid boardId, UpdateBoardRequest request)
+        {
+            if (boardId == Guid.Empty)
+            {
+                return BadRequest(new ApiErrorResponse()
+                {
+                    StatusMessage = "boardId can not be null"
+                });
+            }
+
+            var updatedBoard = await _unitOfWork.Boards.GetByIdAsync(boardId);
+
+            if (updatedBoard == null) 
+            {
+                return NotFound(new ApiErrorResponse()
+                {
+                    StatusMessage = $"board-{boardId} not found"
+                });
+            }
+
+            if (!string.IsNullOrEmpty(request.Name))
+            {
+                updatedBoard.Name = request.Name;
+            }
+
+            if (request.Visibility != null)
+            {
+                updatedBoard.Visibility = request.Visibility.Value;
+            }
+
+            _unitOfWork.Complete();
+
+            return Ok(_mapper.Map<BoardResponseDto>(updatedBoard));
+        }
+
         [HttpPut("[controller]/{boardId}/star")]
         public async Task<IActionResult> StarBoardAsync(Guid boardId)
         {
