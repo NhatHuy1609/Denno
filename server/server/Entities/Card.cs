@@ -7,12 +7,13 @@
         public string Rank { get; set; }
         public string ImageCover { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public DateOnly StartDate { get; set; }
-        public DateTime DueDate { get; set; }
-        public DateTime ReminderDate { get; set; }
+        public DateOnly? StartDate { get; set; }
+        public DateTime? DueDate { get; set; }
+        public DateTime? ReminderDate { get; set; }
         public string Location { get; set; } = string.Empty;
         public bool IsWatching { get; set; } = false;
         public bool IsActive { get; set; } = true;
+        public bool IsCompleted { get; set; } = false;
 
         public Guid CardListId { get; set; }
         public CardList CardList { get; set; }

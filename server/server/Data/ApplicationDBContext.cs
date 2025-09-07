@@ -38,6 +38,8 @@ namespace server.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            DateTimeUtcConvention.Apply(modelBuilder);
+
             modelBuilder.Entity<AppUser>()
                 .HasMany(e => e.OwnedWorkspaces)
                 .WithOne(e => e.Owner)

@@ -5,7 +5,7 @@ using server.Entities;
 using server.Strategies.ActionStrategy.Contexts;
 using server.Strategies.ActionStrategy.Interfaces;
 
-namespace server.Strategies.ActionStrategy
+namespace server.Strategies.ActionStrategy.WorkspaceActionStrategies
 {
     public class SendWorkspaceJoinRequestStrategy : IDennoActionStrategy
     {

@@ -7,7 +7,7 @@ using server.Models.DennoActionMetaData;
 using server.Strategies.ActionStrategy.Contexts;
 using server.Strategies.ActionStrategy.Interfaces;
 
-namespace server.Strategies.ActionStrategy
+namespace server.Strategies.ActionStrategy.WorkspaceActionStrategies
 {
     public class RemoveWorkspaceMemberStrategy : IDennoActionStrategy
     {

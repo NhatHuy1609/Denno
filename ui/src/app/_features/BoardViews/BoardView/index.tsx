@@ -6,7 +6,7 @@ import BoardViewHeader from './components/BoardContentHeader'
 
 function BoardView() {
   const { boardId } = useParams()
-  const { data: cardLists } = useCardListsByBoards(boardId as string)
+  const { data: cardLists, refetch } = useCardListsByBoards(boardId as string)
 
   return (
     <div className='relative flex h-full flex-1 flex-col overflow-x-auto'>

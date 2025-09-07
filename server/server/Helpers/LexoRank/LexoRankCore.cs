@@ -163,7 +163,7 @@ namespace server.Helpers.LexoRank
             return ((char)(c - 1)).ToString();
         }
 
-        public static LexoRankCore Between(object lexBefore, object lexAfter)
+        public static LexoRankCore Between(object? lexBefore, object? lexAfter)
         {
             if (lexBefore == null && lexAfter == null)
                 return new LexoRankCore(LexoRankConstants.START_STRING, LexoRankConstants.MIN_BUCKET);
