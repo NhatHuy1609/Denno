@@ -30,7 +30,7 @@ const CardItem = React.forwardRef<HTMLDivElement, Props>(
         {...listeners}
       >
         <span className='text-sm'>{name}</span>
-        <div className='text-xs'>{rank}</div>
+        {/* <div className='text-xs'>{rank}</div> */}
       </div>
     )
   }

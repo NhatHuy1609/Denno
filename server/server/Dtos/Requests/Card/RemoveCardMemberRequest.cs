@@ -2,11 +2,11 @@
 
 namespace server.Dtos.Requests.Card
 {
-    public class CreateCardRequestDto
+    public class RemoveCardMemberRequest
     {
         [Required]
-        public string Name { get; set; }
-        public Guid CardListId { get; set; }
+        public string MemberId { get; set; }
+        [Required]
         public Guid BoardId { get; set; }
     }
 }

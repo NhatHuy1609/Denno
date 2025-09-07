@@ -1,0 +1,100 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Cms;
+using server.Constants;
+using server.Data;
+using server.Entities;
+using server.Strategies.ActionStrategy.Contexts;
+using server.Strategies.ActionStrategy.Interfaces;
+
+namespace server.Strategies.ActionStrategy.WorkspaceActionStrategies
+{
+    public class JoinWorkspaceByLinkStrategy : IDennoActionStrategy
+    {
+        private readonly ApplicationDBContext _dbContext;
+
+        public JoinWorkspaceByLinkStrategy(ApplicationDBContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
+        public bool CanHandle(string actionType)
+        {
+            return actionType == ActionTypes.JoinWorkspaceByLink;
+        }
+
+        public async Task<DennoAction> Execute(DennoActionContext context)
+        {
+            if (!context.WorkspaceId.HasValue)
+                throw new ArgumentNullException(nameof(context.WorkspaceId), "WorkspaceId is required");
+
+            if (string.IsNullOrEmpty(context.MemberCreatorId))
+                throw new ArgumentNullException(nameof(context.MemberCreatorId), "MemberCreatorId is required");
+
+            var workspaceId = context.WorkspaceId.Value;
+            var memberCreatorId = context.MemberCreatorId;
+
+            var workspace = await _dbContext.Workspaces
+                .Include(w => w.WorkspaceMembers)
+                .FirstOrDefaultAsync(w => w.Id == context.WorkspaceId);
+
+            if (workspace == null)
+                throw new ArgumentNullException(nameof(workspace), $"Not found workpsace with id-{workspaceId}");
+
+            var action = new DennoAction()
+            {
+                MemberCreatorId = context.MemberCreatorId,
+                ActionType = ActionTypes.JoinWorkspaceByLink,
+                WorkspaceId = context.WorkspaceId,
+                Date = DateTime.Now
+            };
+
+            var newMember = new WorkspaceMember()
+            {
+                WorkspaceId = context.WorkspaceId.Value,
+                AppUserId = context.MemberCreatorId
+            };
+
+            var notification = new Notification()
+            {
+                Date = DateTime.Now,
+                Action = action
+            };
+
+            // Notify to all members in workspace
+            var notificationRecipients = workspace.WorkspaceMembers
+                .Select(wm => new NotificationRecipient()
+                {
+                    Notification = notification,
+                    RecipientId = wm.AppUserId
+                });
+
+            // Delete workspace join requests related to user who joined workspace
+            var existedJoinRequest = await _dbContext.JoinRequests
+                .FirstOrDefaultAsync(j => j.WorkspaceId == context.WorkspaceId && j.RequesterId == context.MemberCreatorId);
+
+            var workspaceMember = await _dbContext.WorkspaceMembers
+                .FirstOrDefaultAsync(wm => wm.AppUserId == memberCreatorId && wm.WorkspaceId == workspaceId);
+
+            if (existedJoinRequest != null)
+            {
+                _dbContext.JoinRequests.Remove(existedJoinRequest);
+            }
+
+            if (workspaceMember != null && workspaceMember.Role == WorkspaceMemberRole.Guest)
+            {
+                workspaceMember.Role = WorkspaceMemberRole.Normal;
+                _dbContext.Update(workspaceMember);
+            }
+
+            _dbContext.Actions.Add(action);
+            _dbContext.Notifications.Add(notification);
+            _dbContext.NotificationRecipients.AddRange(notificationRecipients);
+            _dbContext.WorkspaceMembers.Add(newMember);
+
+            // Load needed navigation properties
+            action.MemberCreator = await _dbContext.Users.FindAsync(context.MemberCreatorId);
+
+            return action;
+        }
+    }
+}

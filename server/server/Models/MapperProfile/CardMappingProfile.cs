@@ -8,7 +8,10 @@ namespace server.Models.MapperProfile
     {
         public CardMappingProfile()
         {
-            CreateMap<Card, CardResponseDto>();
+            CreateMap<Card, CardResponseDto>()
+                .ForMember(dest => dest.IsOverdue,
+                            opt => opt.MapFrom(src => 
+                                src.DueDate.HasValue && src.DueDate.Value < DateTime.UtcNow));
         }
     }
 }

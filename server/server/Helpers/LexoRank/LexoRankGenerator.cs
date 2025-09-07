@@ -7,7 +7,7 @@
             return LexoRankConstants.START_POSITION;
         }
 
-        public string GenerateNewRank(object rankBefore, object rankAfter)
+        public string GenerateNewRank(object? rankBefore, object? rankAfter)
         {
             LexoRankCore newRank = LexoRankCore.Between(rankBefore, rankAfter);
 
