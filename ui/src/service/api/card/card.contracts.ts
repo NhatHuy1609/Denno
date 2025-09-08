@@ -7,12 +7,13 @@ const CardBaseDtoSchema = z.object({
   rank: z.string(),
   imageCover: z.string(),
   description: z.string(),
-  startDate: z.string(),
-  dueDate: z.string(),
-  reminderDate: z.string(),
+  startDate: z.string().nullable(),
+  dueDate: z.string().nullable(),
+  reminderDate: z.string().nullable(),
   location: z.string(),
   isWatching: z.boolean(),
   isActive: z.boolean(),
+  isOverDue: z.boolean(),
   cardListId: z.string().uuid()
 })
 
@@ -34,6 +35,7 @@ export const UpdateCardRankDtoSchema = z
     previousRank: z.string().nullable(),
     nextRank: z.string().nullable(),
     oldCardListId: z.string(),
-    newCardListId: z.string().nullable().default(null)
+    newCardListId: z.string().nullable().default(null),
+    boardId: z.string()
   })
   .describe('UpdateCardRankDtoSchema')

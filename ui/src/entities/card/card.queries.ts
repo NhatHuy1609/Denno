@@ -10,7 +10,7 @@ export class CardQueries {
 
   static cardsByCardListQuery(cardListId: string) {
     return queryOptions({
-      queryKey: [...this.keys.list(), `card-[${cardListId}]`],
+      queryKey: [...this.keys.list(), `card-[${cardListId}]`] as unknown[],
       queryFn: async ({ signal }) => {
         const response = await CardService.cardsByCardListQuery({ cardListId }, { signal })
         return transformCardsDtoToCards(response.data)

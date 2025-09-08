@@ -11,6 +11,7 @@ namespace server.Hubs.BoardHub
         Task OnCardListUpdated(CardListResponseDto newUpdatedCardList);
         Task OnCardCreated(CardResponseDto newCreatedCard);
         Task OnCardUpdated(CardResponseDto newUpdatedCard);
+        Task OnCardRankUpdated(Guid oldCardListId, Guid? newCardListId, CardResponseDto updatedCardResponse);
         Task OnCardMemberAssigned();
         Task OnCardMemberRemoved();
     }

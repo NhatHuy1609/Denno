@@ -8,8 +8,8 @@ import { useSignalR } from '@/app/_providers/SignalRProvider/useSignalR'
 import { useWorkspaceMembersWithGuests } from './hooks/useWorkspaceMembersWithGuests'
 
 export default function BoardMembersTab() {
-  const [boardId] = useSyncedLocalStorage<string>(PersistedStateKey.RecentAccessBoard, '')
-  const [workspaceId] = useSyncedLocalStorage<string>(PersistedStateKey.RecentAccessWorkspace, '')
+  const [boardId] = useSyncedLocalStorage(PersistedStateKey.RecentAccessBoard)
+  const [workspaceId] = useSyncedLocalStorage(PersistedStateKey.RecentAccessWorkspace)
 
   const { participantTypeMapById } = useWorkspaceMembersWithGuests(workspaceId)
 

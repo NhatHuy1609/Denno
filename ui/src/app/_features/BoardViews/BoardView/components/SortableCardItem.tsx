@@ -18,15 +18,16 @@ function SortableCardItem({ cardData }: Props) {
     }
   })
 
+  const style: React.CSSProperties = {
+    transform: transform ? CSS.Translate.toString(transform) : undefined,
+    transition: transition ?? undefined,
+    opacity: isDragging ? '0.5' : '1'
+  }
+
   return (
-    <CardItem
-      cardData={cardData}
-      transform={transform}
-      transition={transition}
-      dragging={isDragging}
-      ref={setNodeRef}
-      {...listeners}
-    />
+    <div ref={setNodeRef} style={style} {...listeners}>
+      <CardItem cardData={cardData} />
+    </div>
   )
 }
 

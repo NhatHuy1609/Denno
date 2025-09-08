@@ -148,16 +148,16 @@ namespace server.Controllers
 
             _logger.LogInformation($"Successfully updated rank of card-{id}");
 
-            var updatedCarddto = _mapper.Map<CardResponseDto>(updatedCard);
+            var updatedCardDto = _mapper.Map<CardResponseDto>(updatedCard);
 
             try
             {
                 await _boardHubContext.Clients
                  .Group(SignalRGroupNames.GetBoardGroupName(requestDto.BoardId))
-                 .OnCardUpdated(updatedCarddto);
+                 .OnCardRankUpdated(requestDto.OldCardListId, requestDto.NewCardListId, updatedCardDto);
 
                 _logger.LogInformation(
-                    "Successfully published OnCardUpdated event to board {BoardId}",
+                    "Successfully published OnCardRankUpdated event to board {BoardId}",
                     requestDto.BoardId
                 );
             }
@@ -166,7 +166,7 @@ namespace server.Controllers
                 _logger.LogError(ex, "Failed to publish OnCardUpdated event to board {BoardId}", requestDto.BoardId);
             }
 
-            return Ok(updatedCarddto);
+            return Ok(updatedCardDto);
         }
 
         [HttpPost("[controller]/{cardId}/assign")]
