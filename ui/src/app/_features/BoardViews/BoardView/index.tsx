@@ -1,12 +1,12 @@
 import React from 'react'
 import { useParams } from 'next/navigation'
-import { useCardListsByBoards } from '@/app/_hooks/query/cardList/useCardListsByBoard'
 import SortableCardLists from './components/SortableCardLists'
 import BoardViewHeader from './components/BoardContentHeader'
+import { useCardListsOfBoardQuery } from '@/app/_hooks/query/cardList/useCardListsByBoard'
 
 function BoardView() {
   const { boardId } = useParams()
-  const { data: cardLists, refetch } = useCardListsByBoards(boardId as string)
+  const { data: cardLists, refetch } = useCardListsOfBoardQuery(boardId as string)
 
   return (
     <div className='relative flex h-full flex-1 flex-col overflow-x-auto'>

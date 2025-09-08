@@ -27,11 +27,7 @@ function ColorBackgroundSelectionItem({
       onClick={handleSelectBackground}
       className='relative aspect-[3/2] w-[80px] cursor-pointer overflow-hidden rounded-sm hover:brightness-[0.8]'
     >
-      <Image
-        src={background.imageSrc}
-        alt={background.imageName}
-        className='size-full object-cover'
-      />
+      <Image src={background.imageSrc} alt={background.imageName} className='size-full object-cover' />
       {isBackgroundSelected && (
         <div className='absolute inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.2)]'>
           <FaCheck className='text-xs text-white' />
