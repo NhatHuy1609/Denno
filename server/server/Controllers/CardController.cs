@@ -332,7 +332,7 @@ namespace server.Controllers
 
             var actionMetaData = JsonHelper.DeserializeData<DennoActionContext>(action.MetaData);
             var boarId = actionMetaData!.BoardId!.Value;
-            var updatedCard = _unitOfWork.Cards.GetByIdAsync(cardId);
+            var updatedCard = await _unitOfWork.Cards.GetByIdAsync(cardId);
             var updatedCardResponse = _mapper.Map<CardResponseDto>(updatedCard);
 
             try
@@ -385,7 +385,7 @@ namespace server.Controllers
 
             var actionMetaData = JsonHelper.DeserializeData<DennoActionContext>(action.MetaData);
             var boarId = actionMetaData!.BoardId!.Value;
-            var updatedCard = _unitOfWork.Cards.GetByIdAsync(cardId);
+            var updatedCard = await _unitOfWork.Cards.GetByIdAsync(cardId);
             var updatedCardResponse = _mapper.Map<CardResponseDto>(updatedCard);
 
             try
