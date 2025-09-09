@@ -177,16 +177,15 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
   })
 
   // Adding sensors
+  // Constraints: (tolerance, distance, delay)
   const pointerSensor = useSensor(PointerSensor, {
     activationConstraint: {
-      delay: 80,
-      tolerance: 50
+      distance: 10
     }
   })
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: {
-      delay: 80,
-      tolerance: 50
+      distance: 10
     }
   })
   const sensors = useSensors(pointerSensor, mouseSensor)

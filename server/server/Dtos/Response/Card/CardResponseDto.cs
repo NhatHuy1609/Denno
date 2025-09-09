@@ -13,6 +13,7 @@
         public string Location { get; set; }
         public bool IsWatching { get; set; }
         public bool IsActive { get; set; }
+        public bool IsCompleted { get; set; }
         public Guid CardListId { get; set; }
         public bool IsOverdue { get; set; }
     }

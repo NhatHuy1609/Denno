@@ -24,7 +24,7 @@ namespace server.Strategies.ActionStrategy.BoardActionStrategies
 
         public bool CanHandle(string actionType)
         {
-            return actionType == ActionTypes.CompleteCard;
+            return actionType == ActionTypes.InCompleteCard;
         }
 
         public async Task<DennoAction> Execute(DennoActionContext context)

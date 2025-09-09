@@ -27,8 +27,8 @@ export type BoardReceiveEvents = {
   OnBoardMemberRemoved: () => void
   OnCardListCreated: (newCreatedCardList: cardListTypesDto.CardListResponseDto) => void
   OnCardListUpdated: (newUpdatedCardList: cardListTypesDto.CardListResponseDto) => void
-  OnCardCreated: (newCreatedCard: cardListTypesDto.CardListResponseDto) => void
-  OnCardUpdated: (newUpdatedCard: cardListTypesDto.CardListResponseDto) => void
+  OnCardCreated: (newCreatedCard: cardTypesDto.CardResponseDto) => void
+  OnCardUpdated: (newUpdatedCard: cardTypesDto.CardResponseDto) => void
   OnCardRankUpdated: (
     oldCardListId: string,
     newCardListId: string | null,
