@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using server.Constants;
 using server.Data;
+using server.Dtos.Response.Card;
 using server.Entities;
 using server.Helpers;
 using server.Helpers.LexoRank;
@@ -12,10 +14,14 @@ namespace server.Strategies.ActionStrategy.BoardActionStrategies
     public class AddCardStrategy: IDennoActionStrategy
     {
         private readonly ApplicationDBContext _dbContext;
+        private readonly IMapper _mapper;
 
-        public AddCardStrategy(ApplicationDBContext dbContext)
+        public AddCardStrategy(
+            ApplicationDBContext dbContext,
+            IMapper mapper)
         {
             _dbContext = dbContext;
+            _mapper = mapper;
         }
 
         public bool CanHandle(string actionType)
@@ -34,6 +40,9 @@ namespace server.Strategies.ActionStrategy.BoardActionStrategies
 
             var cardListId = createContext.ListId.Value;
             var newCardName = createContext.CardName;
+
+            var cardList = await _dbContext.CardLists.FindAsync(cardListId);
+            ArgumentNullException.ThrowIfNull(cardList);
 
             var newCard = new Card()
             {
@@ -68,8 +77,10 @@ namespace server.Strategies.ActionStrategy.BoardActionStrategies
                 ActionType = ActionTypes.CreateCard,
                 IsBoardActivity = true,
                 ListId = cardListId,
+                BoardId = cardList.BoardId,
                 Card = newCard,
-                MetaData = JsonHelper.SerializeData(newCard)
+                MetaData = JsonHelper.SerializeData<CardResponseDto>(
+                    _mapper.Map<CardResponseDto>(newCard))
             };
 
             _dbContext.Actions.Add(action);

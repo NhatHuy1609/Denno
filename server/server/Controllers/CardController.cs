@@ -6,12 +6,14 @@ using server.Constants;
 using server.Dtos.Requests.Card;
 using server.Dtos.Response;
 using server.Dtos.Response.Card;
+using server.Dtos.Response.Users;
 using server.Entities;
 using server.Helpers;
 using server.Helpers.LexoRank;
 using server.Hubs.BoardHub;
 using server.Interfaces;
 using server.Models;
+using server.Models.Query;
 using server.Strategies.ActionStrategy.Contexts;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -31,6 +33,7 @@ namespace server.Controllers
         private readonly IActionService _actionService;
         private readonly INotificationRealtimeService _notificationRealtimeService;
         private readonly IHubContext<BoardHub, IBoardHubClient> _boardHubContext;
+        private readonly ICardService _cardService;
 
         public CardController(
             IMapper mapper,
@@ -39,7 +42,8 @@ namespace server.Controllers
             IAuthService authService,
             IActionService actionService,
             INotificationRealtimeService notificationRealtimeService,
-            IHubContext<BoardHub, IBoardHubClient> boardHubContext)
+            IHubContext<BoardHub, IBoardHubClient> boardHubContext,
+            ICardService cardService)
         {
             _mapper = mapper;
             _logger = logger;
@@ -47,6 +51,7 @@ namespace server.Controllers
             _actionService = actionService;
             _notificationRealtimeService = notificationRealtimeService;
             _boardHubContext = boardHubContext;
+            _cardService = cardService;
             _unitOfWork = unitOfWork;
         }
 
@@ -64,6 +69,46 @@ namespace server.Controllers
 
             var cards = await _unitOfWork.Cards.GetCardsByCardListIdAsync(cardListId);
             return Ok(_mapper.Map<List<CardResponseDto>>(cards));
+        }
+
+        [HttpGet("[controller]/{cardId}")]
+        public async Task<IActionResult> GetAsync(Guid cardId, CardQueryModel query)
+        {
+            if (cardId == Guid.Empty)
+            {
+                return BadRequest(new ApiErrorResponse()
+                {
+                    StatusMessage = "cardId can not be null"
+                });
+            }
+
+            var card = await _cardService.GetDetailedCardAsync(cardId, query);
+            var cardResponse = _mapper.Map<CardResponseDto>(card);
+
+            return Ok(cardResponse);
+        }
+
+        [HttpGet("[controller]/{cardId}/members")]
+        public async Task<IActionResult> GetCardMembersAsync(Guid cardId)
+        {
+            if (cardId == Guid.Empty)
+            {
+                return BadRequest(new ApiErrorResponse()
+                {
+                    StatusMessage = "cardId can not be null"
+                });
+            }
+
+            var cardMembers = await _cardService.GetCardMembersAsync(cardId);
+            var cardMembersResponse = new CardMembersResponse()
+            {
+                CardId = cardId,
+                Members = cardMembers.Select(cm => _mapper.Map<GetUserResponseDto>(cm.AppUser)).ToList()
+            };
+
+            _logger.LogInformation($"Successfully got card's members of card-{cardId}");
+
+            return Ok(cardMembersResponse);
         }
 
         [HttpPost("[controller]")]
@@ -97,20 +142,20 @@ namespace server.Controllers
 
             _logger.LogInformation($"Successfully created new card-{requestDto.Name} to list-{requestDto.CardListId}");
 
-            var newCreatedCard = JsonHelper.DeserializeData<Card>(action.MetaData);
-            var newCreatedCardDto = _mapper.Map<CardResponseDto>(newCreatedCard);
+            var newCreatedCardDto = JsonHelper.DeserializeData<CardResponseDto>(action.MetaData);
+            var boardId = action.BoardId!.Value;
 
             try
             {
                 await _boardHubContext.Clients
-                    .Group(SignalRGroupNames.GetBoardGroupName(requestDto.BoardId))
-                    .OnCardCreated(newCreatedCardDto);
+                    .Group(SignalRGroupNames.GetBoardGroupName(boardId))
+                    .OnCardCreated(newCreatedCardDto!);
 
-                _logger.LogInformation($"Successfully published OnCardCreated event to board {requestDto.BoardId}");
+                _logger.LogInformation($"Successfully published OnCardCreated event to board {boardId}");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Failed to publish OnCardCreated event to board {requestDto.BoardId}");
+                _logger.LogError(ex, $"Failed to publish OnCardCreated event to board {boardId}");
             }
 
             return CreatedAtAction(nameof(Create), newCreatedCardDto);
@@ -177,7 +222,7 @@ namespace server.Controllers
 
             var actionContext = new DennoActionContext()
             {
-                CardId = request.CardId,
+                CardId = cardId,
                 MemberCreatorId = _authService.GetCurrentUserId(),
                 TargetUserId = request.AssignedMemberId,
             };
@@ -188,25 +233,28 @@ namespace server.Controllers
             {
                 return BadRequest(new ApiErrorResponse()
                 {
-                    StatusMessage = $"Failed to assign new member to card-{request.CardId}"
+                    StatusMessage = $"Failed to assign new member to card-{cardId}"
                 });
             }
 
-            _logger.LogInformation($"Successfully assigned new member-{request.AssignedMemberId} to card-{request.CardId}");
+            _logger.LogInformation($"Successfully assigned new member-{request.AssignedMemberId} to card-{cardId}");
+
+            var actionMetadata = JsonHelper.DeserializeData<DennoActionContext>(action.MetaData);
+            var boardId = actionMetadata!.BoardId!.Value;
 
             try
             {
                 await _boardHubContext.Clients
-                 .Group(SignalRGroupNames.GetBoardGroupName(request.BoardId))
+                 .Group(SignalRGroupNames.GetBoardGroupName(boardId))
                  .OnCardMemberAssigned();
 
                 _logger.LogInformation(
-                    $"Successfully published OnAssignedCardMember event to board-{request.BoardId}"
+                    $"Successfully published OnAssignedCardMember event to board-{boardId}"
                 );
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Failed to publish OnAssignedCardMember event to board-{request.BoardId}");
+                _logger.LogError(ex, $"Failed to publish OnAssignedCardMember event to board-{boardId}");
             }
 
             return Ok();
@@ -235,19 +283,24 @@ namespace server.Controllers
                 });
             }
 
+            _logger.LogInformation($"Successfully removed member-{request.MemberId} from card-{cardId}");
+
+            var actionMetadata = JsonHelper.DeserializeData<DennoActionContext>(action.MetaData);
+            var boardId = actionMetadata!.BoardId!.Value;
+
             try
             {
                 await _boardHubContext.Clients
-                 .Group(SignalRGroupNames.GetBoardGroupName(request.BoardId))
+                 .Group(SignalRGroupNames.GetBoardGroupName(boardId))
                  .OnCardMemberRemoved();
 
                 _logger.LogInformation(
-                    $"Successfully published OnCardMemberRemoved event to board-{request.BoardId}"
+                    $"Successfully published OnCardMemberRemoved event to board-{boardId}"
                 );
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Failed to publish OnCardMemberRemoved event to board- {request.BoardId}");
+                _logger.LogError(ex, $"Failed to publish OnCardMemberRemoved event to board- {boardId}");
             }
 
             return Ok();
@@ -256,11 +309,11 @@ namespace server.Controllers
         [HttpPut("[controller]/{cardId}/dates")]
         public async Task<IActionResult> UpdateCardDatesAsync(Guid cardId, UpdateCardDatesRequest request)
         {
-            if (cardId == Guid.Empty || request.BoardId == Guid.Empty)
+            if (cardId == Guid.Empty)
             {
                 return BadRequest(new ApiErrorResponse()
                 {
-                    StatusMessage = "cardId or boardId can not be null"
+                    StatusMessage = "cardId can not be null"
                 });
             }
 
@@ -282,22 +335,25 @@ namespace server.Controllers
                 });
             }
 
+            var actionMetadata = JsonHelper.DeserializeData<UpdateCardDatesContext>(action.MetaData);
+            var boardId = actionMetadata!.BoardId!.Value;
+
             var updatedCard = await _unitOfWork.Cards.GetByIdAsync(cardId);
             var updatedCardResponse = _mapper.Map<CardResponseDto>(updatedCard);
 
             try
             {
                 await _boardHubContext.Clients
-                 .Group(SignalRGroupNames.GetBoardGroupName(request.BoardId))
+                 .Group(SignalRGroupNames.GetBoardGroupName(boardId))
                  .OnCardUpdated(updatedCardResponse);
 
                 _logger.LogInformation(
-                    $"Successfully published OnCardUpdated event to board-{request.BoardId}"
+                    $"Successfully published OnCardUpdated event to board-{boardId}"
                 );
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Failed to publish OnCardUpdated event to board- {request.BoardId}");
+                _logger.LogError(ex, $"Failed to publish OnCardUpdated event to board- {boardId}");
             }
 
             return Ok(updatedCardResponse);

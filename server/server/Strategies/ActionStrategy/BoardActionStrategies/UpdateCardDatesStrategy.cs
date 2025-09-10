@@ -1,4 +1,5 @@
-﻿using server.Constants;
+﻿using Microsoft.EntityFrameworkCore;
+using server.Constants;
 using server.Data;
 using server.Entities;
 using server.Helpers;
@@ -33,8 +34,15 @@ namespace server.Strategies.ActionStrategy.BoardActionStrategies
             var updatedCardId = context.CardId;
             var memberCreatorId = context.MemberCreatorId;
 
-            var updatedCard = await _dbContext.Cards.FindAsync(updatedCardId);
+            var updatedCard = await _dbContext.Cards
+                .Include(c => c.CardList)
+                .FirstOrDefaultAsync(c => c.Id == updatedCardId);
             ArgumentNullException.ThrowIfNull(updatedCard);
+
+            var boardId = updatedCard.CardList.BoardId;
+
+            // Update the updatecontext
+            updateContext.BoardId = boardId;
 
             if (!string.IsNullOrEmpty(updateContext.StartDate))
             {
