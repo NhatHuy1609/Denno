@@ -1,6 +1,8 @@
-﻿using server.Constants;
+﻿using Microsoft.EntityFrameworkCore;
+using server.Constants;
 using server.Data;
 using server.Entities;
+using server.Helpers;
 using server.Strategies.ActionStrategy.Contexts;
 using server.Strategies.ActionStrategy.Interfaces;
 
@@ -31,6 +33,14 @@ namespace server.Strategies.ActionStrategy.BoardActionStrategies
             var assigneeId = context.TargetUserId;
             var cardId = context.CardId.Value;
 
+            var card = await _dbContext.Cards
+                .Include(c => c.CardList)
+                .FirstOrDefaultAsync(c => c.Id == cardId);
+            ArgumentNullException.ThrowIfNull(card);
+
+            var boardId = card.CardList.BoardId;
+            context.BoardId = boardId;
+
             var newMember = new CardMember()
             {
                 CardId = cardId,
@@ -42,7 +52,8 @@ namespace server.Strategies.ActionStrategy.BoardActionStrategies
                 ActionType = ActionTypes.AssignCardMember,
                 CardId = cardId,
                 TargetUserId = assigneeId,
-                MemberCreatorId = memberCreatorId
+                MemberCreatorId = memberCreatorId,
+                MetaData = JsonHelper.SerializeData<DennoActionContext>(context)
             };
 
             await _dbContext.CardMembers.AddAsync(newMember);

@@ -7,6 +7,5 @@ namespace server.Dtos.Requests.Card
         [Required]
         public string Name { get; set; }
         public Guid CardListId { get; set; }
-        public Guid BoardId { get; set; }
     }
 }
