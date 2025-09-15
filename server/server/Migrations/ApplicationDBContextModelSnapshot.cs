@@ -371,6 +371,9 @@ namespace server.Migrations
                     b.Property<Guid>("CardListId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime?>("CompleteDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");

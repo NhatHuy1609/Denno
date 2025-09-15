@@ -5,6 +5,7 @@ import { cn } from '@/lib/styles/utils'
 type Props = {
   checked: boolean
   onChange: () => void
+  onClick?: (event: React.MouseEvent<HTMLDivElement>) => void
 }
 
 // sparks với position tối ưu
@@ -30,7 +31,7 @@ const SPARKS_CONFIG = [
   }
 })
 
-export const AnimatedCircleCheckbox = React.forwardRef<HTMLDivElement, Props>(({ checked, onChange }, ref) => {
+export const AnimatedCircleCheckbox = React.forwardRef<HTMLDivElement, Props>(({ checked, onChange, onClick }, ref) => {
   const checkVariants: Variants = {
     checked: {
       pathLength: 1,
@@ -75,13 +76,18 @@ export const AnimatedCircleCheckbox = React.forwardRef<HTMLDivElement, Props>(({
     })
   }
 
+  const handleClickCheckbox = (event: React.MouseEvent<HTMLDivElement>) => {
+    onChange()
+    onClick?.(event)
+  }
+
   return (
     <div
       ref={ref}
       role='checkbox'
       aria-checked={checked}
       tabIndex={0}
-      onClick={onChange}
+      onClick={handleClickCheckbox}
       onKeyDown={(e) => {
         if (e.key === ' ' || e.key === 'Enter') {
           e.preventDefault()

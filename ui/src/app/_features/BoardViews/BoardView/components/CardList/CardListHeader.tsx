@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import { useQueryClient } from '@tanstack/react-query'
-import { useOnClickOutSide } from '@/app/_hooks/useOnClickOutSide'
 import useUpdateCardListMutation from '../../mutations/updateCardList.mutation'
 import { cardListTypesDto } from '@/service/api/cardList'
 import { CardListQueries, cardListSchemas } from '@/entities/cardList'
@@ -9,6 +8,7 @@ import { toastError } from '@/ui'
 import { DraggableSyntheticListeners } from '@dnd-kit/core'
 import { HiOutlineDotsHorizontal } from 'react-icons/hi'
 import PrimaryInputText from '@/app/_components/PrimaryInputText'
+import { useOnClickOutside } from '@/app/_hooks/useOnClickOutSide'
 
 interface IProps {
   cardListData?: cardListSchemas.CardList
@@ -87,7 +87,11 @@ function HeaderName({
     }
   }, [cardListData])
 
-  useOnClickOutSide(inputRef, handleHideInput)
+  useOnClickOutside(inputRef, () => {
+    if (isShowingInput) {
+      handleHideInput()
+    }
+  })
 
   // Auto select input when it is opened
   useEffect(() => {

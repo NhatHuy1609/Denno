@@ -2,10 +2,10 @@ import React, { useRef } from 'react'
 import { cn } from '@/lib/styles/utils'
 import { userSchemas } from '@/entities/user'
 import { useWorkspaceQuery } from '@/app/_hooks/query'
-import { useOnClickOutSide } from '@/app/_hooks/useOnClickOutSide'
 import { Avatar } from '@/ui'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
+import { useOnClickOutside } from '@/app/_hooks/useOnClickOutSide'
 
 interface SearchedUsersResultProps {
   searchedUserData: userSchemas.Users
@@ -25,7 +25,7 @@ function SearchedUsersResult({ searchedUserData, selectUserFn, hideSearchedUsers
   const { users } = searchedUserData
   const { members = [] } = workspace || {}
 
-  useOnClickOutSide(containerRef, () => {
+  useOnClickOutside(containerRef, () => {
     hideSearchedUsersResultFn && hideSearchedUsersResultFn()
   })
 

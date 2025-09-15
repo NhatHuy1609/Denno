@@ -3,8 +3,8 @@ import { cn } from '@/lib/styles/utils'
 import { userSchemas } from '@/entities/user'
 import { useParams } from 'next/navigation'
 import { useWorkspaceQuery } from '@/app/_hooks/query'
-import { useOnClickOutSide } from '@/app/_hooks/useOnClickOutSide'
 import { Avatar } from '@/ui'
+import { useOnClickOutside } from '@/app/_hooks/useOnClickOutSide'
 
 interface SearchedUsersResultProps {
   searchedUserData: userSchemas.Users
@@ -24,7 +24,7 @@ function SearchedUsersResult({ searchedUserData, selectUserFn, hideSearchedUsers
   const { users } = searchedUserData
   const { members = [] } = workspace || {}
 
-  useOnClickOutSide(containerRef, () => {
+  useOnClickOutside(containerRef, () => {
     hideSearchedUsersResultFn && hideSearchedUsersResultFn()
   })
 

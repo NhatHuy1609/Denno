@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using server.Data;
+using server.Dtos.Requests.Card;
 using server.Entities;
 using server.Interfaces;
 using server.Models.Query;
@@ -51,6 +52,8 @@ namespace server.Services
             }
 
             card.IsCompleted = true;
+            card.CompleteDate = DateTime.UtcNow;
+
             _dbContext.Cards.Update(card);
 
             await _dbContext.SaveChangesAsync();
@@ -68,11 +71,31 @@ namespace server.Services
             }
 
             card.IsCompleted = false;
+            card.CompleteDate = null;
+
             _dbContext.Cards.Update(card);
 
             await _dbContext.SaveChangesAsync();
 
             return Result<bool>.Success(true);
+        }
+
+        public async Task<Card?> UpdateCardAsync(Guid cardId, UpdateCardRequest request)
+        {
+            var card = await _dbContext.Cards
+                .Include(c => c.CardList)
+                .FirstOrDefaultAsync(c => c.Id == cardId);
+
+            if (card == null) return null;
+
+            if (!string.IsNullOrWhiteSpace(request.Name))
+            {
+                card.Name = request.Name;
+            }
+
+            await _dbContext.SaveChangesAsync();
+
+            return card;
         }
     }
 }

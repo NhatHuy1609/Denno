@@ -13,6 +13,12 @@ export interface Card {
   isOverDue: boolean
   isCompleted: boolean
   cardListId: string
+
+  memberIds: string[]
 }
 
 export type Cards = Card[]
+
+export type CardQuery = {
+  includeCardList: boolean
+}

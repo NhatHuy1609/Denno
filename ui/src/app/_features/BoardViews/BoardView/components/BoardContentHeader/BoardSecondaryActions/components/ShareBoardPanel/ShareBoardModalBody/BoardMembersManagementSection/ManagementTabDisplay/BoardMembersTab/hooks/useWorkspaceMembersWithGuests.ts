@@ -48,10 +48,6 @@ export const useWorkspaceMembersWithGuests = (workspaceId: string): UseWorkspace
     participants.map((p) => [p.id, p.participantType])
   )
 
-  // console.log('PARTICIPANTS: ', participants)
-  console.log('MEMBERS: ', workspaceMembers)
-  console.log('GUESTS: ', workspaceGuests)
-
   return {
     workspaceParticipants: participants,
     participantTypeMapById

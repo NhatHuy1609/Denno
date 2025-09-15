@@ -2,7 +2,6 @@
 using server.Data;
 using server.Entities;
 using server.Interfaces;
-using System.Linq.Expressions;
 
 namespace server.Repositories
 {
@@ -17,6 +16,7 @@ namespace server.Repositories
             var cardLists = await _context.CardLists
                 .Where(cl => cl.BoardId == boardId)
                 .Include(cl => cl.Cards.OrderBy(c => c.Rank))
+                .ThenInclude(c => c.CardMembers)
                 .OrderBy(cl => cl.Rank)
                 .ToListAsync();
 

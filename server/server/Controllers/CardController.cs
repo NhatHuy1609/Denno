@@ -72,7 +72,7 @@ namespace server.Controllers
         }
 
         [HttpGet("[controller]/{cardId}")]
-        public async Task<IActionResult> GetAsync(Guid cardId, CardQueryModel query)
+        public async Task<IActionResult> GetAsync(Guid cardId, [FromQuery] CardQueryModel query)
         {
             if (cardId == Guid.Empty)
             {
@@ -161,6 +161,44 @@ namespace server.Controllers
             return CreatedAtAction(nameof(Create), newCreatedCardDto);
         }
 
+        [HttpPut("[controller]/{id}")]
+        public async Task<IActionResult> UpdateCardAsync(Guid id, [FromBody] UpdateCardRequest request)
+        {
+            if (id == Guid.Empty)
+            {
+                return BadRequest(new ApiErrorResponse()
+                {
+                    StatusMessage = "cardId can not be null"
+                });
+            }
+
+            var updatedCard = await _cardService.UpdateCardAsync(id, request);
+            var updatedCardResponse = _mapper.Map<CardResponseDto>(updatedCard);
+
+            if (updatedCard != null)
+            {
+                var boardId = updatedCard.CardList.BoardId;
+
+                try
+                {
+                    await _boardHubContext.Clients
+                     .Group(SignalRGroupNames.GetBoardGroupName(boardId))
+                     .OnCardUpdated(updatedCardResponse);
+
+                    _logger.LogInformation(
+                        "Successfully published OnCardUpdated event to board {BoardId}",
+                        boardId
+                    );
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to publish OnCardUpdated event to board {BoardId}", boardId);
+                }
+            }
+
+            return Ok(updatedCardResponse);
+        }
+
         [HttpPut("[controller]/{id}/rank")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> UpdateCardRankAsync(Guid id, [FromBody] UpdateCardRankRequestDto requestDto)
@@ -214,7 +252,7 @@ namespace server.Controllers
             return Ok(updatedCardDto);
         }
 
-        [HttpPost("[controller]/{cardId}/assign")]
+        [HttpPost("[controller]/{cardId}/members/assign")]
         public async Task<IActionResult> AssignCardMemberAsync(Guid cardId, AssignCardMemberRequest request)
         {
             if (!ModelState.IsValid)
@@ -260,7 +298,7 @@ namespace server.Controllers
             return Ok();
         }
         
-        [HttpDelete("[controller]/{cardId}/remove")]
+        [HttpPost("[controller]/{cardId}/members/remove")]
         public async Task<IActionResult> RemoveCardMemberAsync(Guid cardId, RemoveCardMemberRequest request)
         {
             if (!ModelState.IsValid)
