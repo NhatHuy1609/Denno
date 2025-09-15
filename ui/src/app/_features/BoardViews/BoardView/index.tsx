@@ -5,8 +5,8 @@ import BoardViewHeader from './components/BoardContentHeader'
 import { useCardListsOfBoardQuery } from '@/app/_hooks/query/cardList/useCardListsByBoard'
 
 function BoardView() {
-  const { boardId } = useParams()
-  const { data: cardLists, refetch } = useCardListsOfBoardQuery(boardId as string)
+  const { boardId } = useParams<{ boardId: string }>()
+  const { data: cardLists } = useCardListsOfBoardQuery(boardId as string)
 
   return (
     <div className='relative flex h-full flex-1 flex-col overflow-x-auto'>

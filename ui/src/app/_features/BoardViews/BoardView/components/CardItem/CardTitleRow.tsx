@@ -41,7 +41,14 @@ function CardTitleRow({ isHover, cardData }: Props) {
         animate={isChecked || isHover ? { opacity: 1, width: 'auto' } : { opacity: 0, width: 0 }}
         transition={{ duration: 0.35 }}
       >
-        <AnimatedCircleCheckbox checked={isChecked} onChange={handleChangeCheckbox} />
+        <AnimatedCircleCheckbox
+          checked={isChecked}
+          onChange={handleChangeCheckbox}
+          onClick={(event) => {
+            event.preventDefault()
+            event.stopPropagation()
+          }}
+        />
       </motion.div>
 
       <motion.span layout className='text-sm'>

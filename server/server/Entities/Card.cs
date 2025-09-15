@@ -9,6 +9,7 @@
         public string Description { get; set; } = string.Empty;
         public DateOnly? StartDate { get; set; }
         public DateTime? DueDate { get; set; }
+        public DateTime? CompleteDate { get; set; }
         public DateTime? ReminderDate { get; set; }
         public string Location { get; set; } = string.Empty;
         public bool IsWatching { get; set; } = false;

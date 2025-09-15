@@ -46,6 +46,33 @@ namespace server.Controllers
             _boardHubContext = boardHubContext;
         }
 
+        [HttpGet("[controller]/{id}")]
+        public async Task<IActionResult> GetCardListAsync(Guid id)
+        {
+            if (id == Guid.Empty)
+            {
+                return BadRequest(new ApiErrorResponse()
+                {
+                    StatusMessage = "cardList id is required"
+                });
+            }
+
+            var cardList = await _unitOfWork.CardLists.GetByIdAsync(id);
+
+            if (cardList == null)
+            {
+                return NotFound(new ApiErrorResponse()
+                {
+                    StatusMessage = $"cardList-{id} not found"
+                });
+            }
+
+            var cardListResponse = _mapper.Map<CardListResponseDto>(cardList);
+
+            return Ok(cardListResponse);
+        }
+
+
         [HttpPost("[controller]")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<IActionResult> Create(CreateCardListRequestDto request)

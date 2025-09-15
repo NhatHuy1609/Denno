@@ -526,7 +526,7 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
   }
 
   const renderCardItemDragOverlay = (cardId: UniqueIdentifier) => {
-    return <CardItem cardData={cardsMap[cardId]} />
+    return <CardItem cardData={cardsMap[cardId]} isDragging={true} />
   }
 
   return (

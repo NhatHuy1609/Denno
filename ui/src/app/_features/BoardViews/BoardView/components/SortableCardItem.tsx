@@ -26,7 +26,7 @@ function SortableCardItem({ cardData }: Props) {
 
   return (
     <div ref={setNodeRef} style={style} {...listeners}>
-      <CardItem cardData={cardData} />
+      <CardItem cardData={cardData} isDragging={isDragging} />
     </div>
   )
 }

@@ -1,6 +1,6 @@
 import { queryOptions } from '@tanstack/react-query'
 import { CardListService } from '@/service/api/cardList'
-import { transformCardListsDtoToCardLists } from './cardList.lib'
+import { transformCardListDtoToCardList, transformCardListsDtoToCardLists } from './cardList.lib'
 
 export class CardListQueries {
   static readonly keys = {
@@ -14,6 +14,16 @@ export class CardListQueries {
       queryFn: async ({ signal }) => {
         const response = await CardListService.cardListsByBoardQuery({ boardId }, { signal })
         return transformCardListsDtoToCardLists(response.data)
+      }
+    })
+  }
+
+  static cardListQuery(cardListId: string) {
+    return queryOptions({
+      queryKey: [...this.keys.list(), `cardList-[${cardListId}]`] as unknown[],
+      queryFn: async ({ signal }) => {
+        const response = await CardListService.getCardList(cardListId, { signal })
+        return transformCardListDtoToCardList(response.data)
       }
     })
   }

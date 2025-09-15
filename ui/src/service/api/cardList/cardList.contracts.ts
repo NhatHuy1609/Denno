@@ -6,7 +6,7 @@ const CardListDto = z.object({
   name: z.string(),
   rank: z.string(),
   boardId: z.string(),
-  cards: CardsResponseDtoSchema
+  cards: z.lazy(() => CardsResponseDtoSchema)
 })
 
 // Requests
