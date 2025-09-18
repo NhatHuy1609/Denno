@@ -16,6 +16,9 @@ function page() {
     getLocalStorageItem(PersistedStateKey.MeId),
     {
       starredBoards: true
+    },
+    {
+      retry: 3
     }
   )
 
@@ -41,6 +44,14 @@ function page() {
     return (
       <div className='flex w-full items-center justify-center'>
         <WaterFallLoading />
+      </div>
+    )
+  }
+
+  if (boards.length === 0) {
+    return (
+      <div className='mt-10 flex w-full items-center justify-center'>
+        <p className='text-base text-gray-500'>Create workspaces and boards to get started</p>
       </div>
     )
   }

@@ -11,7 +11,7 @@ namespace server.Models.MapperProfile
         {
             CreateMap<Card, CardResponseDto>()
                 .ForMember(dest => dest.IsOverdue,
-                            opt => opt.MapFrom(src => CardHelper.CalculateIsOverdue(src.CompleteDate, src.IsCompleted, src.DueDate)));
+                            opt => opt.MapFrom(src => CardHelper.CalculateIsOverdue(src.DueDate, src.IsCompleted, src.CompleteDate)));
         }
     }
 }

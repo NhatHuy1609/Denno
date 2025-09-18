@@ -14,7 +14,7 @@ const CardBaseDtoSchema = z.object({
   location: z.string(),
   isWatching: z.boolean(),
   isActive: z.boolean(),
-  isOverDue: z.boolean(),
+  isOverdue: z.boolean(),
   isCompleted: z.boolean(),
   cardListId: z.string().uuid(),
 

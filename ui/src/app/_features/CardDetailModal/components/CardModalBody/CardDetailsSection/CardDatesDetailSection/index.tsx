@@ -7,7 +7,7 @@ import { formatDateRange } from '@/utils/formatDateTime'
 
 function CardDatesDetailSection() {
   const { cardData } = useCardDetailModalContext()
-  const { startDate, dueDate, isOverDue, isCompleted } = cardData || {}
+  const { startDate, dueDate, isOverdue, isCompleted } = cardData || {}
 
   if (!startDate && !dueDate) {
     return null
@@ -25,7 +25,7 @@ function CardDatesDetailSection() {
           >
             <span className='text-sm font-semibold text-black'>{formattedCardDates}</span>
             {isCompleted && <span className='rounded bg-green-500 px-2 py-1 text-white'>Completed</span>}
-            {!isCompleted && isOverDue && <span className='rounded bg-red-300 px-2 py-1 text-white'>Overdue</span>}
+            {!isCompleted && isOverdue && <span className='rounded bg-red-500 px-2 py-1 text-white'>Overdue</span>}
           </button>
         )}
         renderContent={(closeFn) => <CardDatesActionPanel onClosePanel={closeFn} />}
