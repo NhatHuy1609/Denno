@@ -7,7 +7,7 @@
         public string Rank { get; set; }
         public string ImageCover { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public DateOnly? StartDate { get; set; }
+        public DateTime? StartDate { get; set; }
         public DateTime? DueDate { get; set; }
         public DateTime? CompleteDate { get; set; }
         public DateTime? ReminderDate { get; set; }

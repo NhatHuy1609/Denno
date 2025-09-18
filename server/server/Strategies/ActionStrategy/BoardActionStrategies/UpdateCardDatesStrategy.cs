@@ -44,15 +44,13 @@ namespace server.Strategies.ActionStrategy.BoardActionStrategies
             // Update the updatecontext
             updateContext.BoardId = boardId;
 
-            if (!string.IsNullOrEmpty(updateContext.StartDate))
-            {
-                updatedCard.StartDate = DateOnly.Parse(updateContext.StartDate);
-            }
+            updatedCard.StartDate = !string.IsNullOrEmpty(updateContext.StartDate) 
+                ? DateTime.Parse(updateContext.StartDate) 
+                : null;
 
-            if (!string.IsNullOrEmpty(updateContext.DueDate))
-            {
-                updatedCard.DueDate = DateTime.Parse(updateContext.DueDate);
-            }
+            updatedCard.DueDate = !string.IsNullOrEmpty(updateContext.DueDate)
+                ? DateTime.Parse(updateContext.DueDate)
+                : null;
 
             var action = new DennoAction()
             {

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import CardActionWrapper from './CardActionWrapper'
 import { LuClock5 } from 'react-icons/lu'
 import CardDatesActionPanel from '../CardActionPanels/CardDatesActionPanel'
@@ -8,10 +8,11 @@ function CardDatesAction() {
     <CardActionWrapper
       icon={<LuClock5 />}
       label='Dates'
-      renderContent={() => <CardDatesActionPanel />}
+      renderContent={(closeFn) => <CardDatesActionPanel onClosePanel={closeFn} />}
       contentConfigs={{
         side: 'right'
       }}
+      contentClassName='w-fit'
     />
   )
 }
