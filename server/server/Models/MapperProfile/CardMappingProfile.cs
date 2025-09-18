@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using server.Dtos.Response.Card;
 using server.Entities;
+using server.Helpers;
 
 namespace server.Models.MapperProfile
 {
@@ -8,7 +9,9 @@ namespace server.Models.MapperProfile
     {
         public CardMappingProfile()
         {
-            CreateMap<Card, CardResponseDto>();
+            CreateMap<Card, CardResponseDto>()
+                .ForMember(dest => dest.IsOverdue,
+                            opt => opt.MapFrom(src => CardHelper.CalculateIsOverdue(src.DueDate, src.IsCompleted, src.CompleteDate)));
         }
     }
 }

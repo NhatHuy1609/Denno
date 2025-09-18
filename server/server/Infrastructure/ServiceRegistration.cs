@@ -43,6 +43,7 @@ namespace server.Infrastructure
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddTransient<IActionService, ActionService>();
             services.AddScoped<IBoardService, BoardService>();
+            services.AddScoped<ICardService, CardService>();
             services.AddScoped<IConnectionManager, ConnectionManagerService>();
 
             services.AddDbContext<ApplicationDBContext>(options =>

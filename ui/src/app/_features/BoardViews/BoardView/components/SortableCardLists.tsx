@@ -37,11 +37,14 @@ import { CardListQueries, cardListSchemas } from '@/entities/cardList'
 import { useParams } from 'next/navigation'
 import { toastError } from '@/ui'
 import { CardQueries, cardSchemas } from '@/entities/card'
-import SortableCardItem from './CardList/SortableCardItem'
-import CardItem from './CardList/CardItem'
+import SortableCardItem from './SortableCardItem'
+import CardItem from './CardItem'
 import useUpdateCardRankMutation from '@/app/_hooks/mutation/card/useUpdateCardRankMutation'
 import { cardTypesDto } from '@/service/api/card'
 import { CardLists } from '@/entities/cardList/cardList.schemas'
+import { useUpdateBoardViewRealtime } from '../hooks/useUpdateBoardViewRealtime'
+import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 
 const dropAnimation: DropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
@@ -105,8 +108,11 @@ interface SortableCardListsProps {
 }
 
 function SortableCardLists({ cardLists }: SortableCardListsProps) {
-  const { boardId } = useParams()
+  const { boardId } = useParams<{ boardId: string }>()
   const queryClient = useQueryClient()
+
+  // Update cards and cardLists data realtime when they have any changes
+  useUpdateBoardViewRealtime({ boardId })
 
   /**
    * Transforms an array of card lists into two lookup maps:
@@ -146,14 +152,6 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
 
       return { previousData, previousLists, previousContainers }
     },
-    onSuccess(data, variables, context) {
-      const { id: updatedCardListId } = data
-      queryClient.setQueryData(CardListQueries.cardListsByBoardQuery(boardId as string).queryKey, (oldData) => {
-        return oldData
-          ?.map((cardList) => (cardList.id === updatedCardListId ? data : cardList))
-          .sort((a, b) => a.rank.localeCompare(b.rank))
-      })
-    },
     onError(error, variables, context) {
       console.error(error)
       const { previousLists, previousContainers } = context
@@ -167,67 +165,9 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
     onMutate() {
       const previousData = queryClient.getQueryData(CardListQueries.cardListsByBoardQuery(boardId as string).queryKey)
       const previousLists = transformCardListsToItems(previousData as cardListSchemas.CardLists)
-
       return { previousLists }
     },
-    onSuccess(data, variables, context) {
-      // Takes cardListId in variables to know whether it has moved to a new cardlist
-      const {
-        updateCardRankDto: { oldCardListId, newCardListId }
-      } = variables
-      const { id: updatedCardId } = data
 
-      queryClient.setQueryData(CardListQueries.cardListsByBoardQuery(boardId as string).queryKey, (oldData) => {
-        if (!oldData) {
-          return []
-        }
-
-        // Clone the data to avoid direct mutations
-        const newData = [...oldData]
-
-        // Takes cardlist container contains the updated card and container's indices
-        const oldContainer = oldData?.find((cardList) => cardList.id === oldCardListId)
-        const oldContainerIndex = oldData?.findIndex((c) => c.id === oldCardListId) as number
-
-        if (oldContainerIndex === -1 || !oldContainer) return newData
-
-        // Creates new cardlist container because of changes in cards of old cardlist
-        if (newCardListId) {
-          const newContainer = oldData?.find((cardList) => cardList.id === newCardListId)
-          const newContainerIndex = oldData?.findIndex((c) => c.id === newCardListId) as number
-
-          if (newContainerIndex === -1 || !newContainer) return newData
-
-          newData[oldContainerIndex] = {
-            ...oldContainer,
-            cards: oldContainer?.cards
-              .filter((card) => card.id !== updatedCardId)
-              .sort((a, b) => a.rank.localeCompare(b.rank))
-          }
-
-          console.log('OLD CONTAINER: ', newData[oldContainerIndex])
-          newData[newContainerIndex] = {
-            ...newContainer,
-            cards: [...(newContainer?.cards as cardSchemas.Cards), data].sort((a, b) => a.rank.localeCompare(b.rank))
-          }
-
-          return newData
-        } else {
-          const updatedContainer = {
-            ...oldContainer,
-            cards: oldContainer?.cards
-              .map((card) => (card.id === updatedCardId ? data : card))
-              .sort((a, b) => a.rank.localeCompare(b.rank))
-          } as cardListSchemas.CardList
-
-          return [
-            ...(oldData?.slice(0, oldContainerIndex) || []),
-            updatedContainer,
-            ...(oldData?.slice(oldContainerIndex + 1) || [])
-          ]
-        }
-      })
-    },
     onError(error, variables, context) {
       console.log(error)
       const { previousLists } = context
@@ -237,16 +177,15 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
   })
 
   // Adding sensors
+  // Constraints: (tolerance, distance, delay)
   const pointerSensor = useSensor(PointerSensor, {
     activationConstraint: {
-      delay: 80,
-      tolerance: 50
+      distance: 10
     }
   })
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: {
-      delay: 80,
-      tolerance: 50
+      distance: 10
     }
   })
   const sensors = useSensors(pointerSensor, mouseSensor)
@@ -435,13 +374,17 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
       const overIndex = containers.indexOf(over.id)
       const isDraggingUpward = activeIndex > overIndex
 
-      let updateCardListRankDto = {} as cardListTypesDto.UpdateCardListRankDto
+      let updateCardListRankDto = {
+        boardId
+      } as cardListTypesDto.UpdateCardListRankDto
       updateCardListRankDto = isDraggingUpward
         ? {
+            ...updateCardListRankDto,
             nextRank: cardListsMap[containers[overIndex]]?.rank,
             previousRank: cardListsMap[containers[overIndex - 1]]?.rank ?? null
           }
         : {
+            ...updateCardListRankDto,
             nextRank: cardListsMap[containers[overIndex + 1]]?.rank ?? null,
             previousRank: cardListsMap[containers[overIndex]]?.rank
           }
@@ -474,12 +417,15 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
     if (activeContainer !== overContainer) {
       // Moving card to a different list
       const overContainerItems = lists[overContainer]
-      let updateCardRankDto = {} as cardTypesDto.UpdateCardRankDto
+      let updateCardRankDto = {
+        boardId
+      } as cardTypesDto.UpdateCardRankDto
 
       // Check if the target container is empty
       if (overContainerItems.length === 0) {
         // Moving to empty list - no previous or next cards
         updateCardRankDto = {
+          ...updateCardRankDto,
           oldCardListId: activeContainer as string,
           newCardListId: overContainer as string,
           nextRank: null,
@@ -493,6 +439,7 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
           // over.id is the container itself (dropping at the end of the list)
           const lastCardInContainer = overContainerItems[overContainerItems.length - 1]
           updateCardRankDto = {
+            ...updateCardRankDto,
             oldCardListId: activeContainer as string,
             newCardListId: overContainer as string,
             nextRank: null,
@@ -510,6 +457,7 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
           }
 
           updateCardRankDto = {
+            ...updateCardRankDto,
             oldCardListId: activeContainer as string,
             newCardListId: overContainer as string,
             nextRank: cardsMap[overContainerItems[overIndex + 1]]?.rank ?? null,
@@ -538,6 +486,7 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
       }))
 
       let updateCardRankDto = {
+        boardId,
         oldCardListId: activeContainer as string,
         newCardListId: null
       } as cardTypesDto.UpdateCardRankDto
@@ -577,7 +526,7 @@ function SortableCardLists({ cardLists }: SortableCardListsProps) {
   }
 
   const renderCardItemDragOverlay = (cardId: UniqueIdentifier) => {
-    return <CardItem cardData={cardsMap[cardId]} />
+    return <CardItem cardData={cardsMap[cardId]} isDragging={true} />
   }
 
   return (

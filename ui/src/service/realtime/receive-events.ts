@@ -1,4 +1,6 @@
 import { notificationTypesDto } from '../api/notification'
+import type { cardListTypesDto } from '../api/cardList'
+import { cardTypesDto } from '../api/card'
 
 export type BaseHubReceiveEvents = {
   Error: (message: string) => void
@@ -22,6 +24,18 @@ export type WorkspaceReceiveEvents = {
 
 export type BoardReceiveEvents = {
   ReceiveMemberRoleChanged: () => void
+  OnBoardMemberRemoved: () => void
+  OnCardListCreated: (newCreatedCardList: cardListTypesDto.CardListResponseDto) => void
+  OnCardListUpdated: (newUpdatedCardList: cardListTypesDto.CardListResponseDto) => void
+  OnCardCreated: (newCreatedCard: cardTypesDto.CardResponseDto) => void
+  OnCardUpdated: (newUpdatedCard: cardTypesDto.CardResponseDto) => void
+  OnCardRankUpdated: (
+    oldCardListId: string,
+    newCardListId: string | null,
+    updatedCardResponse: cardTypesDto.CardResponseDto
+  ) => void
+  OnCardMemberAssigned: () => void
+  OnCardMemberRemoved: () => void
 }
 
 export type HubReceiveEventMap = {

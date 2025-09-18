@@ -1,10 +1,9 @@
-import { CardQueries } from "@/entities/card"
-import { useQuery } from "@tanstack/react-query"
+import { CardQueries, cardSchemas } from '@/entities/card'
+import { ApiQueryOptionsParams } from '../types'
+import { useApiQueryWrapper } from '../useApiQueryWrapper'
 
-interface Params {
-  cardListId: string
-}
+export const useCardsOfCardListQuery = (cardListId: string, options?: ApiQueryOptionsParams<cardSchemas.Cards>) => {
+  const queryOptions = CardQueries.cardsByCardListQuery(cardListId)
 
-export const useCardsByCardList = ({ cardListId}: Params) => {
-  return useQuery(CardQueries.cardsByCardListQuery(cardListId))
+  return useApiQueryWrapper(queryOptions, options)
 }

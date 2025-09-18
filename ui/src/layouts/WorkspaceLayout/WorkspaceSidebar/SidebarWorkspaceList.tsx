@@ -13,6 +13,7 @@ import { useWorkspaceQuery } from '@/app/_hooks/query'
 import useCurrentUserWorkspacesQuery from '@/app/_hooks/query/user/useCurrentUserWorkspacesQuery'
 import { useParams, usePathname } from 'next/navigation'
 import { match } from 'path-to-regexp'
+import WaterFallLoading from '@/app/_components/Loadings/WaterFallLoading'
 
 interface IWorkspaceSubItem {
   title: string
@@ -123,7 +124,15 @@ function SidebarWorkspaceItem({ workspaceId }: { workspaceId: string }) {
 }
 
 function SidebarWorkspaceList() {
-  const { data: workspaces } = useCurrentUserWorkspacesQuery({})
+  const { data: workspaces, isLoading } = useCurrentUserWorkspacesQuery({})
+
+  if (isLoading) {
+    return (
+      <div className='mt-4 flex w-full items-center justify-center'>
+        <WaterFallLoading />
+      </div>
+    )
+  }
 
   return (
     <div className='mt-3 flex w-full flex-col'>
