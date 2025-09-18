@@ -83,13 +83,11 @@ function SignUpGoogleForm() {
           <Controller
             name='avatar'
             control={control}
-            render={({ field: { onChange, ref } }) => (
-              <AvatarInput size='lg' initialImage={avatar} onChange={onChange} ref={ref} />
-            )}
+            render={({ field: { onChange, ref } }) => <AvatarInput size='lg' onChange={onChange} ref={ref} />}
           />
           <p className='text-center'>
-            Hi <span className='font-medium text-sky-500'>{fullName}</span>, complete your account
-            registration by entering a password
+            Hi <span className='font-medium text-sky-500'>{fullName}</span>, complete your account registration by
+            entering a password
           </p>
         </div>
 

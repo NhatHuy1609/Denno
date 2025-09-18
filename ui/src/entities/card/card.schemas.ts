@@ -10,7 +10,7 @@ export interface Card {
   location: string
   isWatching: boolean
   isActive: boolean
-  isOverDue: boolean
+  isOverdue: boolean
   isCompleted: boolean
   cardListId: string
 

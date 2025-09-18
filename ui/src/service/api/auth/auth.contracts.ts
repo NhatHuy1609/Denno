@@ -13,9 +13,9 @@ export const LoginUserDtoSchema = z.object({
     .string({ required_error: 'Email required!' })
     .min(1, { message: 'Email required!' })
     .email({ message: 'This email is invalid' }),
-  password: z 
-    .string({required_error: 'Password required!'})
-    .min(8, {message: 'Password must be 8 characters or longer!'})
+  password: z
+    .string({ required_error: 'Password required!' })
+    .min(8, { message: 'Password must be 8 characters or longer!' })
 })
 
 export const RegisterUserDtoSchema = z.object({
@@ -25,13 +25,13 @@ export const RegisterUserDtoSchema = z.object({
     .email({ message: 'This email is invalid' }),
   fullName: z
     .string({ required_error: 'Full name required!' })
-    .min(1, "Full name required!")
-    .max(50, "Your name is too long"),
+    .min(1, 'Full name required!')
+    .max(50, 'Your name is too long'),
   password: z
     .string({ required_error: 'Password required!' })
     .min(8, { message: 'Password must contain at least 8 character(s)' }),
-  avatar: z.instanceof(File, { message: 'Avatar must be a file' }),
-}).required()
+  avatar: z.instanceof(File, { message: 'Avatar must be a file' })
+})
 
 export const ValidateRegisterUserDtoSchema = z.object({
   email: z.string(),
@@ -65,6 +65,3 @@ export const LoginGoogleResponseDtoSchema = z.object({
   refreshToken: z.string().nullable(),
   userInfo: GetUserResponseDtoSchema
 })
-
-
-

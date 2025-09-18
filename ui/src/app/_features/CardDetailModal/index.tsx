@@ -13,10 +13,11 @@ type Props = {
 }
 
 function CardDetailModal({ boardId, cardId }: Props) {
-  const { data: { card } = {}, refetch: refetchCardQuery } = useCardQuery(cardId)
-  const { data: { members: cardMembers } = {}, refetch: refetchMembersQuery } = useCardMembersQuery(cardId, {
-    staleTime: Infinity
+  const { data: { card } = {}, refetch: refetchCardQuery } = useCardQuery(cardId, undefined, {
+    staleTime: 0,
+    refetchOnMount: true
   })
+  const { data: { members: cardMembers } = {}, refetch: refetchMembersQuery } = useCardMembersQuery(cardId)
 
   const { cardListId = '' } = card || {}
 
