@@ -70,7 +70,7 @@ export const UpdateCardDtoSchema = z
 
 export const UpdateCardDatesDtoSchema = z
   .object({
-    dueDate: z.string().optional(),
-    startDate: z.string().optional()
+    dueDate: z.string().nullable().optional(),
+    startDate: z.string().nullable().optional()
   })
   .describe('UpdateCardDatesDtoSchema')

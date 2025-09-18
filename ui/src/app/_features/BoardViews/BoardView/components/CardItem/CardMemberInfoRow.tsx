@@ -7,12 +7,16 @@ type Props = {
 }
 
 function CardMemberInfoRow({ cardId }: Props) {
-  const { data: cardMembers } = useCardMembersQuery(cardId)
+  const { data: cardMembers } = useCardMembersQuery(cardId, {
+    staleTime: Infinity
+  })
 
   return (
     <div className='flex w-full justify-end'>
       <div className='flex gap-1'>
-        {cardMembers?.members.map((member) => <Avatar size='sm' src={member.avatar} name={member.fullName} />)}
+        {cardMembers?.members.map((member) => (
+          <Avatar size='sm' src={member.avatar} name={member.fullName} key={member.id} />
+        ))}
       </div>
     </div>
   )

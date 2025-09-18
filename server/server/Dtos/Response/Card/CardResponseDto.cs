@@ -10,7 +10,7 @@ namespace server.Dtos.Response.Card
         public string Rank { get; set; }
         public string ImageCover { get; set; }
         public string Description { get; set; }
-        public DateOnly? StartDate { get; set; }
+        public DateTime? StartDate { get; set; }
         public DateTime? DueDate { get; set; }
         public DateTime? ReminderDate { get; set; }
         public DateTime? CompleteDate { get; set; }

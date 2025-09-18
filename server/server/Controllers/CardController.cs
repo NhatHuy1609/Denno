@@ -360,6 +360,7 @@ namespace server.Controllers
                 MemberCreatorId = _authService.GetCurrentUserId(),
                 CardId = cardId,
                 StartDate = request.StartDate,
+
                 DueDate = request.DueDate
             };
 

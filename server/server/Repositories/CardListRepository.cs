@@ -18,6 +18,7 @@ namespace server.Repositories
                 .Include(cl => cl.Cards.OrderBy(c => c.Rank))
                 .ThenInclude(c => c.CardMembers)
                 .OrderBy(cl => cl.Rank)
+                .AsSplitQuery()
                 .ToListAsync();
 
             return cardLists;

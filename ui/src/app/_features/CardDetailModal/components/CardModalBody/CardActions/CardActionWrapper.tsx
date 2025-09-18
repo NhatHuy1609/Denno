@@ -5,7 +5,6 @@ import { useCardDetailModalContext } from '../../../context'
 type Props = {
   icon: React.ReactNode
   label: string
-  renderContent: () => React.ReactNode
 } & Omit<React.ComponentProps<typeof PopoverActionWrapper>, 'renderTrigger'>
 
 function CardActionWrapper({ icon, label, ...props }: Props) {
