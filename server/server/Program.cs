@@ -2,6 +2,7 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using Serilog;
 using server.Authorization.Extensions;
+using server.Data;
 using server.Exceptions;
 using server.Extensions;
 using server.Factories.BoardActivityResponseFactory.Helpers;
@@ -65,6 +66,12 @@ builder.Services.AddSignalR().AddNewtonsoftJsonProtocol(options =>
 builder.Services.AddCustomAuthorization();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
+    await db.Database.EnsureCreatedAsync();
+}
 
 app.UseRouting();
 

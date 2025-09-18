@@ -19,5 +19,12 @@
         public const string UpdateWorkspaceMemberRole = "updateWorkspaceMemberRole";
         public const string RemoveWorkspaceMember = "removeWorkspaceMember";
         public const string RemoveWorkspaceGuest = "removeWorkspaceGuest";
+        public const string CreateCardList = "createCardList";
+        public const string CreateCard = "createCard";
+        public const string AssignCardMember = "assignCardMember";
+        public const string RemoveCardMember = "removeCardMember";
+        public const string UpdateCardDates = "updateCardDates";
+        public const string CompleteCard = "completeCard";
+        public const string InCompleteCard = "IncompleteCard";
     }
 }

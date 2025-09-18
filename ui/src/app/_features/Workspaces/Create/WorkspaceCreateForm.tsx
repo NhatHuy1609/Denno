@@ -2,14 +2,12 @@ import { z } from 'zod'
 import React from 'react'
 import Image from 'next/image'
 import WorkspaceImage from 'public/workspace_create_image.svg'
-import { queryClient } from '@/lib/react-query/query-client'
-import { WorkspaceQueries } from '@/entities/workspace'
-import { workspaceContractsDto, workspaceTypesDto } from '@/service/api/workspace'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, Controller } from 'react-hook-form'
 import useCreateWorkspaceMutation from './create.mutation'
 import { getErrorMessage } from '@/service/api/_getErrorMessage'
 import { ScrollArea, Form, Button, toastSuccess, toastError } from '@/ui'
+import useCurrentUserWorkspacesQuery from '@/app/_hooks/query/user/useCurrentUserWorkspacesQuery'
 
 const FormSchema = z
   .object({
@@ -21,6 +19,8 @@ const FormSchema = z
 type FormValues = z.infer<typeof FormSchema>
 
 function WorkspaceCreateForm() {
+  const { data: workspaces, refetch } = useCurrentUserWorkspacesQuery({})
+
   const {
     reset,
     control,
@@ -41,6 +41,7 @@ function WorkspaceCreateForm() {
     },
     onSuccess: () => {
       toastSuccess('Workspace created successfully')
+      refetch()
     },
     onSettled: () => {
       reset()

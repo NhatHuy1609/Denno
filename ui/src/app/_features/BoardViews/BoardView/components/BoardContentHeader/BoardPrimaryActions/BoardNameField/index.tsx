@@ -2,11 +2,11 @@ import React, { useState, useRef, useEffect } from 'react'
 import { cn } from '@/lib/styles/utils'
 import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import { useBoardQuery } from '@/app/_hooks/query'
-import { useOnClickOutSide } from '@/app/_hooks/useOnClickOutSide'
 import PrimaryInputText from '@/app/_components/PrimaryInputText'
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 import useUpdateBoardMutation from '@/app/_hooks/mutation/board/useUpdateBoardMutation'
 import { toastError, toastSuccess } from '@/ui'
+import { useOnClickOutside } from '@/app/_hooks/useOnClickOutSide'
 
 type Props = {
   enabledEdit?: boolean
@@ -28,7 +28,7 @@ function BoardNameField({ enabledEdit = false }: Props) {
   const inputValue = inputRef.current?.value || ''
 
   // Handle click outside to hide the input and update the board name
-  useOnClickOutSide(inputRef, () => {
+  useOnClickOutside(inputRef, () => {
     if (isShowInput) {
       setIsShowInput(false)
       handleUpdateBoardName()

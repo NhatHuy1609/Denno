@@ -39,7 +39,6 @@ export const CardList = React.memo(
         <CardListProvider value={{ cardListData }}>
           <div className='size-auto'>
             <div ref={ref} style={style} className='flex w-[272px] flex-col gap-2' {...props}>
-              <span className='text-xs'>{cardListData?.id}</span>
               <CardListHeader cardListData={cardListData} listeners={listeners} />
               {children}
               <CardListFooter />

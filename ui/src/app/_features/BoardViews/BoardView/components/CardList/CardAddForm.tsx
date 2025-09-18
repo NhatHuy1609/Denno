@@ -2,7 +2,6 @@ import { z } from 'zod'
 import React, { useEffect, useRef } from 'react'
 import type { cardTypesDto } from '@/service/api/card'
 import { useQueryClient } from '@tanstack/react-query'
-import { useOnClickOutSide } from '@/app/_hooks/useOnClickOutSide'
 import { useForm, Controller } from 'react-hook-form'
 import { useCardListContext } from './context'
 import useCreateCardMutation from '@/app/_hooks/mutation/card/useCreateCardMutation'
@@ -11,7 +10,7 @@ import { toastError } from '@/ui'
 import PrimaryInputText from '@/app/_components/PrimaryInputText'
 import CustomizableButton from '@/ui/components/CustomizableButton'
 import { useParams } from 'next/navigation'
-import { CardListQueries, cardListSchemas } from '@/entities/cardList'
+import { useOnClickOutside } from '@/app/_hooks/useOnClickOutSide'
 
 interface Props {
   hideFormFn: () => void
@@ -33,25 +32,6 @@ function CardAddForm({ hideFormFn }: Props) {
   const { reset, control, handleSubmit } = useForm<FormValues>()
 
   const { mutate: createCard, isPending } = useCreateCardMutation({
-    onMutate() {},
-    onSuccess(data, variables) {
-      const { cardListId, id: cardId } = data
-      queryClient.setQueryData(CardListQueries.cardListsByBoardQuery(boardId as string).queryKey, (oldCardLists) => {
-        // Takes container which contains created card
-        const oldCardListContainer = oldCardLists?.find((cardList) => cardList.id === cardListId)
-        const oldCardListContainerIndex = oldCardLists?.findIndex((cardList) => cardList.id === cardListId) as number
-        const newCardListContainer = {
-          ...oldCardListContainer,
-          cards: [...(oldCardListContainer?.cards || []), data]
-        } as cardListSchemas.CardList
-
-        return [
-          ...(oldCardLists?.slice(0, oldCardListContainerIndex) || []),
-          newCardListContainer,
-          ...(oldCardLists?.slice(oldCardListContainerIndex + 1) || [])
-        ]
-      })
-    },
     onError() {
       toastError('Failed to create new card')
     },
@@ -72,7 +52,7 @@ function CardAddForm({ hideFormFn }: Props) {
     hideFormFn && hideFormFn()
   }
 
-  useOnClickOutSide(formRef, handleHideForm)
+  useOnClickOutside(formRef, handleHideForm)
 
   const onSubmit = (data: FormValues) => {
     if (!cardListData?.id || !data.name) {

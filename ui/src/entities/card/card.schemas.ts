@@ -4,13 +4,21 @@ export interface Card {
   rank: string
   imageCover: string
   description: string
-  startDate: string
-  dueDate: string
-  reminderDate: string
+  startDate: string | null
+  dueDate: string | null
+  reminderDate: string | null
   location: string
   isWatching: boolean
   isActive: boolean
+  isOverdue: boolean
+  isCompleted: boolean
   cardListId: string
+
+  memberIds: string[]
 }
 
 export type Cards = Card[]
+
+export type CardQuery = {
+  includeCardList: boolean
+}
