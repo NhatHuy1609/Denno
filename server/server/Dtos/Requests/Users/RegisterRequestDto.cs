@@ -10,7 +10,6 @@ namespace server.Dtos.Requests.Users
         [Required]
         [EmailAddress]
         public string Email { get; set; }
-        [Required]
-        public IFormFile Avatar { get; set; }
+        public IFormFile? Avatar { get; set; }
     }
 }

@@ -1,9 +1,11 @@
 import { cardListTypesDto } from '@/service/api/cardList'
 import { CardList, CardLists } from './cardList.schemas'
+import { transformCardDtoToCard } from '../card/card.lib'
 
 export function transformCardListDtoToCardList(cardListDto: cardListTypesDto.CardListResponseDto): CardList {
   return {
-    ...cardListDto
+    ...cardListDto,
+    cards: cardListDto.cards.map((c) => transformCardDtoToCard(c))
   }
 }
 

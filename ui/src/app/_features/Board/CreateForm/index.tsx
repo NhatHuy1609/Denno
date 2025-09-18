@@ -41,7 +41,7 @@ function BoardCreateForm({ selectedWorkspaceId }: Props) {
       workspaceId:
         selectedWorkspaceId ||
         getLocalStorageItem(PersistedStateKey.RecentAccessWorkspace) ||
-        userWorkspaces[0].id ||
+        userWorkspaces[0]?.id ||
         '',
       background: PHOTOS_BACKGROUND[0].url
     },

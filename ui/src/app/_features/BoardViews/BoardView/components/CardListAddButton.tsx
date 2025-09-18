@@ -7,9 +7,9 @@ import { RxCross1 } from 'react-icons/rx'
 import { useParams } from 'next/navigation'
 import { useForm, Controller } from 'react-hook-form'
 import { useQueryClient } from '@tanstack/react-query'
-import { useOnClickOutSide } from '@/app/_hooks/useOnClickOutSide'
 import useCreateCardListMutation from '../mutations/createCardList.mutation'
-import { CardListQueries, cardListSchemas } from '@/entities/cardList'
+import { cardListLib, CardListQueries, cardListSchemas } from '@/entities/cardList'
+import { useOnClickOutside } from '@/app/_hooks/useOnClickOutSide'
 
 const CreateCardListFormSchema = z.object({
   name: z.string().min(1)
@@ -36,7 +36,7 @@ function CardListAddForm({ hideForm }: { hideForm: () => void }) {
   const { mutate: createCardList, isPending } = useCreateCardListMutation({
     onSuccess: (data) => {
       queryClient.setQueryData(CardListQueries.cardListsByBoardQuery(boardId as string).queryKey, (old) => {
-        return [...(old as cardListSchemas.CardLists), data]
+        return [...(old as cardListSchemas.CardLists), cardListLib.transformCardListDtoToCardList(data)]
       })
     },
     onSettled: () => {
@@ -46,7 +46,7 @@ function CardListAddForm({ hideForm }: { hideForm: () => void }) {
     }
   })
 
-  useOnClickOutSide(ref, () => {
+  useOnClickOutside(ref, () => {
     hideForm && hideForm()
   })
 
