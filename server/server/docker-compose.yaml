@@ -10,25 +10,99 @@ services:
     depends_on:
       - db
     environment:
-      - ConnectionStrings__DefaultConnection=Server=db,1433;Database=${DB_NAME};User Id=${DB_USER};Password=${DB_PASSWORD};Encrypt=True;TrustServerCertificate=True;
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD};
+      - DB_HOST=db
+      - DB_PORT=5432
+
+      
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
 
+      - KEYVAULT_URL=${KEYVAULT_URL}
+
+      - JWT_KEY=${JWT_KEY}
+      - JWT_ISSUER=${JWT_ISSUER}
+      - JWT_AUDIENCE=${JWT_AUDIENCE}
+
+      - CLOUDINARY_NAME=${CLOUDINARY_NAME}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
+
+      - MAIL_HOST=${MAIL_HOST}
+      - MAIL_EMAIL=${MAIL_EMAIL}
+      - MAIL_PORT=${MAIL_PORT}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - MAIL_DEFAULTCREDENTIALS=${MAIL_DEFAULTCREDENTIALS}
+      - MAIL_USESSL=${MAIL_USESSL}
+
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI}
+      - GOOGLE_AUTH_URL=${GOOGLE_AUTH_URL}
+      - GOOGLE_TOKEN_URL=${GOOGLE_TOKEN_URL}
+      - GOOGLE_USERINFO_URL=${GOOGLE_USERINFO_URL}
+
+      - FRONTEND_BASE_URL=${FRONTEND_BASE_URL}
+      - FRONTEND_EMAIL_CONFIRMATION=${FRONTEND_EMAIL_CONFIRMATION}
+    
+    networks:
+      - denno-net
+
   db:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: sqlserver
+    image: postgres:15-alpine
+    container_name: postgres_db
+    restart: always
     environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
     ports:
-      - "1433:1433"
+      - "5432:5432"
     volumes:
-      - sql_data:/var/opt/mssql
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${DB_PASSWORD} -Q 'SELECT 1' || exit 1"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 20s
       timeout: 10s
       retries: 10
       start_period: 30s
+    networks:
+      - denno-net  
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx_reverse
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/denno-api.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    depends_on:
+      - api
+    networks:
+      - denno-net  
+  
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    entrypoint: >
+      sh -c 'trap exit TERM;
+      while :; do
+        certbot renew --webroot -w /var/www/certbot --quiet --agree-tos;
+        sleep 12h;
+      done'
+    networks:
+      - denno-net
 
 volumes:
-  sql_data:
+  postgres_data:
+
+networks:
+  denno-net:
+    driver: bridge

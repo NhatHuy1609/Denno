@@ -1,4 +1,4 @@
-using Newtonsoft.Json.Converters;
+﻿using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using Serilog;
 using server.Authorization.Extensions;
@@ -65,6 +65,11 @@ builder.Services.AddSignalR().AddNewtonsoftJsonProtocol(options =>
 // Add custom authorization policies
 builder.Services.AddCustomAuthorization();
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(8080); // lắng nghe tất cả IP trên cổng 8080
+});
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -78,7 +83,7 @@ app.UseRouting();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseCors(x => x
     .AllowAnyMethod()
