@@ -9,10 +9,12 @@ import {
 import { InvitationSecret } from '../invitationSecret/invitationSecret.schemas'
 
 export function transformWorkspaceDtoToWorkspace(workspaceDto: workspaceTypesDto.WorkspaceResponseDto): Workspace {
-  const { guests = [] } = workspaceDto
+  const { guests = [], members = [], joinRequests = [] } = workspaceDto
 
   return {
     ...workspaceDto,
+    members,
+    joinRequests,
     guests: guests?.map((guest) => ({
       user: {
         id: guest.user.id,

@@ -59,14 +59,12 @@ export const useCardQueryCacheActions = ({ boardId }: Props) => {
     queryClient.setQueryData(queryKey, (oldData: cardListSchemas.CardList[] | undefined) => {
       if (!oldData) return oldData
 
-      const updatedCard = cardLib.transformCardDtoToCard(data)
-
       return oldData.map((cardList) =>
         cardList.id !== data.cardListId
           ? cardList
           : {
               ...cardList,
-              cards: cardList.cards?.map((card) => (card.id === data.id ? updatedCard : card))
+              cards: cardList.cards?.map((card) => (card.id === data.id ? data : card))
             }
       )
     })
@@ -76,14 +74,12 @@ export const useCardQueryCacheActions = ({ boardId }: Props) => {
     queryClient.setQueryData(queryKey, (oldData: cardListSchemas.CardList[] | undefined) => {
       if (!oldData) return oldData
 
-      const addedCard = cardLib.transformCardDtoToCard(data)
-
       return oldData.map((cardList) =>
         cardList.id !== data.cardListId
           ? cardList
           : {
               ...cardList,
-              cards: [...cardList.cards, addedCard]
+              cards: [...cardList.cards, data]
             }
       )
     })
