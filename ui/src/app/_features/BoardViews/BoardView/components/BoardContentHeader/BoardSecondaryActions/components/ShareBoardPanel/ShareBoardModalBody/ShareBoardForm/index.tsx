@@ -18,7 +18,7 @@ import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 type SearchedUserFilter = Pick<userSchemas.UsersFilterQuery, 'email'>
 
 function ShareBoardForm() {
-  const [boardId, setRecentAccessBoardId] = useSyncedLocalStorage<string>(PersistedStateKey.RecentAccessBoard, '')
+  const [boardId] = useSyncedLocalStorage(PersistedStateKey.RecentAccessBoard, '')
   const queryClient = useQueryClient()
 
   // State to manage selected users for sharing the board

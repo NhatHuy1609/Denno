@@ -15,7 +15,7 @@ import DropdownMenuPrimary, { DropdownMenuPrimaryItemProps } from '@/app/_compon
 import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 
 function ShareBoardWithLink() {
-  const [boardId, setRecentAccessBoardId] = useSyncedLocalStorage<string>(PersistedStateKey.RecentAccessBoard, '')
+  const [boardId] = useSyncedLocalStorage(PersistedStateKey.RecentAccessBoard, '')
   const queryClient = useQueryClient()
 
   const { data: boardInvitationSecret } = useBoardInvitationSecretQuery(boardId, {

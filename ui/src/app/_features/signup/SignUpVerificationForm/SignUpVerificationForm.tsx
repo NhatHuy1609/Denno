@@ -47,7 +47,7 @@ function SignUpVerificationForm() {
     onSuccess: async (response) => {
       if (response.status === 200) {
         messageSuccess('Account registration verification successful.')
-        router.replace('/general')
+        router.replace('/sign-in')
       }
     },
     onError: (error) => {
@@ -86,23 +86,13 @@ function SignUpVerificationForm() {
           <p className='block text-sm text-stone-400'>Please enter the code we emailed you.</p>
           <span className='text-sm'>{email}</span>
         </div>
-        <span
-          className={cn(
-            'mt-4 block text-sm font-medium',
-            `${isFormError ? 'text-red-500' : 'text-black'}`
-          )}
-        >
+        <span className={cn('mt-4 block text-sm font-medium', `${isFormError ? 'text-red-500' : 'text-black'}`)}>
           Confirmation code
         </span>
       </div>
 
       <form className='mt-6 flex flex-col gap-4' onSubmit={handleSubmit(onSubmit)}>
-        <SignUpVerificationOTP
-          setValue={setValue}
-          fieldList={fieldNames}
-          control={control}
-          error={isFormError}
-        />
+        <SignUpVerificationOTP setValue={setValue} fieldList={fieldNames} control={control} error={isFormError} />
         <Button
           block
           primary

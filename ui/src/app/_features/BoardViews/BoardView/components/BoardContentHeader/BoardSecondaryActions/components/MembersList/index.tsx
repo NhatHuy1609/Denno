@@ -7,7 +7,7 @@ import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
 type Props = {}
 
 function MembersList({}: Props) {
-  const [boardId] = useSyncedLocalStorage<string>(PersistedStateKey.RecentAccessBoard, '')
+  const [boardId] = useSyncedLocalStorage(PersistedStateKey.RecentAccessBoard, '')
   const { data: board } = useBoardQuery(boardId, {
     includeBoardMembers: true
   })

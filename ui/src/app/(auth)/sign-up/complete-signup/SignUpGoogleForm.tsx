@@ -41,7 +41,7 @@ function SignUpGoogleForm() {
       const sessionData = sessionStoreLib.transformRegisterResponseDtoToSession(response.data)
       dispatch(updateSession(sessionData))
 
-      router.push('/general')
+      router.push('/sign-in')
     },
     onError: (error) => {
       const { field, message } = authApiLib.getDetailedError(error)

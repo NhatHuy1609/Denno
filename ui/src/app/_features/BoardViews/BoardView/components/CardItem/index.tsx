@@ -37,7 +37,7 @@ function CardItem({ cardData, isDragging = false }: Props) {
       href={`/card/${cardData.id}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className='block w-full rounded-lg border-2 border-transparent bg-white px-3 py-[6px] shadow-[0_1px_1px_rgba(0,0,0,0.15)] hover:border-2 hover:border-blue-500'
+      className='flex w-full flex-col gap-2 rounded-lg border-2 border-transparent bg-white px-3 py-[6px] shadow-[0_1px_1px_rgba(0,0,0,0.15)] hover:border-2 hover:border-blue-500'
     >
       <CardTitleRow isHover={isHover} cardData={cardData} />
       <CardDetailsInfoRow cardData={cardData} />

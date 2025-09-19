@@ -48,6 +48,7 @@ namespace server.Controllers
         }
 
         [HttpPost("login")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -95,6 +96,7 @@ namespace server.Controllers
         }
 
         [HttpPost("register")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -124,6 +126,7 @@ namespace server.Controllers
         }
 
         [HttpGet("login-google")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult GoogleLogin()
@@ -134,6 +137,7 @@ namespace server.Controllers
         }
 
         [HttpPost("google-sign-in")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -185,6 +189,7 @@ namespace server.Controllers
         }
 
         [HttpPost("validate-email")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ValidateEmailRegister([FromBody] ValidateRegisterRequestDto reqDto)
@@ -217,6 +222,7 @@ namespace server.Controllers
         }
 
         [HttpPost("resend-register-code")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

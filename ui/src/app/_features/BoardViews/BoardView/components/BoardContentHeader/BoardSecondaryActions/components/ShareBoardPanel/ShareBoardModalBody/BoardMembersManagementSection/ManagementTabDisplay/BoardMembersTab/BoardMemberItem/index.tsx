@@ -18,7 +18,7 @@ interface BoardMemberItemProps {
 }
 
 function BoardMemberItem({ member, memberRole, workspaceParticipantType }: BoardMemberItemProps) {
-  const [boardId] = useSyncedLocalStorage<string>(PersistedStateKey.RecentAccessBoard, '')
+  const [boardId] = useSyncedLocalStorage(PersistedStateKey.RecentAccessBoard, '')
 
   const { mutateAsync: updateBoardMemberRoleAsync } = useUpdateBoardMemberRole({
     onSuccess: () => {}
