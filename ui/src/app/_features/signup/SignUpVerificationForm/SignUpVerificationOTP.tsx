@@ -9,10 +9,10 @@ import React, {
   useEffect
 } from 'react'
 import { cn } from '@/lib/styles/utils'
-import { FormKeys, FormValues } from './SignUpVerificationForm'
 import { TiWarning } from 'react-icons/ti'
 import type { Control, UseFormSetValue } from 'react-hook-form'
 import { Controller } from 'react-hook-form'
+import { FormKeys, FormValues } from './SignUpVerificationForm'
 
 interface VerificationOTPInputContextProps {
   indexHasChanged: number
@@ -21,13 +21,12 @@ interface VerificationOTPInputContextProps {
   setIndexHasDeleted: Dispatch<SetStateAction<number>>
 }
 
-const VerificationOTPInputContext =
-  createContext<VerificationOTPInputContextProps>({
-    indexHasChanged: -1,
-    indexHasDeleted: 10e7,
-    setIndexHasChanged: () => {},
-    setIndexHasDeleted: () => {}
-  })
+const VerificationOTPInputContext = createContext<VerificationOTPInputContextProps>({
+  indexHasChanged: -1,
+  indexHasDeleted: 10e7,
+  setIndexHasChanged: () => {},
+  setIndexHasDeleted: () => {}
+})
 
 function SignUpVerificationOTPInput({
   index,
@@ -42,17 +41,10 @@ function SignUpVerificationOTPInput({
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const value = useRef<string | undefined>(undefined) // Capture input's value
-  const {
-    indexHasChanged,
-    setIndexHasChanged,
-    indexHasDeleted,
-    setIndexHasDeleted
-  } = useContext(VerificationOTPInputContext) // Capture input's position has changed
+  const { indexHasChanged, setIndexHasChanged, indexHasDeleted, setIndexHasDeleted } =
+    useContext(VerificationOTPInputContext) // Capture input's position has changed
 
-  const handleKeyUpInput = (
-    e: React.KeyboardEvent<HTMLInputElement>,
-    index: number
-  ) => {
+  const handleKeyUpInput = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
     const key = e.key
 
     const isLetter = /^[a-zA-Z]$/.test(key)
@@ -106,9 +98,7 @@ function SignUpVerificationOTPInput({
   }, [indexHasDeleted])
 
   // Handle reset indexHasChanged when click input
-  const handleClickInput = (
-    e: React.MouseEvent<HTMLInputElement, MouseEvent>
-  ) => {
+  const handleClickInput = (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => {
     setIndexHasChanged(10e7)
   }
 
@@ -166,9 +156,7 @@ function SignUpVerificationOTPInputList({
       {error && (
         <div className='mt-2 flex items-center'>
           <TiWarning className='-mt-px text-sm text-red-500' />
-          <span className='text-xs font-medium text-red-500'>
-            Must enter all 4 numbers
-          </span>
+          <span className='text-xs font-medium text-red-500'>Must enter all 4 numbers</span>
         </div>
       )}
     </div>

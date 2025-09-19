@@ -10,10 +10,10 @@ import { authContractsDto, authTypesDto } from '@/service/api/auth'
 import { authApiLib } from '@/service/api/auth'
 import { LuMail, LuUser2, LuLock } from 'react-icons/lu'
 import { Button, Form, messageError, setFixLoading } from '@/ui'
-import SignInGoogleButton from '../../Signin/SignInForm/SignInGoogleButton'
 import AvatarInput from '@/app/(auth)/sign-up/complete-signup/AvatarInput'
 import { getLocalStorageItem, setLocalStorageItem } from '@/utils/local-storage'
 import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
+import SignInGoogleButton from '../../Signin/SignInForm/SignInGoogleButton'
 
 type RegisterUserFormData = authTypesDto.RegisterUserDto
 

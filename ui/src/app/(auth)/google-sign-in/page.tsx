@@ -3,10 +3,10 @@
 import { useEffect } from 'react'
 import { useAppDispatch } from '@/store/hooks'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { useLoginGoogleMutation } from '@/app/_features/Signin/SignInForm'
 import { updateCurrentUser } from '@/store/features/session'
 import { getErrorMessage } from '@/service/api/_getErrorMessage'
 import { messageError, messageInfo, setFixLoading } from '@/ui'
+import { useLoginGoogleMutation } from '@/app/_features/Signin/SignInForm/signin-google.mutation'
 
 const Home = () => {
   const router = useRouter()
