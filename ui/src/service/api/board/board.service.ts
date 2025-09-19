@@ -132,7 +132,7 @@ export class BoardService {
   }
 
   static rejectBoardJoinRequest(requestId: number) {
-    return httpDel(`${this.basePath}/joinRequests//${requestId}/rejection`)
+    return httpDel(`${this.basePath}/joinRequests/${requestId}/rejection`)
   }
 
   static updateBoardMemberRole(data: {

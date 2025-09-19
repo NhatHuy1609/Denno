@@ -24,7 +24,7 @@ const ACCESSIBLE_TABS: {
 export default function ManagementTabs({ tabs, activeTab, handleSelectTab }: ManagementTabsProps) {
   const currentUserRole = useCurrentUserBoardMemberRole()
 
-  const [boardId] = useSyncedLocalStorage<string>(PersistedStateKey.RecentAccessBoard, '')
+  const [boardId] = useSyncedLocalStorage(PersistedStateKey.RecentAccessBoard, '')
   const { data: boardData } = useBoardQuery(boardId, {
     includeBoardMembers: true,
     includeJoinRequests: true

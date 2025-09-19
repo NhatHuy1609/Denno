@@ -5,6 +5,7 @@ import { getLocalStorageItem } from '@/utils/local-storage'
 import { authApiLib } from './auth'
 import { updateSession } from '@/store/features/session'
 import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
+import { redirect } from 'next/navigation' // App Router
 
 // Types
 interface QueuedRequest {
@@ -12,6 +13,7 @@ interface QueuedRequest {
   reject: (error: any) => void
 }
 
+// Global window flags
 declare global {
   interface Window {
     sessionExpiredMessageShown?: boolean
@@ -19,55 +21,58 @@ declare global {
   }
 }
 
-const instance = axios.create({
+// Axios instances
+
+const instance = axios.create({ baseURL: process.env.NEXT_PUBLIC_BE_GATEWAY })
+const refreshInstance = axios.create({ baseURL: process.env.NEXT_PUBLIC_BE_GATEWAY })
+const publicInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BE_GATEWAY
 })
 
-// Tạo instance riêng cho refresh token để tránh circular dependency
-const refreshInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BE_GATEWAY
-})
-
-// Biến để track trạng thái refresh token
+// Refresh token state
 let isRefreshing = false
 let failedQueue: QueuedRequest[] = []
 
-// Process queue khi refresh token thành công/thất bại
-const processQueue = (error: any, token: string | null = null): void => {
-  failedQueue.forEach((prom) => {
-    if (error) {
-      prom.reject(error)
-    } else {
-      prom.resolve(token!)
-    }
-  })
-
+// Process queued requests after refresh token
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach((prom) => (error ? prom.reject(error) : prom.resolve(token!)))
   failedQueue = []
 }
 
+// Helper redirect + message
+const handleSignInRedirect = (message: string, delay = 500) => {
+  if (!window.sessionExpiredMessageShown) {
+    window.sessionExpiredMessageShown = true
+    messageInfo(message)
+    setTimeout(() => {
+      window.sessionExpiredMessageShown = false
+      store.dispatch(updateSession({ token: undefined, refreshToken: undefined }))
+      redirect('/sign-in') // App Router redirect
+    }, delay)
+  }
+}
+
+// Request interceptor: gắn token
 instance.interceptors.request.use(
   (config) => {
     const token = getLocalStorageItem(PersistedStateKey.Token)
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`
-    }
+    if (token) config.headers['Authorization'] = `Bearer ${token}`
     return config
   },
-  (error) => {
-    return Promise.reject(error)
-  }
+  (error) => Promise.reject(error)
 )
 
+// Response interceptor
 instance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config
     const { statusCode, errorType } = authApiLib.getDetailedError(error)
 
-    // Chỉ xử lý 401 với ExpiredToken và chưa retry
+    // === 401 ExpiredToken ===
     if (statusCode === 401 && errorType === 'ExpiredToken' && !originalRequest._retry) {
-      // Nếu đang refresh token, add request vào queue
       if (isRefreshing) {
+        // Nếu đang refresh token, push vào queue
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject })
         })
@@ -75,99 +80,51 @@ instance.interceptors.response.use(
             originalRequest.headers['Authorization'] = `Bearer ${token}`
             return instance(originalRequest)
           })
-          .catch((err) => {
-            return Promise.reject(err)
-          })
+          .catch((err) => Promise.reject(err))
       }
 
+      // Bắt đầu refresh token
       originalRequest._retry = true
       isRefreshing = true
-
       try {
         const token = getLocalStorageItem(PersistedStateKey.Token)
         const refreshToken = getLocalStorageItem(PersistedStateKey.RefreshToken)
+        if (!refreshToken) throw new Error('No refresh token available')
 
-        if (!refreshToken) {
-          throw new Error('No refresh token available')
-        }
-
-        const refreshData = {
-          jwtToken: token,
-          refreshToken
-        }
-
-        // Sử dụng refreshInstance để tránh circular dependency
-        const response = await refreshInstance.post('/auth/refresh', refreshData)
+        const response = await refreshInstance.post('/auth/refresh', { jwtToken: token, refreshToken })
         const { accessToken, refreshToken: newRefreshToken } = response.data
 
-        // Update session
-        store.dispatch(
-          updateSession({
-            token: accessToken,
-            refreshToken: newRefreshToken
-          })
-        )
-
-        // Process queue với token mới
+        store.dispatch(updateSession({ token: accessToken, refreshToken: newRefreshToken }))
         processQueue(null, accessToken)
 
-        // Retry original request với token mới
         originalRequest.headers['Authorization'] = `Bearer ${accessToken}`
         return instance(originalRequest)
       } catch (refreshError) {
-        // Process queue với error
         processQueue(refreshError, null)
-
-        // Clear tokens và redirect
-        store.dispatch(
-          updateSession({
-            token: undefined,
-            refreshToken: undefined
-          })
-        )
-
-        // Chỉ show message một lần
-        if (!window.sessionExpiredMessageShown) {
-          window.sessionExpiredMessageShown = true
-          messageInfo('Your session has expired. Please log in again to continue')
-
-          setTimeout(() => {
-            window.sessionExpiredMessageShown = false
-
-            const currentPath = window.location.pathname
-            if (currentPath !== '/sign-in') {
-              localStorage.setItem(PersistedStateKey.RedirectAfterLogin, currentPath)
-              window.location.href = '/sign-in'
-            }
-          }, 500)
-        }
-
+        handleSignInRedirect('Your session has expired. Please log in again to continue')
         return Promise.reject(refreshError)
       } finally {
         isRefreshing = false
       }
     }
 
-    // Xử lý các lỗi khác
+    // === 401 InvalidToken ===
     if (statusCode === 401 && errorType !== 'ExpiredToken') {
-      // Token không hợp lệ, redirect ngay
-      if (!window.sessionInvalidMessageShown) {
-        window.sessionInvalidMessageShown = true
-        messageError('Invalid session. Please log in again.')
-
-        setTimeout(() => {
-          window.sessionInvalidMessageShown = false
-          window.location.href = '/sign-in'
-        }, 1500)
-      }
+      handleSignInRedirect('Invalid session. Please log in again.', 1500)
     }
 
     return Promise.reject(error)
   }
 )
 
+// Export helpers
 export const req = instance
 export const httpGet = req.get
 export const httpPost = req.post
 export const httpPut = req.put
 export const httpDel = req.delete
+
+export const publicGet = publicInstance.get
+export const publicPost = publicInstance.post
+export const publicPut = publicInstance.put
+export const publicDelete = publicInstance.delete

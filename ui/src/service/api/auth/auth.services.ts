@@ -1,4 +1,4 @@
-import { httpDel, httpGet, httpPost } from '../_req'
+import { httpDel, httpGet, httpPost, publicPost } from '../_req'
 import { AxiosContracts } from '@/lib/axios/AxiosContracts'
 import {
   LoginGoogleDto,
@@ -26,7 +26,7 @@ export class AuthService {
   static loginGoogleMutation(data: { loginGoogleDto: LoginGoogleDto }) {
     const loginGoogleDto = AxiosContracts.requestContract(LoginGoogleDtoSchema, data.loginGoogleDto)
 
-    return httpPost('/auth/google-sign-in', loginGoogleDto)
+    return publicPost('/auth/google-sign-in', loginGoogleDto)
   }
 
   static registerUserMutation(data: { registerUserDto: RegisterUserDto }) {
@@ -36,7 +36,7 @@ export class AuthService {
       formData.append(key, value)
     })
 
-    return httpPost('/auth/register', formData, {
+    return publicPost('/auth/register', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -48,12 +48,12 @@ export class AuthService {
       ValidateRegisterUserDtoSchema,
       data.validateRegisterUserDto
     )
-    return httpPost('/auth/validate-email', validateRegisterUserDto)
+    return publicPost('/auth/validate-email', validateRegisterUserDto)
   }
 
   static loginUserMutation(data: { loginUserDto: LoginUserDto }) {
     const loginUserDto = AxiosContracts.requestContract(LoginUserDtoSchema, data.loginUserDto)
-    return httpPost('/auth/login', loginUserDto)
+    return publicPost('/auth/login', loginUserDto)
   }
 
   static resendRegisterCodeMutation(data: { resendRegisterCodeDto: ResendRegisterCodeDto }) {
@@ -61,7 +61,7 @@ export class AuthService {
       ResendRegisterCodeDtoSchema,
       data.resendRegisterCodeDto
     )
-    return httpPost('auth/resend-register-code', resendRegisterCodeDto)
+    return publicPost('auth/resend-register-code', resendRegisterCodeDto)
   }
 
   static revokeToken() {

@@ -48,7 +48,7 @@ namespace server.Infrastructure
 
             services.AddDbContext<ApplicationDBContext>(options =>
             {
-                options.UseSqlServer(connectionStringConfigName);
+                options.UseNpgsql(connectionStringConfigName);
             });
 
             // Background services

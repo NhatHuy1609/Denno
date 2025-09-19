@@ -6,8 +6,12 @@ import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 import BoardJoinRequestItem from './BoardJoinRequestItem'
 
 function BoardJoinRequestsTab() {
-  const [boardId] = useSyncedLocalStorage<string>(PersistedStateKey.RecentAccessBoard, '')
-  const { data: boardData, isPending } = useBoardQuery(boardId, {
+  const [boardId] = useSyncedLocalStorage(PersistedStateKey.RecentAccessBoard, '')
+  const {
+    data: boardData,
+    isPending,
+    refetch: refetchBoardData
+  } = useBoardQuery(boardId, {
     includeBoardMembers: true,
     includeJoinRequests: true
   })
@@ -28,12 +32,24 @@ function BoardJoinRequestsTab() {
     )
   }
 
+  const onApproveJoinRequest = () => {
+    refetchBoardData()
+  }
+
+  const onRejectJoinRequest = () => {
+    refetchBoardData()
+  }
+
   return (
     <div className='w-full'>
       <ul className='w-full list-none'>
         {joinRequests.map((joinRequest) => (
           <li key={joinRequest.id}>
-            <BoardJoinRequestItem request={joinRequest} />
+            <BoardJoinRequestItem
+              request={joinRequest}
+              onApprove={onApproveJoinRequest}
+              onReject={onRejectJoinRequest}
+            />
           </li>
         ))}
       </ul>

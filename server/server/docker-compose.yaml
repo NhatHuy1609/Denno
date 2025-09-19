@@ -4,6 +4,7 @@ services:
   api:
     image: nhathuy16092003/denno-api:latest
     container_name: denno_api
+    restart: always
     ports:
       - "8080:8080"
     depends_on:

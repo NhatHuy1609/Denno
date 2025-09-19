@@ -12,12 +12,15 @@ import useRejectBoardJoinRequest from '@/app/_hooks/mutation/joinRequest/useReje
 
 interface BoardJoinRequestItemProps {
   request: boardSchemas.BoardJoinRequest
+  onApprove?: () => void
+  onReject?: () => void
 }
 
-function BoardJoinRequestItem({ request }: BoardJoinRequestItemProps) {
+function BoardJoinRequestItem({ request, onApprove, onReject }: BoardJoinRequestItemProps) {
   const { mutateAsync: approveBoardJoinRequestAsync } = useApproveBoardJoinRequest({
     onSuccess: () => {
       toastSuccess('Request approved!')
+      onApprove?.()
     },
     onError: (error) => {
       console.log(error)
@@ -27,6 +30,7 @@ function BoardJoinRequestItem({ request }: BoardJoinRequestItemProps) {
   const { mutateAsync: rejectBoardJoinRequestAsync } = useRejectBoardJoinRequest({
     onSuccess: () => {
       toastSuccess('Request rejected!')
+      onReject?.()
     },
     onError: (error) => {
       console.log(error)
