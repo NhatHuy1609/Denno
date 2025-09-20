@@ -5,6 +5,8 @@ import type { cardSchemas } from '@/entities/card'
 import CardTitleRow from './CardTitleRow'
 import CardMemberInfoRow from './CardMemberInfoRow'
 import CardDetailsInfoRow from './CardDetailsInfoRow'
+import { useSyncedLocalStorage } from '@/app/_hooks/useSyncedLocalStorage'
+import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
 
 type Props = {
   cardData: cardSchemas.Card
@@ -12,6 +14,7 @@ type Props = {
 }
 
 function CardItem({ cardData, isDragging = false }: Props) {
+  const boardId = useSyncedLocalStorage(PersistedStateKey.RecentAccessBoard)
   const [isHover, setIsHover] = useState(false)
 
   useEffect(() => {
@@ -34,7 +37,7 @@ function CardItem({ cardData, isDragging = false }: Props) {
 
   return (
     <Link
-      href={`/card/${cardData.id}`}
+      href={`/board/${boardId}/(cardModal)/card/${cardData.id}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className='flex w-full flex-col gap-2 rounded-lg border-2 border-transparent bg-white px-3 py-[6px] shadow-[0_1px_1px_rgba(0,0,0,0.15)] hover:border-2 hover:border-blue-500'
