@@ -31,7 +31,7 @@ Think of it as a digital whiteboard with lists and cards, where each card repres
 
 - 🌐 **ASP.NET Core**
 - 🗄️ **Entity Framework Core** (ORM)
-- 💾 **SQL Server** as database
+- 🐘 **PostgreSQL** as database
 - 🔐 **ASP.NET Identity** for authentication & authorization
 - ⚡ **SignalR** for real-time communication
 
