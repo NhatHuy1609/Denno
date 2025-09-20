@@ -9,9 +9,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { useAppSelector } from '@/store/hooks'
-import { useValidateRegisterUserMutation } from './verification.mutation'
 import { getErrorMessage } from '@/service/api/_getErrorMessage'
 import { Button, messageError, messageSuccess } from '@/ui'
+import { useValidateRegisterUserMutation } from './verification.mutation'
 import SignUpVerificationOTP from './SignUpVerificationOTP'
 
 const VerificationOTPSchema = z.object({

@@ -6,7 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { updateCurrentUser } from '@/store/features/session'
 import { getErrorMessage } from '@/service/api/_getErrorMessage'
 import { messageError, messageInfo, setFixLoading } from '@/ui'
-import { useLoginGoogleMutation } from '@/app/_features/Signin/SignInForm/signin-google.mutation'
+import { useLoginGoogleMutation } from '@/app/_features/SignIn/SignInForm/signin-google.mutation'
 
 const Home = () => {
   const router = useRouter()

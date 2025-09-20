@@ -6,14 +6,14 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useAppSelector } from '@/store/hooks'
 import { useForm, Controller } from 'react-hook-form'
-import { useLoginMutation } from './signin.mutation'
 import { authTypesDto, authContractsDto, authApiLib } from '@/service/api/auth'
 import { LuMail, LuLock } from 'react-icons/lu'
 import { Form, Button, messageError, messageInfo } from '@/ui'
-import SignInGoogleButton from './SignInGoogleButton'
 import { getLocalStorageItem, setLocalStorageItem } from '@/utils/local-storage'
 import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
-import { useResendCodeMutation } from '../../Signup/SignUpVerificationForm/resendcode.mutation'
+import { useResendCodeMutation } from '../../SignUp/SignUpVerificationForm/resendcode.mutation'
+import { useLoginMutation } from './signin.mutation'
+import SignInGoogleButton from './SignInGoogleButton'
 
 type SignInFormValues = authTypesDto.LoginUserDto
 

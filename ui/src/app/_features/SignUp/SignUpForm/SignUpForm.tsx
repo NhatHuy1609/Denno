@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useForm, Controller } from 'react-hook-form'
-import { useRegisterUserMutation } from './signup.mutation'
 import { authContractsDto, authTypesDto } from '@/service/api/auth'
 import { authApiLib } from '@/service/api/auth'
 import { LuMail, LuUser2, LuLock } from 'react-icons/lu'
@@ -13,7 +12,8 @@ import { Button, Form, messageError, setFixLoading } from '@/ui'
 import AvatarInput from '@/app/(auth)/sign-up/complete-signup/AvatarInput'
 import { getLocalStorageItem, setLocalStorageItem } from '@/utils/local-storage'
 import { PersistedStateKey } from '@/data/local-storage/persisted-keys'
-import SignInGoogleButton from '../../Signin/SignInForm/SignInGoogleButton'
+import SignInGoogleButton from '../../SignIn/SignInForm/SignInGoogleButton'
+import { useRegisterUserMutation } from '@/app/_features/SignUp/SignUpForm/signup.mutation'
 
 type RegisterUserFormData = authTypesDto.RegisterUserDto
 

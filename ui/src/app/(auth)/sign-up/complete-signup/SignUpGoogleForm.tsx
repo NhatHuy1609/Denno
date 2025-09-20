@@ -8,10 +8,10 @@ import { authApiLib, authTypesDto } from '@/service/api/auth'
 import { useAppSelector, useAppDispatch } from '@/store/hooks'
 import { sessionStoreLib, updateSession } from '@/store/features/session'
 import { useForm, Controller } from 'react-hook-form'
-import { useRegisterUserMutation } from '../../../_features/Signup/SignUpForm/signup.mutation'
 import { LuLock } from 'react-icons/lu'
 import { Button, Form, messageError } from '@/ui'
 import AvatarInput from './AvatarInput'
+import { useRegisterUserMutation } from '@/app/_features/SignUp/SignUpForm/signup.mutation'
 
 const SignUpGoogleSchema = z.object({
   password: z
