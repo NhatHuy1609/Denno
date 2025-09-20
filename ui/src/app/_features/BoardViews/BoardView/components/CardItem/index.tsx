@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import type { cardSchemas } from '@/entities/card'
 import CardTitleRow from './CardTitleRow'
 import CardMemberInfoRow from './CardMemberInfoRow'
@@ -14,6 +14,7 @@ type Props = {
 }
 
 function CardItem({ cardData, isDragging = false }: Props) {
+  const router = useRouter()
   const [boardId] = useSyncedLocalStorage(PersistedStateKey.RecentAccessBoard)
   const [isHover, setIsHover] = useState(false)
 
@@ -35,10 +36,16 @@ function CardItem({ cardData, isDragging = false }: Props) {
     }
   }
 
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    router.push(`/card/${cardData.id}`)
+  }
+
   return (
-    <Link
+    <button
+      onClick={handleClick}
       // href={`/board/${boardId}/card/${cardData.id}`}
-      href={`/card/${cardData.id}`}
+      // href={`/card/${cardData.id}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className='flex w-full flex-col gap-2 rounded-lg border-2 border-transparent bg-white px-3 py-[6px] shadow-[0_1px_1px_rgba(0,0,0,0.15)] hover:border-2 hover:border-blue-500'
@@ -46,7 +53,7 @@ function CardItem({ cardData, isDragging = false }: Props) {
       <CardTitleRow isHover={isHover} cardData={cardData} />
       <CardDetailsInfoRow cardData={cardData} />
       <CardMemberInfoRow cardId={cardData.id} />
-    </Link>
+    </button>
   )
 }
 
