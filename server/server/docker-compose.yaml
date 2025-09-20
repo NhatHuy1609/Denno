@@ -6,45 +6,40 @@ services:
     container_name: denno_api
     restart: always
     ports:
-      - "8080:8080"
+      - '8080:8080'
     depends_on:
       - db
     environment:
-      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD};
-      - DB_HOST=db
-      - DB_PORT=5432
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD}
 
-      
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
 
-      - KEYVAULT_URL=${KEYVAULT_URL}
+      - Jwt__Key=${JWT_KEY}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
 
-      - JWT_KEY=${JWT_KEY}
-      - JWT_ISSUER=${JWT_ISSUER}
-      - JWT_AUDIENCE=${JWT_AUDIENCE}
+      - CloudinarySettings__CloudName=${CLOUDINARY_NAME}
+      - CloudinarySettings__ApiKey=${CLOUDINARY_API_KEY}
+      - CloudinarySettings__ApiSecret=${CLOUDINARY_API_SECRET}
 
-      - CLOUDINARY_NAME=${CLOUDINARY_NAME}
-      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
-      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
+      - MailSettings__Host=${MAIL_HOST}
+      - MailSettings__EmailId=${MAIL_EMAIL}
+      - MailSettings__Port=${MAIL_PORT}
+      - MailSettings__UserName=${MAIL_USERNAME}
+      - MailSettings__Password=${MAIL_PASSWORD}
+      - MailSettings__DefaultCredentials=${MAIL_DEFAULTCREDENTIALS}
+      - MailSettings__UseSSL=${MAIL_USESSL}
 
-      - MAIL_HOST=${MAIL_HOST}
-      - MAIL_EMAIL=${MAIL_EMAIL}
-      - MAIL_PORT=${MAIL_PORT}
-      - MAIL_USERNAME=${MAIL_USERNAME}
-      - MAIL_PASSWORD=${MAIL_PASSWORD}
-      - MAIL_DEFAULTCREDENTIALS=${MAIL_DEFAULTCREDENTIALS}
-      - MAIL_USESSL=${MAIL_USESSL}
+      - Authentication__Google__ClientId=${GOOGLE_CLIENT_ID}
+      - Authentication__Google__ClientSecret=${GOOGLE_CLIENT_SECRET}
+      - Authentication__Google__RedirectUri=${GOOGLE_REDIRECT_URI}
+      - Authentication__Google__AuthUrl=${GOOGLE_AUTH_URL}
+      - Authentication__Google__TokenUrl=${GOOGLE_TOKEN_URL}
+      - Authentication__Google__UserInfoUrl=${GOOGLE_USERINFO_URL}
 
-      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-      - GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI}
-      - GOOGLE_AUTH_URL=${GOOGLE_AUTH_URL}
-      - GOOGLE_TOKEN_URL=${GOOGLE_TOKEN_URL}
-      - GOOGLE_USERINFO_URL=${GOOGLE_USERINFO_URL}
+      - FrontendUrls__BaseUrl=${FRONTEND_BASE_URL}
+      - FrontendUrls__EmailConfirmation=${FRONTEND_EMAIL_CONFIRMATION}
 
-      - FRONTEND_BASE_URL=${FRONTEND_BASE_URL}
-      - FRONTEND_EMAIL_CONFIRMATION=${FRONTEND_EMAIL_CONFIRMATION}
-    
     networks:
       - denno-net
 
@@ -57,48 +52,48 @@ services:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER} -d ${DB_NAME}']
       interval: 20s
       timeout: 10s
       retries: 10
       start_period: 30s
     networks:
-      - denno-net  
-
-  nginx:
-    image: nginx:alpine
-    container_name: nginx_reverse
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/denno-api.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
-    depends_on:
-      - api
-    networks:
-      - denno-net  
-  
-  certbot:
-    image: certbot/certbot
-    container_name: certbot
-    volumes:
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
-    entrypoint: >
-      sh -c 'trap exit TERM;
-      while :; do
-        certbot renew --webroot -w /var/www/certbot --quiet --agree-tos;
-        sleep 12h;
-      done'
-    networks:
       - denno-net
+
+  # nginx:
+  #   image: nginx:alpine
+  #   container_name: nginx_reverse
+  #   restart: unless-stopped
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./nginx/denno-api.conf:/etc/nginx/conf.d/default.conf:ro
+  #     - ./certbot/conf:/etc/letsencrypt
+  #     - ./certbot/www:/var/www/certbot
+  #   depends_on:
+  #     - api
+  #   networks:
+  #     - denno-net
+
+  # certbot:
+  #   image: certbot/certbot
+  #   container_name: certbot
+  #   volumes:
+  #     - ./certbot/conf:/etc/letsencrypt
+  #     - ./certbot/www:/var/www/certbot
+  #   entrypoint: >
+  #     sh -c 'trap exit TERM;
+  #     while :; do
+  #       certbot renew --webroot -w /var/www/certbot --quiet --agree-tos;
+  #       sleep 12h;
+  #     done'
+  #   networks:
+  #     - denno-net
 
 volumes:
   postgres_data:

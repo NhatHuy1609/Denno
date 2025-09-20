@@ -5,22 +5,20 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <InvariantGlobalization>false</InvariantGlobalization>
-	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-	<GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
-	<LangVersion>preview</LangVersion>
-	<UserSecretsId>ed0f839e-6821-41e1-947f-f135c9e7a2d2</UserSecretsId>
-	<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    <LangVersion>preview</LangVersion>
+    <UserSecretsId>ed0f839e-6821-41e1-947f-f135c9e7a2d2</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+	<EnableDefaultContentItems>false</EnableDefaultContentItems>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Content Remove="Helpers\HtmlTemplates\LatestNewsEmailTemplate.cshtml" />
-    <Content Remove="Helpers\HtmlTemplates\NotificationTemplate.cshtml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Helpers\HtmlTemplates\LatestNewsEmailTemplate.cshtml" />
-    <None Include="Helpers\HtmlTemplates\NotificationTemplate.cshtml" />
-  </ItemGroup>
+    <ItemGroup>
+	    <Content Include="Helpers\HtmlTemplates\**\*.*">
+		    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		    <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+	    </Content>
+    </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Asp.Versioning.Mvc" Version="8.1.0" />
