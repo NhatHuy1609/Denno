@@ -85,12 +85,12 @@ app.UseSwaggerUI();
 
 //app.UseHttpsRedirection();
 
+var frontendBaseUrl = builder.Configuration["FrontendUrls:BaseUrl"];
 app.UseCors(x => x
     .AllowAnyMethod()
     .AllowAnyHeader()
     .AllowCredentials()
-    //.WithOrigins("https://localhost:3000")
-    .SetIsOriginAllowed(origin => true)
+    .WithOrigins(frontendBaseUrl!)
 );
 
 app.UseAuthentication();
