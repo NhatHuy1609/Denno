@@ -14,7 +14,7 @@ type Props = {
 }
 
 function CardItem({ cardData, isDragging = false }: Props) {
-  const boardId = useSyncedLocalStorage(PersistedStateKey.RecentAccessBoard)
+  const [boardId] = useSyncedLocalStorage(PersistedStateKey.RecentAccessBoard)
   const [isHover, setIsHover] = useState(false)
 
   useEffect(() => {
