@@ -53,8 +53,7 @@ namespace server.Data
                 .HasForeignKey<UserVisibilitySettings>(v => v.Id);
 
             modelBuilder.Entity<Workspace>()
-                .HasKey(e => e.Id)
-                .IsClustered(false);
+                .HasKey(e => e.Id);
 
             modelBuilder.Entity<Workspace>()
                 .HasOne(w => w.Logo)
@@ -76,8 +75,7 @@ namespace server.Data
                 .OnDelete(DeleteBehavior.ClientCascade);
 
             modelBuilder.Entity<Board>()
-                .HasKey(e => e.Id)
-                .IsClustered(false);
+                .HasKey(e => e.Id);
 
             modelBuilder.Entity<BoardMember>()
                 .HasKey(e => new { e.BoardId, e.AppUserId });
@@ -97,8 +95,7 @@ namespace server.Data
                 .HasKey(e => new { e.BoardId, e.RestrictionId });
 
             modelBuilder.Entity<Card>()
-                .HasKey(e => e.Id)
-                .IsClustered(false);
+                .HasKey(e => e.Id);
 
             modelBuilder.Entity<Card>()
                 .Property(e => e.Description)
@@ -128,16 +125,13 @@ namespace server.Data
                 .OnDelete(DeleteBehavior.ClientCascade);
 
             modelBuilder.Entity<BoardLabel>()
-                .HasKey(e => e.Id)
-                .IsClustered(false);
+                .HasKey(e => e.Id);
 
             modelBuilder.Entity<CardCheckList>()
-                .HasKey(e => e.Id)
-                .IsClustered(false);
+                .HasKey(e => e.Id);
 
             modelBuilder.Entity<CardCheckListItem>()
-                .HasKey(e => e.Id)
-                .IsClustered(false);
+                .HasKey(e => e.Id);
 
             modelBuilder.Entity<CardCheckListItem>()
                 .HasOne(e => e.Asignee)
@@ -146,16 +140,14 @@ namespace server.Data
                 .OnDelete(DeleteBehavior.ClientCascade);
 
             modelBuilder.Entity<CardAttachment>()
-                .HasKey(e => e.Id)
-                .IsClustered(false);
+                .HasKey(e => e.Id);
 
             modelBuilder.Entity<CardAttachment>()
                 .Property(e => e.FileLink)
                 .HasColumnType("text");
 
             modelBuilder.Entity<CardComment>()
-                .HasKey(e => e.Id)
-                .IsClustered(false);
+                .HasKey(e => e.Id);
 
             modelBuilder.Entity<CardComment>()
                 .Property(e => e.Comment)
